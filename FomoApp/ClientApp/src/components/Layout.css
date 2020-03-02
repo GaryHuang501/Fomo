@@ -1,0 +1,102 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+
+#root {
+    height: 100%;
+    width: 100%;
+    --dark-picton-blue: #199de5;
+    --picton-blue: #22A7F0;
+    --dodger-blue: #19B5FE;
+    --pumice: #d9d9d9;
+    --pumice-light: #e5e5e5;
+    --red-grey: #eff0f1;
+    --header-logo-padding-sides: 7px;
+}
+
+#rootWrapper {
+    height: 100%;
+    width: 100%;
+}
+
+#layout-root {
+    display: grid;
+    grid-column-gap: 20px;
+    min-height: 100%;
+    box-sizing: border-box;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-columns: repeat(12, minmax(auto, 1fr));
+}
+
+#layout-header-logo {
+    background-color: var(--picton-blue);
+    grid-column: 1 / 13;
+    grid-row: 1 / 2;
+    grid-template-columns: inherit;
+    display: grid;
+    align-items: center;
+    height: 40px;
+    padding-left: var(--header-logo-padding-left);
+}
+
+#layout-header-logo #header-logo {
+    grid-column: 2 / 3;
+    color: white;
+}
+
+#layout-nav-header {
+    background-color: var(--dodger-blue);
+    display: grid;
+    grid-template-columns: inherit;
+    grid-column: 1 / 13;
+    grid-row: 2 / 3;
+    height: 35px;
+}
+
+#layout-overview-bar {
+    display: grid;
+    grid-template-columns: inherit;
+    grid-row: 3 / 4;
+    grid-column: 1 / 13;
+    border-bottom: 1px solid mistyrose;
+    margin-bottom: 10px;
+    height: 100px;
+}
+
+#layout-leftsidebar {
+    grid-column: 1/ 3;
+    grid-row: 4 / 5;
+}
+
+#layout-content {
+    grid-column: 2 / 11;
+    grid-row: 4 / 5;
+    min-height: 800px;
+    margin-bottom: 10px;
+}
+
+#layout-rightsidebar {
+    grid-column: 11 / 13;
+}
+
+#layout-footer {
+    grid-column: 1 / 13;
+    grid-row: 5 / 6;
+    height: 80px;
+    background-color: var(--picton-blue);
+}
+
+.layout-border {
+    border: 1px solid var(--pumice);
+    border-top: 1px solid var(--pumice-light);
+}

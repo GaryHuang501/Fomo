@@ -1,0 +1,28 @@
+﻿
+#nav-header-items {
+    grid-column: 2 / 13;
+    color: white;
+    display: flex;
+    overflow: hidden;
+}
+
+.nav-header-item {
+    margin-right: 15px;
+    display: block;
+    height: 100%;
+    padding: 15px var(--header-logo-padding-sides) 0 var(--header-logo-padding-sides);
+    box-sizing: border-box;
+}
+
+#nav-header-items a {
+    text-decoration: none;
+}
+
+.nav-header-item-selected {
+    background-color: var(--dark-picton-blue);
+}
+
+#nav-header-items a:visited {
+    color: white;
+}
+

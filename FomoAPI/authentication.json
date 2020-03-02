@@ -1,0 +1,8 @@
+﻿{
+  "Authentication": {
+    "Google": {
+      "ClientId": "889322570796-msaguv1cibfealr9r8h15f8ip36p7tj2.apps.googleusercontent.com",
+      "ClientSecret": "dFWFw1MGE6hfnLjyLWd3cgun"
+    }
+  }
+}

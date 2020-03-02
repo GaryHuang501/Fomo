@@ -1,0 +1,57 @@
+{
+  "name": "WebApplication12",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "react": "^16.0.0",
+    "react-bootstrap": "^0.31.5",
+    "react-dom": "^16.0.0",
+    "react-redux": "^5.0.7",
+    "react-router-bootstrap": "^0.24.4",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.0.17",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.5.3",
+    "redux-thunk": "^2.3.0",
+    "rimraf": "^2.6.2"
+  },
+  "scripts": {
+    "start": "rimraf ./build && react-scripts start",
+    "build": "react-scripts build",
+    "test": "jest",
+    "test-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "babel-jest": "^23.6.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.7.0",
+    "fetch-mock": "^7.2.5",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^23.6.0",
+    "node-fetch": "^2.3.0",
+    "react-test-render": "^1.1.1",
+    "react-test-renderer": "^16.6.0",
+    "watchman": "^1.0.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy"
+    },
+    "setupTestFrameworkScriptFile": "<rootDir>/test-setup.js"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ]
+  }
+}
