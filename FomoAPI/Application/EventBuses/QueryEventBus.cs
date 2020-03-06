@@ -11,8 +11,8 @@ namespace FomoAPI.Application.EventBuses
 {
     /// <summary>
     /// Thread-Safe Singleton class that will run the queries in the queue and save the results into a store (eg. cache)
-    /// Every scheduler run should reset the number of queries allowed per minute
-    /// since Alphavantage allows only an x Amount of api calls per minute.
+    /// Every scheduler run should reset the number of queries allowed per Interval
+    /// since Alphavantage allows only an x Amount of api calls per Interval.
     /// </summary>
     public class QueryEventBus : IQueryEventBus
     {
@@ -23,11 +23,11 @@ namespace FomoAPI.Application.EventBuses
         private readonly QuerySubscriptions _querySubscriptions;
         private readonly object _queriesExecutedCounterLock;
 
-        private int _maxQueryPerMinuteThreshold;
+        private int _maxQueryPerIntervalThreshold;
         private int _queriesExecutedCounter;
 
         public QueryEventBus(QueryPrioritySet queryQueue,
-                             QueryExecutorContextRegistry queryExecutorContextRegistry,
+                             IQueryExecutorContextRegistry queryExecutorContextRegistry,
                              IQueuePriorityRule queuePriorityRule,
                              ILogger<QueryEventBus> logger,
                              QuerySubscriptions querySubscriptions)
@@ -41,14 +41,14 @@ namespace FomoAPI.Application.EventBuses
         }
 
         /// <summary>
-        /// Set the max query that can be run per minute. 
+        /// Set the max query that can be run per Interval. 
         /// </summary>
         /// <remarks>If some queries get delayed from running on the previous interval, this will prevent too many
         /// queries from being run on the next in</remarks>
-        /// <param name="maxQueryPerMinuteThreshold">Max number of queries per minute allowed by the Data API</param>
-        public void SetMaxQueryPerMinuteThreshold(int maxQueryPerMinuteThreshold)
+        /// <param name="maxQueryPerIntervalThreshold">Max number of queries per Interval allowed by the Data API</param>
+        public void SetMaxQueryPerIntervalThreshold(int maxQueryPerIntervalThreshold)
         {
-            _maxQueryPerMinuteThreshold = maxQueryPerMinuteThreshold;
+            _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
         }
 
         public void ResetQueryExecutedCounter()
@@ -70,7 +70,7 @@ namespace FomoAPI.Application.EventBuses
                     queryEnqueueCount++;
                 }
 
-                if (queryEnqueueCount >= _maxQueryPerMinuteThreshold)
+                if (queryEnqueueCount >= _maxQueryPerIntervalThreshold)
                 {
                     break;
                 }
@@ -80,14 +80,14 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// Executes the queries in the QuerySubscriptions in priority 
         /// and saves the data in the cache and runs any result triggers for each query context.
-        /// Function will exit when the allowed query per minute executed threshold has been exceeded.
+        /// Function will exit when the allowed query per Interval executed threshold has been exceeded.
         /// </summary>
         /// <returns>Task to await</returns>
         public async Task ExecutePendingQueriesAsync()
         {
             _logger.LogTrace($"Fetching query priority list");
 
-            var queriesToExecute = _queryQueue.Take(_maxQueryPerMinuteThreshold);
+            var queriesToExecute = _queryQueue.Take(_maxQueryPerIntervalThreshold);
 
             _logger.LogInformation($"{queriesToExecute.Count()} queries pended up");
 
@@ -101,15 +101,16 @@ namespace FomoAPI.Application.EventBuses
             {
                 _logger.LogTrace($"Executing query {query.Symbol}");
 
-  
                 var executorContext = _queryExecutorContextRegistry.GetExecutorContext(query);
 
                 // lock to prevent race condition where 2 queries get executed at same time
-                // when the counter is one less than the maximum
+                // when the counter is one less than the maximum. 
+                // This can happen if the scheduler schedules another run but the previous run's
+                // task gets delayed and overlaps the current run.
                 lock (_queriesExecutedCounterLock)
                 {
                     _queriesExecutedCounter++;
-                    if (_queriesExecutedCounter >= _maxQueryPerMinuteThreshold) return;
+                    if (_queriesExecutedCounter >= _maxQueryPerIntervalThreshold) return;
                 }
 
                 var queryResult = await FetchQueryResultAsync(executorContext, query);
@@ -120,7 +121,7 @@ namespace FomoAPI.Application.EventBuses
                 // so it can be requeued again when the data is stale
                 _queryQueue.Remove(query);
 
-                await ExecuteQueryResultTrigers(executorContext, queryResult);
+                await ExecuteQueryResultTriggers(executorContext, queryResult);
 
                 _logger.LogTrace($"Finished processing query {query.Symbol}");
 
@@ -145,7 +146,7 @@ namespace FomoAPI.Application.EventBuses
             return queryResult;
         }
 
-        private async Task ExecuteQueryResultTrigers(IQueryExecutorContext<ISubscribableQuery, ISubscriptionQueryResult> executorContext, ISubscriptionQueryResult result)
+        private async Task ExecuteQueryResultTriggers(IQueryExecutorContext<ISubscribableQuery, ISubscriptionQueryResult> executorContext, ISubscriptionQueryResult result)
         {
             var queryResultTriggers = executorContext.GetQueryResultTriggers();
 

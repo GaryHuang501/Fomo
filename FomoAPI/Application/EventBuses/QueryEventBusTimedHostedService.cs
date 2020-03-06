@@ -10,14 +10,13 @@ using System.Threading.Tasks;
 namespace FomoAPI.Application.EventBuses
 {
     /// <summary>
-    /// Singleton Scheduler that will trigger the event bus to run the queries every minute
+    /// Singleton Scheduler that will trigger the event bus to run the queries every specified interval
     /// </summary>
     public class QueryEventBusTimedHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IQueryEventBus _queryEventBus;
         private readonly EventBusOptions _eventBusOptions;
-        private Timer _timerSetEventBusState;
         private Timer _timerExecuteEventBus;
 
         public QueryEventBusTimedHostedService(ILogger<QueryEventBusTimedHostedService> logger, IQueryEventBus queryEventBus, IOptionsMonitor<EventBusOptions> eventBusOptionsAccessor)
@@ -32,12 +31,13 @@ namespace FomoAPI.Application.EventBuses
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is starting");
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} will reset state and run any pending queries every {_eventBusOptions.DelayMSRunScheduleEventBus} seconds");
 
+            ValidateOptions();
 
-            _timerExecuteEventBus = new Timer((state) =>
+            _timerExecuteEventBus = new Timer(async(state) =>
             {
                 SetEventBusState();
                 EnqueuePendingQueries();
-                ExecuteEventBus();
+                await ExecuteEventBus();
             }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(_eventBusOptions.DelayMSRunScheduleEventBus));
 
             return Task.CompletedTask;
@@ -52,9 +52,9 @@ namespace FomoAPI.Application.EventBuses
                 throw new ArgumentException(error);
             }
 
-            if (_eventBusOptions.MaxQueriesPerMinute <= 0)
+            if (_eventBusOptions.MaxQueriesPerInterval <= 0)
             {
-                var error = $"{nameof(_eventBusOptions.MaxQueriesPerMinute)} cannot be less than or equal to 0";
+                var error = $"{nameof(_eventBusOptions.MaxQueriesPerInterval)} cannot be less than or equal to 0";
                 _logger.LogError(error);
                 throw new ArgumentException(error);
             }
@@ -65,16 +65,15 @@ namespace FomoAPI.Application.EventBuses
             _queryEventBus.EnqueueNextQueries();
         }
 
-        private async void SetEventBusState()
+        private void SetEventBusState()
         {
             _logger.LogInformation($"Resetting Event Bus state");
-            _logger.LogInformation($"Max queries to run per minute is {_eventBusOptions.MaxQueriesPerMinute}");
+            _logger.LogInformation($"Max queries to run per interval is {_eventBusOptions.MaxQueriesPerInterval}");
 
             try
             {
-                _queryEventBus.SetMaxQueryPerMinuteThreshold(_eventBusOptions.MaxQueriesPerMinute);
+                _queryEventBus.SetMaxQueryPerMinuteThreshold(_eventBusOptions.MaxQueriesPerInterval);
                 _queryEventBus.ResetQueryExecutedCounter();
-                await _queryEventBus.ExecutePendingQueriesAsync();
             }
             catch (Exception ex)
             {
@@ -82,7 +81,7 @@ namespace FomoAPI.Application.EventBuses
             }
         }
 
-        private async void ExecuteEventBus()
+        private async Task ExecuteEventBus()
         {
             _logger.LogInformation($"Scheduling event bus queries");
 
@@ -100,7 +99,6 @@ namespace FomoAPI.Application.EventBuses
         {
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is stopping");
 
-            _timerSetEventBusState?.Change(Timeout.Infinite, 0);
             _timerExecuteEventBus?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
@@ -108,7 +106,6 @@ namespace FomoAPI.Application.EventBuses
 
         public void Dispose()
         {
-            _timerSetEventBusState.Dispose();
             _timerExecuteEventBus?.Dispose();
         }
     }

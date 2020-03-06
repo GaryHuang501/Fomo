@@ -12,7 +12,7 @@ namespace FomoAPI.Application.ConfigurationOptions
         /// </summary>
         public int DelayMSRunScheduleEventBus { get; set; }
 
-        public int MaxQueriesPerMinute { get; set; }
+        public int MaxQueriesPerInterval { get; set; }
 
     }
 }
