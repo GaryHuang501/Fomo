@@ -8,10 +8,19 @@ namespace FomoAPIUnitTests.Application.EventBuses
 {
     public class QuerySubscriptionTests
     {
+        [Fact]
+        public void GetSubscriptionInfos_ReturnsCountZero_WhenZeroQueries()
+        {
+            var querySubscription = new QuerySubscriptions();
+            var querySubscriptionInfos = querySubscription.GetSubscriptionInfos();
+
+            Assert.Empty(querySubscriptionInfos);
+        }
+
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
-        public void ShouldHaveSubscriberCountEqualToNumberOfTimesQueryAdded(int timesAdded)
+        public void GetSubscriptionInfos_ReturnsSubscriberCountEqualTimesAdded(int timesAdded)
         {
             var querySubscription = new QuerySubscriptions();
 
@@ -32,7 +41,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         [Theory]
         [InlineData(1, 1)]
         [InlineData(3, 2)]
-        public void ShouldHaveSubscriberCountEqualToNumberOfTimesQueryAddedSubtractedByRemoved(int timesAdded, int timesRemoved)
+        public void GetSubscriptionInfos_ReturnsSubscriberCountEqualTimesAddedAndSubtracted_WhenSingleQuery(int timesAdded, int timesRemoved)
         {
             var querySubscription = new QuerySubscriptions();
 
@@ -57,7 +66,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public void ShouldNeverHaveSubscriberCountGoBelowZeroWhenRemovingQueries()
+        public void GetSubscriptionInfos_SubscriberCountNeverLessThanZero_WhenSubscribersRemoved()
         {
             var querySubscription = new QuerySubscriptions();
 
@@ -77,7 +86,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public void ShouldHaveSubscriberCountEqualToNumberOfTimesQueryAdded_WhenMultipleQueries()
+        public void GetSubscriptionInfos_ReturnsSubscriberCountEqualsTimesAdded_WhenMultipleQueries()
         {
             var querySubscription = new QuerySubscriptions();
 
@@ -109,7 +118,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public void ShouldHaveSubscriberCountEqualToNumberOfTimesQueryAddedSubtractedByRemoved_WhenMultipleQueries()
+        public void GetSubscriptionInfos_ReturnsSubscriberCountEqualsTimesAddedAndSubtracted_MultipleQueries()
         {
             var querySubscription = new QuerySubscriptions();
 
@@ -144,7 +153,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public void ShouldNotHaveQueryWhenQueryRemoved()
+        public void GetSubscriptionInfos_ReturnsZeroSubscriberCount_WhenQueryCleared()
         {
             var querySubscription = new QuerySubscriptions();
 

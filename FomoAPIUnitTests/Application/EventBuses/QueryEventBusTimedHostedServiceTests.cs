@@ -41,7 +41,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             _mockEventBusOptionsAccessor.Setup(x => x.CurrentValue).Returns(options);
 
-            _mockEventBus.Setup(x => x.SetMaxQueryPerMinuteThreshold(options.MaxQueriesPerInterval)).Callback((int x) =>
+            _mockEventBus.Setup(x => x.SetMaxQueryPerIntervalThreshold(options.MaxQueriesPerInterval)).Callback((int x) =>
             {
                 _eventList.Add(EventType.SetMaxQueryPerInterval);
                 _mockEventBusSetInterval = x;
@@ -122,7 +122,6 @@ namespace FomoAPIUnitTests.Application.EventBuses
         [InlineData(-1)]
         public async Task ShouldThrowExceptionWhenMaxQueriesSettingEqualOrLessThanZero(int settingValue)
         {
-
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = settingValue,
@@ -136,9 +135,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
                 await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
 
             }
-
         }
-
 
         [Theory]
         [InlineData(0)]

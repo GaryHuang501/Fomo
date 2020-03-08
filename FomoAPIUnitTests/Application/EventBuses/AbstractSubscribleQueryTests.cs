@@ -38,7 +38,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
         [Theory]
         [MemberData(nameof(EqualsTestData))]
-        public void Equals_ShouldReturnTrue_WhenSymbolAndFunctionTypeEqualAndIsISubscribleQuery(string otherQuerySymbol, QueryFunctionType otherQueryFunctionType, bool expectedResult)
+        public void Equals_ShouldReturnTrue_WhenSymbolAndFunctionTypeEqualAndIsISubscribableQuery(string otherQuerySymbol, QueryFunctionType otherQueryFunctionType, bool expectedResult)
         {
             var query = new TestQuery(functionType: QueryFunctionType.SingleQuote, symbol: "MSFT");
             var query2 = new TestQuery(otherQueryFunctionType, otherQuerySymbol);
@@ -47,7 +47,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public void Equals_ShouldReturnFalse_WhenOtherObjectIsNotAISubscribleQuery()
+        public void Equals_ShouldReturnFalse_WhenOtherObjectIsNotAISubscribableQuery()
         {
             var query = new TestQuery(functionType: QueryFunctionType.SingleQuote, symbol: "MSFT");
 

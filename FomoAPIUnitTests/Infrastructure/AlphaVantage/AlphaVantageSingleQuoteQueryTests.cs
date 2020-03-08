@@ -10,7 +10,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
     public class AlphaVantageSingleQuoteQueryTests
     {
         [Fact]
-        public void GetParameters_ShouldReturnCorrectFunctionAndDataTypeAndSymbolParametersForApi()
+        public void GetParameters_ShouldReturnFunctionAndDataTypeAndSymbol()
         {
             string symbol = "TSLA";
             var query = new AlphaVantageSingleQuoteQuery(symbol);
@@ -40,7 +40,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         }
 
         [Fact]
-        public void ShouldInstantiateWithCorrectCreateDateAndSymbol()
+        public void ShouldInstantiateWithCreateDateAndSymbol()
         {
             string symbol = "TSLA";
             var query = new AlphaVantageSingleQuoteQuery(symbol);

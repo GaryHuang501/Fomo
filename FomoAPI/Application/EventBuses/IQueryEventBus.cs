@@ -8,7 +8,7 @@ namespace FomoAPI.Application.EventBuses
 
         Task ExecutePendingQueriesAsync();
 
-        void SetMaxQueryPerMinuteThreshold(int maxQueryPerMinuteThreshold);
+        void SetMaxQueryPerIntervalThreshold(int maxQueryPerMinuteThreshold);
 
         void ResetQueryExecutedCounter();
     }
