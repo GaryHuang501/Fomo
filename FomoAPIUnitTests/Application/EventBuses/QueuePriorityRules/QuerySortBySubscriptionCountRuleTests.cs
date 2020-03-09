@@ -1,4 +1,4 @@
-﻿using FomoAPI.Application.Caches;
+﻿using FomoAPI.Application.Stores;
 using FomoAPI.Application.EventBuses;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
 using FomoAPI.Infrastructure.Enums;

@@ -1,4 +1,4 @@
-﻿using FomoAPI.Application.Caches;
+﻿using FomoAPI.Application.Stores;
 using FomoAPI.Application.EventBuses.Triggers;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.AlphaVantage;

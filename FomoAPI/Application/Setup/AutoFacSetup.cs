@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using FomoAPI.Application.Caches;
+using FomoAPI.Application.Stores;
 using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Application.EventBuses;
 using FomoAPI.Application.EventBuses.QueryExecutorContexts;

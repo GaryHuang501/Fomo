@@ -128,7 +128,8 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Unexpected in event bus for query {query.Symbol}");
+                _queryQueue.Remove(query);
+                _logger.LogError(ex, $"Unexpected error in event bus for query {query.Symbol}");
             }
         }
 

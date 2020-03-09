@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using FomoApi.Models;
+using FomoApi.Infrastructure;
 using FomoAPI.Application;
 using FomoAPI.Application.EventBuses;
 using Microsoft.AspNetCore.Builder;
@@ -35,13 +35,11 @@ namespace FomoAPI
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MasterContext>(options =>
-                 options.UseSqlServer(
-
-            Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<LoginContext>(options =>
+                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<IdentityUser, IdentityRole>()
-                 .AddEntityFrameworkStores<MasterContext>()
+                 .AddEntityFrameworkStores<LoginContext>()
                  .AddDefaultTokenProviders();
 
             services.AddAuthentication()

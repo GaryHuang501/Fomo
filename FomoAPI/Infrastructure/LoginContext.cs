@@ -2,27 +2,26 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using FomoApi.Domain.Login;
 
-namespace FomoApi.Models
+namespace FomoApi.Infrastructure
 {
-    public partial class MasterContext: IdentityDbContext<IdentityUser>
+    public partial class LoginContext: IdentityDbContext<IdentityUser>
     {
-        public MasterContext()
+        public LoginContext()
         {
         }
 
-        public MasterContext(DbContextOptions<MasterContext> options)
+        public LoginContext(DbContextOptions<LoginContext> options)
             : base(options)
         {
         }
 
-        //public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
-        //public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
-        //public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
-        //public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
-        //public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
-        //public virtual DbSet<Portfolios> Portfolios { get; set; }
-        //public virtual DbSet<PortfolioSymbols> PortfolioSymbols { get; set; }
+        public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
+        public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
+        public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
+        public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
+        public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -111,61 +110,6 @@ namespace FomoApi.Models
             //    entity.Property(e => e.UserName)
             //        .IsRequired()
             //        .HasMaxLength(256);
-            //});
-
-            //modelBuilder.Entity<Portfolios>(entity =>
-            //{
-            //    entity.HasKey(e => e.Id);
-
-            //    entity.HasIndex(e => e.UserId)
-            //        .HasName("IX_FK__Portfolio__UserI__239E4DCF");
-
-            //    entity.Property(e => e.Id)
-            //        .HasMaxLength(128)
-            //        .ValueGeneratedNever();
-
-            //    entity.Property(e => e.CreateDate).HasColumnType("datetime");
-
-            //    entity.Property(e => e.LastUpdateDate).HasColumnType("datetime");
-
-            //    entity.Property(e => e.Name)
-            //        .IsRequired()
-            //        .HasMaxLength(128);
-
-            //    entity.Property(e => e.UserId).HasMaxLength(128);
-
-            //    entity.HasOne(d => d.User)
-            //        .WithMany(p => p.Portfolios)
-            //        .HasForeignKey(d => d.UserId)
-            //        .HasConstraintName("FK__Portfolio__UserI__239E4DCF");
-            //});
-
-            //modelBuilder.Entity<PortfolioSymbols>(entity =>
-            //{
-            //    entity.HasKey(e => new { e.PortfolioId, e.Name });
-
-            //    entity.HasIndex(e => e.UserId)
-            //        .HasName("IX_FK_PortfolioSymbolsUserId");
-
-            //    entity.Property(e => e.PortfolioId).HasMaxLength(128);
-
-            //    entity.Property(e => e.Name).HasMaxLength(12);
-
-            //    entity.Property(e => e.UserId)
-            //        .IsRequired()
-            //        .HasMaxLength(128);
-
-            //    entity.HasOne(d => d.Portfolio)
-            //        .WithMany(p => p.PortfolioSymbols)
-            //        .HasForeignKey(d => d.PortfolioId)
-            //        .OnDelete(DeleteBehavior.ClientSetNull)
-            //        .HasConstraintName("FK__Portfolio__Portf__276EDEB3");
-
-            //    entity.HasOne(d => d.User)
-            //        .WithMany(p => p.PortfolioSymbols)
-            //        .HasForeignKey(d => d.UserId)
-            //        .OnDelete(DeleteBehavior.ClientSetNull)
-            //        .HasConstraintName("FK_PortfolioSymbolsUserId");
             //});
         }
     }

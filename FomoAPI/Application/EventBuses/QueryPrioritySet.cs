@@ -1,4 +1,4 @@
-﻿using FomoAPI.Application.Caches;
+﻿using FomoAPI.Application.Stores;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

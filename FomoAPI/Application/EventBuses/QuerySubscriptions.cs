@@ -3,7 +3,7 @@ using FomoAPI.Infrastructure.AlphaVantage;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
-using FomoAPI.Application.Caches;
+using FomoAPI.Application.Stores;
 
 namespace FomoAPI.Application.EventBuses
 {

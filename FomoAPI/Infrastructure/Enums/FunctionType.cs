@@ -37,13 +37,6 @@ namespace FomoAPI.Infrastructure.Enums
             RenewalTime = renewalTime;
         }
 
-        //public override bool Equals(object obj)
-        //{
-        //    QueryFunctionType other = obj as QueryFunctionType;
-
-        //    return other != null && other.QueryFunctionName == QueryFunctionName;
-        //}
-
         public override int GetHashCode()
         {
             return QueryFunctionName.GetHashCode();
