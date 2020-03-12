@@ -7,8 +7,4 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
     {
         IEnumerable<ISubscribableQuery> Sort(QuerySubscriptions querySubscriptions);   
     }
-
-
-
-
 }

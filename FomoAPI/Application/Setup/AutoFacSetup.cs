@@ -31,6 +31,7 @@ namespace FomoAPI.Application
         {
             services.Configure<AlphaVantageOptions>(configuration.GetSection("AlphaVantage"));
             services.Configure<EventBusOptions>(configuration.GetSection("EventBus"));
+            services.Configure<SingleQuoteCacheOptions>(configuration.GetSection("SingleQuoteCache"));
         }
 
         private static void RegisterServices(ContainerBuilder builder)
@@ -43,7 +44,6 @@ namespace FomoAPI.Application
             builder.RegisterType<QueryEventBus>().SingleInstance();
             builder.RegisterType<QueryExecutorContextRegistry>().SingleInstance();
             builder.RegisterType<QuerySubscriptions>().SingleInstance();
-            builder.RegisterType<QueryResultCache>().SingleInstance();
 
             builder.RegisterType<AlphaVantageSingleQuoteQueryExecutorContext>();
             builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>();

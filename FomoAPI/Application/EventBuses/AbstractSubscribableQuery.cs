@@ -7,6 +7,11 @@ using FomoAPI.Infrastructure.Enums;
 
 namespace FomoAPI.Application.EventBuses
 {
+    /// <summary>
+    /// Abstract query type that the event bus expects
+    /// in order to queue and store.
+    /// Queries that will go on the event bus should inherit this.
+    /// </summary>
     public abstract class AbstractSubscribableQuery: ISubscribableQuery
     {
         public QueryFunctionType FunctionType { get; }
