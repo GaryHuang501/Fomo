@@ -9,6 +9,7 @@ using FomoAPI.Infrastructure.AlphaVantage.Parsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using FomoAPI.Application.EventBuses.QueuePriorityRules;
 
 namespace FomoAPI.Application
 {
@@ -41,13 +42,19 @@ namespace FomoAPI.Application
 
         private static void RegisterComponents(ContainerBuilder builder)
         {
-            builder.RegisterType<QueryEventBus>().SingleInstance();
-            builder.RegisterType<QueryExecutorContextRegistry>().SingleInstance();
-            builder.RegisterType<QuerySubscriptions>().SingleInstance();
-
             builder.RegisterType<AlphaVantageSingleQuoteQueryExecutorContext>();
             builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>();
             builder.RegisterType<AlphaVantageClient>().As<IAlphaVantageClient>();
+
+            builder.RegisterType<SingleQuoteCache>().As<IQueryCache>().SingleInstance();
+            builder.RegisterType<QueryResultStore>().As<IQueryResultStore>().SingleInstance();
+            builder.RegisterType<QueryExecutorContextRegistry>().As<IQueryExecutorContextRegistry>().SingleInstance();
+            builder.RegisterType<QuerySubscriptions>().SingleInstance();
+            builder.RegisterType<QueryPrioritySet>().SingleInstance();
+            builder.RegisterType<QuerySortBySubscriptionCountRule>().As<IQueuePriorityRule>().SingleInstance();
+            builder.RegisterType<QueryEventBus>().As<IQueryEventBus>().SingleInstance();
+
+
         }
     }
 }

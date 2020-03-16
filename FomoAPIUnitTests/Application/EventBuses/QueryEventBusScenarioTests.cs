@@ -8,6 +8,8 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Options;
+using FomoAPI.Application.ConfigurationOptions;
 
 namespace FomoAPIUnitTests.Application.EventBuses
 {
@@ -16,7 +18,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         private readonly QueryEventBus _queryEventBus;
         private readonly QueryPrioritySet _queryQueue;
         private readonly QuerySubscriptions _querySubscriptions;
-        private readonly QueryResultCache _store;
+        private readonly IQueryResultStore _store;
         private readonly Mock<IAlphaVantageClient> _mockAlphaVantageClient;
         private int _maxQueryPerIntervalThreshold = 5;
 
@@ -27,7 +29,16 @@ namespace FomoAPIUnitTests.Application.EventBuses
             _queryQueue = new QueryPrioritySet();
             _querySubscriptions = new QuerySubscriptions();
             _mockAlphaVantageClient = new Mock<IAlphaVantageClient>();
-            _store = new QueryResultCache();
+
+            var mockCacheOptions = new Mock<IOptionsMonitor<SingleQuoteCacheOptions>>();
+            mockCacheOptions.Setup(x => x.CurrentValue).Returns(new SingleQuoteCacheOptions
+            {
+                CacheItemSize = 10,
+                CacheExpiryTimeMinutes = 1,
+                CacheSize = 10
+            });
+
+            _store = new QueryResultStore(new SingleQuoteCache(mockCacheOptions.Object));
            
             var alphaVantageContext = new AlphaVantageSingleQuoteQueryExecutorContext(_mockAlphaVantageClient.Object, _store);
             var contextRegistry = new QueryExecutorContextRegistry(alphaVantageContext);
