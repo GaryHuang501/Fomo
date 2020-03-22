@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FomoApp", "FomoApp\FomoApp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FomoAPI", "FomoAPI\FomoAPI.csproj", "{F58DB8A7-2BE3-486D-B30D-60505A228A8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FomoAPIUnitTests", "FomoAPIUnitTests\FomoAPIUnitTests.csproj", "{328B582E-7804-4C87-B691-A47C5D40F43E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FomoAPIUnitTests", "FomoAPIUnitTests\FomoAPIUnitTests.csproj", "{328B582E-7804-4C87-B691-A47C5D40F43E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FomoAPIIntegrationTests", "FomoAPIIntegrationTests\FomoAPIIntegrationTests.csproj", "{1C6D2364-01D6-41EA-8DFA-B59579DB634E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FomoAPIIntegrationTests", "FomoAPIIntegrationTests\FomoAPIIntegrationTests.csproj", "{1C6D2364-01D6-41EA-8DFA-B59579DB634E}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "FomoSQL", "FomoSQL\FomoSQL.sqlproj", "{FD698737-FAB0-4636-A62F-8392791AA724}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,12 @@ Global
 		{1C6D2364-01D6-41EA-8DFA-B59579DB634E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C6D2364-01D6-41EA-8DFA-B59579DB634E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C6D2364-01D6-41EA-8DFA-B59579DB634E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD698737-FAB0-4636-A62F-8392791AA724}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

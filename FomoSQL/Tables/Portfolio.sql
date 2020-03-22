@@ -1,0 +1,14 @@
+﻿CREATE TABLE [dbo].[Portfolio]
+(
+	[Id] INT NOT NULL PRIMARY KEY,
+	[UserId] UNIQUEIDENTIFIER NOT NULL,
+	[Name] NVARCHAR(100) NOT NULL,
+	[DateCreated] DATETIME NOT NULL,
+	[DateModified] DATETIME NOT NULL,
+	CONSTRAINT FK_Portfolio_Id FOREIGN KEY ([UserId]) REFERENCES AspNetUsers(Id)
+);
+GO;
+
+CREATE NONCLUSTERED INDEX IX_Portfolio_FK_UserId ON Portfolio(UserId);
+GO;
+
