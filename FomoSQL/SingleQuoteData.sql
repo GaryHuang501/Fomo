@@ -7,5 +7,5 @@
 )
 GO;
 
-CREATE NONCLUSTERED INDEX IX_SingleQuoteData_FK_SymbolID ON SingleQuoteData(SymbolId);
+CREATE NONCLUSTERED INDEX IX_SingleQuoteData_FK_SymbolId ON SingleQuoteData(SymbolId);
 GO;

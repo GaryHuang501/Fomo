@@ -12,5 +12,5 @@ GO;
 CREATE NONCLUSTERED INDEX IX_PortfolioSymbol_FK_PortfolioId ON PortfolioSymbol(PortfolioId);
 GO;
 
-CREATE NONCLUSTERED INDEX IX_PortfolioSymbol_FK_SymbolID ON PortfolioSymbol(SymbolId);
+CREATE NONCLUSTERED INDEX IX_PortfolioSymbol_FK_SymbolId ON PortfolioSymbol(SymbolId);
 GO;
