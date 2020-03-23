@@ -69,5 +69,7 @@
     <Build Include="PortfolioSymbol.sql" />
     <Build Include="SingleQuoteData.sql" />
     <Build Include="Symbol.sql" />
+    <Build Include="Exchange.sql" />
+    <Build Include="PriceAlert.sql" />
   </ItemGroup>
 </Project>
