@@ -35,7 +35,7 @@ namespace FomoAPI
             services.AddDbContext<LoginContext>(options =>
                  options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
                  .AddEntityFrameworkStores<LoginContext>()
                  .AddDefaultTokenProviders();
 

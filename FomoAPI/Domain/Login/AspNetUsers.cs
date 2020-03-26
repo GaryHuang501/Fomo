@@ -11,7 +11,7 @@ namespace FomoApi.Domain.Login
             AspNetUserLogins = new HashSet<AspNetUserLogins>();
         }
 
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }
         public string PasswordHash { get; set; }

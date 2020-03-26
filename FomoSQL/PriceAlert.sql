@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[PriceAlert]
 (
 	[SymbolId] INT NOT NULL,
-	[UserId] NVARCHAR(450) NOT NULL,
+	[UserId] UNIQUEIDENTIFIER NOT NULL,
 	[DateCreated] DATETIME NOT NULL,
 	[ThresholdPrice] DECIMAL(6,2) NOT NULL,
 	[IsBullTrigger] BIT NOT NULL,

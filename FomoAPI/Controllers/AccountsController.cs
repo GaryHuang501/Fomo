@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using FomoApp.Exceptions;
+using System;
 
 namespace FomoAPI.Controllers
 {
@@ -12,11 +13,11 @@ namespace FomoAPI.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser<Guid>> _signInManager;
+        private readonly UserManager<IdentityUser<Guid>> _userManager;
 
-        public AccountsController(SignInManager<IdentityUser> signInManager, 
-            UserManager<IdentityUser> userManager)
+        public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
+            UserManager<IdentityUser<Guid>> userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -86,10 +87,10 @@ namespace FomoAPI.Controllers
 
         }
 
-        private async Task<IdentityUser> RegisterUser(ExternalLoginInfo loginInfo)
+        private async Task<IdentityUser<Guid>> RegisterUser(ExternalLoginInfo loginInfo)
         {
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-            var user = new IdentityUser { UserName = email, Email = email };
+            var user = new IdentityUser<Guid> { UserName = email, Email = email };
 
             var result = await _userManager.CreateAsync(user);
 

@@ -6,7 +6,7 @@ using FomoApi.Domain.Login;
 
 namespace FomoApi.Infrastructure
 {
-    public partial class LoginContext: IdentityDbContext<IdentityUser>
+    public partial class LoginContext: IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
     {
         public LoginContext()
         {
