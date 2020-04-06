@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Symbol]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	[Name] VARCHAR(5) NOT NULL,
 	[ExchangeName] VARCHAR(10) NOT NULL,
     CONSTRAINT FK_Symbol_ExchangeName FOREIGN KEY (ExchangeName) REFERENCES Exchange(Name),

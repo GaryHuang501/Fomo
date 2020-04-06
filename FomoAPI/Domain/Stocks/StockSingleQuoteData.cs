@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
+    /// <summary>
+    /// Stock data for a single point in time.
+    /// </summary>
     public class StockSingleQuoteData : IQueryableData
     {
         public string Symbol { get; private set; }
