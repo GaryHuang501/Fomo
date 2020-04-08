@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
+using FomoAPI.Infrastructure.Repositories;
 
 namespace FomoAPI.Application
 {
@@ -46,6 +47,8 @@ namespace FomoAPI.Application
             builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>();
             builder.RegisterType<AlphaVantageClient>().As<IAlphaVantageClient>();
 
+            builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>();
+
             builder.RegisterType<SingleQuoteCache>().As<IQueryCache>().SingleInstance();
             builder.RegisterType<QueryResultStore>().As<IQueryResultStore>().SingleInstance();
             builder.RegisterType<QueryExecutorContextRegistry>().As<IQueryExecutorContextRegistry>().SingleInstance();
@@ -53,6 +56,8 @@ namespace FomoAPI.Application
             builder.RegisterType<QueryPrioritySet>().SingleInstance();
             builder.RegisterType<QuerySortBySubscriptionCountRule>().As<IQueuePriorityRule>().SingleInstance();
             builder.RegisterType<QueryEventBus>().As<IQueryEventBus>().SingleInstance();
+
+
 
 
         }

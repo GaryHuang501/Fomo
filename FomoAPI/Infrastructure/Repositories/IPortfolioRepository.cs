@@ -11,15 +11,18 @@ namespace FomoAPI.Infrastructure.Repositories
     /// </summary>
     public interface IPortfolioRepository
     {
-        Task AddPortfolioSymbol(int portfolioId, int symbolId);
+        Task<bool> AddPortfolioSymbol(int portfolioId, int symbolId);
 
         Task AddPriceAlert(Guid userId);
 
         Task<Portfolio> CreatePortfolio(Guid userId, string name);
+
         Task DeletePortfolio(int portfolioId);
 
         Task<Portfolio> GetPortfolio(int portfolioId);
 
         Task RemovePortfolioSymbol(int portfolioId, int symbolId);
+
+        Task<bool> RenamePortfolio(int portfolioId, string newName);
     }
 }

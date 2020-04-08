@@ -20,6 +20,12 @@ namespace FomoAPI.Infrastructure.Repositories
             _connectionString = connectionString;
         }
 
+        /// <summary>
+        /// Create new portfolio
+        /// </summary>
+        /// <param name="userId">UserId for owner of portfolio</param>
+        /// <param name="name">Portfolio name</param>
+        /// <returns></returns>
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
             var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
@@ -33,17 +39,38 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        public async Task AddPortfolioSymbol(int portfolioId, int symbolId)
+        /// <summary>
+        /// Add symbol to portfolio
+        /// </summary>
+        /// <param name="portfolioId">Id of Portfolio to add symbols to</param>
+        /// <param name="symbolId"></param>
+        /// <returns>Successfully added row or not.</returns>
+        public async Task<bool> AddPortfolioSymbol(int portfolioId, int symbolId)
         {
             var sql = @"INSERT INTO PortfolioSymbol (PortfolioId, SymbolID)
-                        (@portfolioID, @symbolID);";
+                        (@portfolioID, @symbolID);
+
+                        UPDATE Portfolio 
+                        SET
+                            LastModified = GETDATE()
+                        WHERE
+                            PortfolioId = @PortfolioID;
+                    ";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync(sql, new { portfolioId, symbolId });
+                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, symbolId });
+
+                return rowsAffected > 0;
             }
         }
 
+        /// <summary>
+        /// Remove symbol from portfolio
+        /// </summary>
+        /// <param name="portfolioId">Id of portfolio to remove symbol from</param>
+        /// <param name="symbolId">Id of symbol to remove</param>
+        /// <returns>Task</returns>
         public async Task RemovePortfolioSymbol(int portfolioId, int symbolId)
         {
             var sql = @"DELETE PortfolioSymbol 
@@ -58,6 +85,11 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
+        /// <summary>
+        /// Delete portfolio
+        /// </summary>
+        /// <param name="portfolioId">Id of portfolio to delete</param>
+        /// <returns>Task</returns>
         public async Task DeletePortfolio(int portfolioId)
         {
             var sql = @"DELETE Portfolio
@@ -70,11 +102,38 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
+        /// <summary>
+        /// Rename portfolio to given name
+        /// </summary>
+        /// <param name="portfolioId">Id of portfolio to rename</param>
+        /// <param name="newName">New name for the portfolio</param>
+        /// <returns>If portfolio was successfully updated</returns>
+        public async Task<bool> RenamePortfolio(int portfolioId, string newName)
+        {
+            var sql = @"UPDATE Portfolio
+                        SET
+                            Name = @name
+                        WHERE 
+                            PortfolioId = @portfolioId;";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var rowsUpdated = await connection.ExecuteAsync(sql, new { portfolioId, newName });
+
+                return rowsUpdated > 0;
+            }
+        }
+
         public async Task AddPriceAlert(Guid userId)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Get the portfolio and it's symbols
+        /// </summary>
+        /// <param name="portfolioId">Id of portfolio to fetch</param>
+        /// <returns>Portfolio</returns>
         public async Task<Portfolio> GetPortfolio(int portfolioId)
         {
             Portfolio portfolio;
