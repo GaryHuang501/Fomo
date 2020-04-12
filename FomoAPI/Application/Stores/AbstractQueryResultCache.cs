@@ -17,10 +17,10 @@ namespace FomoAPI.Application.Stores
         protected readonly int _cacheExpiryTimeMinutes;
 
 
-        public AbstractQueryResultCache(IQueryCacheOptions options)
+        public AbstractQueryResultCache(CacheOptions options)
         {
             _cache = new MemoryCache(new MemoryCacheOptions
-            {
+            {           
                 SizeLimit = options.CacheSize,           
             });
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using FomoApi.Infrastructure;
-using FomoAPI.Application;
+using FomoAPI.Setup;
+using FomoAPI.AutoFacModules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -28,68 +28,18 @@ namespace FomoAPI
 
         private string DevelopmentCorsPolicyName = "DevelopmentCORS";
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
-            services.AddDbContext<LoginContext>(options =>
-                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddCustomDBContexts(Configuration)
+                    .AddCustomAuthentications(Configuration)
+                    .AddCustomCORS(DevelopmentCorsPolicyName)
+                    .AddCustomAntiForgery()
+                    .AddCustomHttpClients(Configuration)
+                    .AddCustomOptions(Configuration);
 
-            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
-                 .AddEntityFrameworkStores<LoginContext>()
-                 .AddDefaultTokenProviders();
-
-            services.AddAuthentication()
-            .AddGoogle(o =>
-            {
-                o.ClientId = Configuration["Authentication:Google:ClientId"];
-                o.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                o.SaveTokens = true;
-            });
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(DevelopmentCorsPolicyName,
-                builder =>
-                {
-                    builder.WithOrigins("https://localhost:44395")
-                                        .AllowAnyHeader()
-                                        .AllowAnyMethod()
-                                        .AllowCredentials();
-                });
-            });
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = $"/api/accounts/login";
-                options.LogoutPath = $"/Identity/Account/Logout";
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    context.Response.StatusCode = 401;
-                    return Task.CompletedTask;
-                };
-            });
-
-            services.AddAntiforgery(options =>
-            {
-                options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-                options.Cookie.Domain = "localhost";
-                options.Cookie.Name = "X-CSRF-TOKEN-COOKIENAME";
-                options.Cookie.Path = "Path";
-                options.FormFieldName = "AntiforgeryFieldname";
-                options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
-                options.SuppressXFrameOptionsHeader = false;
-            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
-            services.AddHttpClient("AlphaVantage", c =>
-            {
-                c.BaseAddress = new Uri(Configuration.GetValue<string>("AlphaVantageUrl"));          
-            });
-
-            ApplicationContainer = AutoFacSetup.Setup(services, Configuration);
-
-            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,6 +70,99 @@ namespace FomoAPI
             });
         }
 
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterModule(new ApiModule());
+            builder.RegisterModule(new EventBusModule());
+        }
+    }
 
+    public static class CustomStartUpExtensions
+    {
+        public static IServiceCollection AddCustomDBContexts(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddDbContext<LoginContext>(options =>
+                 options.UseSqlServer(config["Database:ConnectionString"]));
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomAuthentications(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
+                     .AddEntityFrameworkStores<LoginContext>()
+                     .AddDefaultTokenProviders();
+
+            services.AddAuthentication()
+            .AddGoogle(o =>
+            {
+                o.ClientId = config["Authentication:Google:ClientId"];
+                o.ClientSecret = config["Authentication:Google:ClientSecret"];
+                o.SaveTokens = true;
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/api/accounts/login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomCORS(this IServiceCollection services, string policyName)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(policyName,
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:44395")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .AllowCredentials();
+                });
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomAntiForgery(this IServiceCollection services)
+        {
+            services.AddAntiforgery(options =>
+            {
+                options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+                options.Cookie.Domain = "localhost";
+                options.Cookie.Name = "X-CSRF-TOKEN-COOKIENAME";
+                options.Cookie.Path = "Path";
+                options.FormFieldName = "AntiforgeryFieldname";
+                options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
+                options.SuppressXFrameOptionsHeader = false;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddHttpClient("AlphaVantage", c =>
+            {
+                c.BaseAddress = new Uri(config.GetValue<string>("AlphaVantageUrl"));
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomOptions(this IServiceCollection services, IConfiguration config)
+        {
+            OptionsSetup.RegisterOptions(services, config);
+
+            return services;
+        }
     }
 }
