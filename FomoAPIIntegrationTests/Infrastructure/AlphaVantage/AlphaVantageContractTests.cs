@@ -11,7 +11,7 @@ using Xunit;
 
 namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
 {
-    public class AlphaVantageContractTests
+    public class AlphaVantageContractTests: IDisposable
     {
         private readonly MockHttpClientFactory _mockHttpFactory;
         private readonly Mock<IOptionsMonitor<AlphaVantageOptions>> _mockAlphaVantageOptionsAccessor;
@@ -21,6 +21,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
         private class MockHttpClientFactory : IHttpClientFactory
         {
             public string Url { get; set; }
+
+            public HttpClient Client; 
             public MockHttpClientFactory(string url)
             {
                 Url = url;
@@ -28,21 +30,27 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
 
             public HttpClient CreateClient(string name)
             {
-                return new HttpClient()
+                Client =  new HttpClient()
                 {
                     BaseAddress = new Uri(Url)
                 };
+
+                return Client;
+            }
+
+            public void Dispose()
+            {
+                Client.Dispose();
             }
         }
 
         public AlphaVantageContractTests()
         {
             _mockAlphaVantageOptionsAccessor = new Mock<IOptionsMonitor<AlphaVantageOptions>>();
-            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppSettings.Instance.Value.AlphaVantageOptions);
-            _mockHttpFactory = new MockHttpClientFactory(AppSettings.Instance.Value.AlphaVantageOptions.Url);
+            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppSettings.Instance.AlphaVantageOptions);
+            _mockHttpFactory = new MockHttpClientFactory(AppSettings.Instance.AlphaVantageOptions.Url);
             _parserFactory = new AlphaVantageParserFactory();
             _mockLogger = new Mock<ILogger<AlphaVantageClient>>();
-
         }
 
         [Fact]
@@ -74,6 +82,11 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
 
             Assert.True(singleQuoteResult.HasError);
             Assert.False(string.IsNullOrEmpty(singleQuoteResult.ErrorMessage));
+        }
+
+        public void Dispose()
+        {
+            _mockHttpFactory.Client.Dispose();
         }
     }
 }

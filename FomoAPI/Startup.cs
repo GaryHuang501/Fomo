@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace FomoAPI
 {
@@ -31,7 +33,6 @@ namespace FomoAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
             services.AddCustomDBContexts(Configuration)
                     .AddCustomAuthentications(Configuration)
                     .AddCustomCORS(DevelopmentCorsPolicyName)
@@ -39,7 +40,8 @@ namespace FomoAPI
                     .AddCustomHttpClients(Configuration)
                     .AddCustomOptions(Configuration);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                    .AddApplicationPart(typeof(Startup).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -90,21 +92,21 @@ namespace FomoAPI
         public static IServiceCollection AddCustomAuthentications(this IServiceCollection services, IConfiguration config)
         {
             services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
-                     .AddEntityFrameworkStores<LoginContext>()
-                     .AddDefaultTokenProviders();
+                    .AddEntityFrameworkStores<LoginContext>()
+                    .AddDefaultTokenProviders();
 
             services.AddAuthentication()
-            .AddGoogle(o =>
-            {
-                o.ClientId = config["Authentication:Google:ClientId"];
-                o.ClientSecret = config["Authentication:Google:ClientSecret"];
-                o.SaveTokens = true;
-            });
+                    .AddGoogle(o =>
+                    {
+                        o.ClientId = config["Authentication:Google:ClientId"];
+                        o.ClientSecret = config["Authentication:Google:ClientSecret"];
+                        o.SaveTokens = true;
+                    });
 
             services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = $"/api/accounts/login";
-                options.LogoutPath = $"/Identity/Account/Logout";
+                options.LogoutPath = $"/api/Account/Logout";
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;

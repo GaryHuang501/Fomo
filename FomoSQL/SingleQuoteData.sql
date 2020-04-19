@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[SingleQuoteData]
 (
-	[SymbolId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	[SymbolId] INT PRIMARY KEY,
 	[LastModified] DateTime NOT NULL,
 	[Data] VARCHAR(800) NOT NULL,
 	CONSTRAINT FK_SingleQuoteData_SymbolId FOREIGN KEY (SymbolId) REFERENCES Symbol(Id)

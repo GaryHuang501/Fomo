@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[PortfolioSymbol]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[PortfolioId] INT NOT NULL,
 	[SortOrder] TINYINT NOT NULL,
 	[SymbolId] INT NOT NULL

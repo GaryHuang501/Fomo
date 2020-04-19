@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using FomoAPI.Domain.Stocks;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,9 +17,9 @@ namespace FomoAPI.Infrastructure.Repositories
     public class PortfolioRepository : IPortfolioRepository
     {
         private string _connectionString;
-        public PortfolioRepository(string connectionString)
+        public PortfolioRepository(IOptionsMonitor<DbOptions> dbOptions)
         {
-            _connectionString = connectionString;
+            _connectionString = dbOptions.CurrentValue.ConnectionString;
         }
 
         /// <summary>
@@ -29,13 +31,13 @@ namespace FomoAPI.Infrastructure.Repositories
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
             var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
-                        OUTPUT Inserted.UserId, Inserted.Name, Inserted.DateCreated, Inserted.DateModified
+                        OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateCreated, Inserted.DateModified
                         VALUES
-                        (@userId, @name, GETDATE(), GETDATE());";
+                        (@userId, @name, GETUTCDATE(), GETUTCDATE());";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return await connection.QuerySingleAsync<Portfolio>(sql, new { userId, name });
+                return await connection.QuerySingleAsync<Portfolio>(sql, new { userId, name});
             }
         }
 
@@ -48,18 +50,11 @@ namespace FomoAPI.Infrastructure.Repositories
         public async Task<bool> AddPortfolioSymbol(int portfolioId, int symbolId)
         {
             var sql = @"INSERT INTO PortfolioSymbol (PortfolioId, SymbolID)
-                        (@portfolioID, @symbolID);
-
-                        UPDATE Portfolio 
-                        SET
-                            LastModified = GETDATE()
-                        WHERE
-                            PortfolioId = @PortfolioID;
-                    ";
+                        (@portfolioID, @symbolID);";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, symbolId });
+                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, symbolId});
 
                 return rowsAffected > 0;
             }

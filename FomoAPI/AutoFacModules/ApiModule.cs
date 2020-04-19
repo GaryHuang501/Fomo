@@ -11,7 +11,7 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerRequest();
+            builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
         }
     }
 }

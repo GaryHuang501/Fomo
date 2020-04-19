@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FomoAPI.Application.Commands.Portfolio;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,13 +12,13 @@ namespace FomoAPI.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class PortfolioController : ControllerBase
+    public class PortfoliosController : ControllerBase
     {
         private IPortfolioRepository _portfolioRepository;
 
-        private ILogger<PortfolioController> _logger;
+        private ILogger<PortfoliosController> _logger;
 
-        public PortfolioController(IPortfolioRepository portfolioRepository, ILogger<PortfolioController> logger)
+        public PortfoliosController(IPortfolioRepository portfolioRepository, ILogger<PortfoliosController> logger)
         {
             _portfolioRepository = portfolioRepository;
             _logger = logger;
@@ -38,9 +40,9 @@ namespace FomoAPI.Controllers
         }
 
         [HttpPatch("{id:int}/rename")]
-        public async Task<IActionResult> RenameAsync(int portfolioId, [FromBody] string newName)
+        public async Task<IActionResult> RenameAsync(int portfolioId, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
         {
-            var success = await _portfolioRepository.RenamePortfolio(portfolioId, newName);
+            var success = await _portfolioRepository.RenamePortfolio(portfolioId, renamePortfolioCommand.PortfolioName);
 
             if (!success)
             {
@@ -50,20 +52,19 @@ namespace FomoAPI.Controllers
             return Ok();
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] string newPortfolioName)
+        public async Task<IActionResult> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
         {
             var userId = User.GetUserId();
-            var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, newPortfolioName);
+            var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, createPortfolioCommand.PortfolioName);
 
             return Ok(newPortfolio);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> AddPortfolioSymbol(int portfolioId, [FromBody] int symbolId)
+        [HttpPost("/symbols/{id:int}")]
+        public async Task<IActionResult> AddPortfolioSymbol(int portfolioId, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
         {          
-           var success = await _portfolioRepository.AddPortfolioSymbol(portfolioId, symbolId);
+           var success = await _portfolioRepository.AddPortfolioSymbol(portfolioId, addPortfolioSymbolCommand.SymbolId);
 
             if (!success)
             {

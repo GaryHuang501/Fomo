@@ -13,7 +13,7 @@ namespace FomoAPI.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class SingleQuoteController : ControllerBase
+    public class SingleQuotesController : ControllerBase
     {
         [HttpPost("Query")]
         public IActionResult CreateQuery([FromBody] CreateSingleQuoteQueryCommand command)

@@ -30,8 +30,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
             _querySubscriptions = new QuerySubscriptions();
             _mockAlphaVantageClient = new Mock<IAlphaVantageClient>();
 
-            var mockCacheOptions = new Mock<IOptionsMonitor<SingleQuoteCacheOptions>>();
-            mockCacheOptions.Setup(x => x.CurrentValue).Returns(new SingleQuoteCacheOptions
+            var mockCacheOptions = new Mock<IOptionsMonitor<CacheOptions>>();
+            mockCacheOptions.Setup(x => x.CurrentValue).Returns(new CacheOptions
             {
                 CacheItemSize = 10,
                 CacheExpiryTimeMinutes = 1,
