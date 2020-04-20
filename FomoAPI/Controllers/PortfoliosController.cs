@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -24,12 +23,12 @@ namespace FomoAPI.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{id:int}", Name = "Get")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAsync(int portfolioId)
+        public async Task<IActionResult> GetAsync(int id)
         {
-            var portfolio = await _portfolioRepository.GetPortfolio(portfolioId);
+            var portfolio = await _portfolioRepository.GetPortfolio(id);
 
             if (portfolio == null)
             {
@@ -39,10 +38,12 @@ namespace FomoAPI.Controllers
             return Ok(portfolio);
         }
 
-        [HttpPatch("{id:int}/rename")]
-        public async Task<IActionResult> RenameAsync(int portfolioId, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
+        [HttpPatch("{id}/rename")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RenameAsync(int id, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
         {
-            var success = await _portfolioRepository.RenamePortfolio(portfolioId, renamePortfolioCommand.PortfolioName);
+            var success = await _portfolioRepository.RenamePortfolio(id, renamePortfolioCommand.PortfolioName);
 
             if (!success)
             {
@@ -61,10 +62,12 @@ namespace FomoAPI.Controllers
             return Ok(newPortfolio);
         }
 
-        [HttpPost("/symbols/{id:int}")]
-        public async Task<IActionResult> AddPortfolioSymbol(int portfolioId, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
+        [HttpPost("{id}/symbols")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
         {          
-           var success = await _portfolioRepository.AddPortfolioSymbol(portfolioId, addPortfolioSymbolCommand.SymbolId);
+           var success = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.Ticker, addPortfolioSymbolCommand.Exchange);
 
             if (!success)
             {
@@ -74,10 +77,10 @@ namespace FomoAPI.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteAsync(int portfolioId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            await _portfolioRepository.DeletePortfolio(portfolioId);
+            await _portfolioRepository.DeletePortfolio(id);
 
             return Ok();
         }

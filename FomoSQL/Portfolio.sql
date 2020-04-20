@@ -11,14 +11,3 @@ GO;
 
 CREATE NONCLUSTERED INDEX IX_Portfolio_FK_UserId ON Portfolio(UserId);
 GO;
-
-CREATE TRIGGER PortfolioLastModifiedTrigger 
-ON Portfolio
-FOR UPDATE
-AS 
-BEGIN
-      UPDATE Portfolio 
-      SET DateModified = GETUTCDATE()
-      FROM INSERTED 
-      WHERE INSERTED.Id = Portfolio.Id
-END;

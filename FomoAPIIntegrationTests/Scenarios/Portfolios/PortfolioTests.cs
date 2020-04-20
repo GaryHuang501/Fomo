@@ -1,5 +1,6 @@
 ﻿using FomoAPI.Domain.Stocks;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -18,7 +19,7 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
         private string PortfolioPath(string endpoint = null) => $"api/portfolios/{endpoint}";
 
         [Fact]
-        public async Task Should_CreatePortfolio()
+        public async Task Should_GetNewPortfolioWithCorrectSymbolsAdded()
         {
             var client = _clientFactory.CreateClientNoAuth();
 
@@ -40,6 +41,37 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.True(portfolio.Id > 0);
             Assert.True(portfolio.DateCreated > currentDateTimeUtc);
             Assert.Equal(portfolio.Name, portfolioName);
+
+            var addTeslaPayload = new
+            {
+                Ticker = "TSLA",
+                Exchange = "NASDAQ"
+            }.ToJsonPayload();
+
+            var addJPMPayload = new
+            {
+                Ticker = "JPM",
+                Exchange = "NYSE"
+            }.ToJsonPayload();
+
+            var addTeslaResponse =  await client.PostAsync(PortfolioPath($"{portfolio.Id}/symbols"), addTeslaPayload);
+
+            addTeslaResponse.EnsureSuccessStatusCode();
+
+            var addJPMResponse = await client.PostAsync(PortfolioPath($"{portfolio.Id}/symbols"), addJPMPayload);
+
+            addJPMResponse.EnsureSuccessStatusCode();
+
+            // Grab portfolio and verify symbols returned
+            var getPortfolioResponse = await client.GetAsync(PortfolioPath(portfolio.Id.ToString()));
+            getPortfolioResponse.EnsureSuccessStatusCode();
+
+            var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
+
+            Assert.Equal(portfolio.Id, fetchedPortfolio.Id);
+            Assert.Equal(2, fetchedPortfolio.Symbols.Count());
+            Assert.Contains(fetchedPortfolio.Symbols, s => s.Ticker == "TSLA" && s.ExchangeName == "NASDAQ");
+            Assert.Contains(fetchedPortfolio.Symbols, s => s.Ticker == "JPM" && s.ExchangeName == "NYSE");
         }
     }
 }

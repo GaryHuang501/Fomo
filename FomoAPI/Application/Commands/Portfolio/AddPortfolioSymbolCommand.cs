@@ -7,6 +7,8 @@ namespace FomoAPI.Application.Commands.Portfolio
 {
     public class AddPortfolioSymbolCommand
     {
-        public int SymbolId { get; set; }
+        public string Ticker { get; set; }
+
+        public string Exchange { get; set; }
     }
 }

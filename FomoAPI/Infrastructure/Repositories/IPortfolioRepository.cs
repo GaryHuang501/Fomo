@@ -11,7 +11,7 @@ namespace FomoAPI.Infrastructure.Repositories
     /// </summary>
     public interface IPortfolioRepository
     {
-        Task<bool> AddPortfolioSymbol(int portfolioId, int symbolId);
+        Task<bool> AddPortfolioSymbol(int portfolioId, string ticker, string exchange);
 
         Task AddPriceAlert(Guid userId);
 

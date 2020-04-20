@@ -30,10 +30,10 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <returns></returns>
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
-            var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
-                        OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateCreated, Inserted.DateModified
+            var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated)
+                        OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateCreated
                         VALUES
-                        (@userId, @name, GETUTCDATE(), GETUTCDATE());";
+                        (@userId, @name, GETUTCDATE());";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -47,14 +47,21 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <param name="portfolioId">Id of Portfolio to add symbols to</param>
         /// <param name="symbolId"></param>
         /// <returns>Successfully added row or not.</returns>
-        public async Task<bool> AddPortfolioSymbol(int portfolioId, int symbolId)
+        public async Task<bool> AddPortfolioSymbol(int portfolioId, string ticker, string exchange)
         {
-            var sql = @"INSERT INTO PortfolioSymbol (PortfolioId, SymbolID)
-                        (@portfolioID, @symbolID);";
+            var sql = @"INSERT INTO PortfolioSymbol (PortfolioId, SymbolID, SortOrder)
+                        SELECT TOP 1
+                            @portfolioId,
+                            Symbol.Id,
+                            COALESCE((SELECT MAX(SortOrder) FROM PortfolioSymbol WHERE PortfolioId = @portfolioId), 1)
+                        FROM Symbol
+                        WHERE
+                            Ticker = @ticker
+                            AND ExchangeName = @exchange";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, symbolId});
+                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, ticker, exchange });
 
                 return rowsAffected > 0;
             }
@@ -134,19 +141,20 @@ namespace FomoAPI.Infrastructure.Repositories
             Portfolio portfolio;
 
             var getPortfolioSql = @"SELECT
+                                        Id,
                                         UserId,
                                         Name,
-                                        DateCreated,
-                                        DateLastModified
+                                        DateCreated
                                     FROM
                                         Portfolio
                                     WHERE
                                         Id = @portfolioId
 
                                     SELECT
-                                        Id,
-                                        Name,
-                                        ExchangeName
+                                        Symbol.Id,
+                                        Symbol.Ticker,
+                                        Symbol.FullName,
+                                        Symbol.ExchangeName
                                     FROM
                                         PortfolioSymbol
                                     INNER JOIN

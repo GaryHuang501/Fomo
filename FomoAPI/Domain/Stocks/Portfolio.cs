@@ -16,7 +16,7 @@ namespace FomoAPI.Domain.Stocks
 
         public string Name { get; set; }
 
-        public DateTime LastModified { get; set; }
+        public DateTime DateModified { get; set; }
 
         public DateTime DateCreated { get; set; }
 

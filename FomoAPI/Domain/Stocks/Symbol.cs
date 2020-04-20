@@ -12,8 +12,8 @@ namespace FomoAPI.Domain.Stocks
     {
         public string Ticker { get; set; }
 
-        public string Exchange { get; set; }
+        public string ExchangeName { get; set; }
 
-        public string FullNAme { get; set; }
+        public string FullName { get; set; }
     }
 }
