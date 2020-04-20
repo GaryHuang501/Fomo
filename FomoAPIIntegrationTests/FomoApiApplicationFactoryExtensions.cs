@@ -9,7 +9,7 @@ namespace FomoAPIIntegrationTests
 {
     public static class FomoApiApplicationFactoryExtensions
     {
-        public static HttpClient CreateClientNoAuth(this FomoApiApplicationFactory factory)
+        public static HttpClient CreateClientNoAuth(this FomoApiApplicationFactory factory, string apiEndPoint = null)
         {
             var client =  factory.WithWebHostBuilder(builder =>
             {
@@ -30,7 +30,7 @@ namespace FomoAPIIntegrationTests
             });
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
-
+            client.BaseAddress = new System.Uri($"{client.BaseAddress}{apiEndPoint}");
             return client;
         }
     }

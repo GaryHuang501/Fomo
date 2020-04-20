@@ -37,7 +37,7 @@ namespace FomoAPI.Infrastructure.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return await connection.QuerySingleAsync<Portfolio>(sql, new { userId, name});
+                return await connection.QuerySingleAsync<Portfolio>(sql, new { userId, name });
             }
         }
 
@@ -61,7 +61,7 @@ namespace FomoAPI.Infrastructure.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsAffected =  await connection.ExecuteAsync(sql, new { portfolioId, ticker, exchange });
+                var rowsAffected = await connection.ExecuteAsync(sql, new { portfolioId, ticker, exchange });
 
                 return rowsAffected > 0;
             }
@@ -94,14 +94,31 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <returns>Task</returns>
         public async Task DeletePortfolio(int portfolioId)
         {
-            var sql = @"DELETE Portfolio
+            var sql = @"DELETE PriceAlert FROM PriceAlert
+                        INNER JOIN PortfolioSymbol
+                        ON  PortfolioSymbol.Id = PriceAlert.PortfolioSymbolId
+                        WHERE
+                            PortfolioSymbol.PortfolioId = @portfolioId;
+
+                        DELETE FROM PortfolioSymbol
+                        WHERE
+                            PortfolioSymbol.PortfolioId = @portfolioId;
+                         
+                        DELETE Portfolio
                         WHERE 
                             Id = @portfolioId;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync(sql, new { portfolioId });
+                await connection.OpenAsync();
+
+                using (var transaction = await connection.BeginTransactionAsync())
+                {
+                    await connection.ExecuteAsync(sql, new { portfolioId }, transaction: transaction);
+                    await transaction.CommitAsync();
+                }
             }
+
         }
 
         /// <summary>
@@ -114,9 +131,9 @@ namespace FomoAPI.Infrastructure.Repositories
         {
             var sql = @"UPDATE Portfolio
                         SET
-                            Name = @name
+                            Name = @newName
                         WHERE 
-                            PortfolioId = @portfolioId;";
+                            Id = @portfolioId;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -135,7 +152,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Get the portfolio and it's symbols
         /// </summary>
         /// <param name="portfolioId">Id of portfolio to fetch</param>
-        /// <returns>Portfolio</returns>
+        /// <returns>Portfolio. Null if does not exist.</returns>
         public async Task<Portfolio> GetPortfolio(int portfolioId)
         {
             Portfolio portfolio;
@@ -171,8 +188,12 @@ namespace FomoAPI.Infrastructure.Repositories
                     var portfolioResultSet = await multiCommand.ReadAsync<Portfolio>();
                     var portfolioSymbolsResultSet = await multiCommand.ReadAsync<Symbol>();
 
-                    portfolio = portfolioResultSet.First();
-                    portfolio.Symbols = portfolioSymbolsResultSet;
+                    portfolio = portfolioResultSet.FirstOrDefault();
+
+                    if(portfolio != null)
+                    {
+                        portfolio.Symbols = portfolioSymbolsResultSet;
+                    }
                 }
             }
 

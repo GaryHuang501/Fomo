@@ -43,7 +43,7 @@ namespace FomoAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> RenameAsync(int id, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
         {
-            var success = await _portfolioRepository.RenamePortfolio(id, renamePortfolioCommand.PortfolioName);
+            var success = await _portfolioRepository.RenamePortfolio(id, renamePortfolioCommand.Name);
 
             if (!success)
             {
@@ -57,7 +57,7 @@ namespace FomoAPI.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
         {
             var userId = User.GetUserId();
-            var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, createPortfolioCommand.PortfolioName);
+            var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, createPortfolioCommand.Name);
 
             return Ok(newPortfolio);
         }

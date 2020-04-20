@@ -7,6 +7,6 @@ namespace FomoAPI.Application.Commands.Portfolio
 {
     public class RenamePortfolioCommand
     {
-        public string PortfolioName { get; set; }
+        public string Name { get; set; }
     }
 }
