@@ -10,8 +10,10 @@ namespace FomoAPI.Domain.Stocks
     /// </summary>
     public class Symbol
     {
-        public string Name { get; set; }
+        public string Ticker { get; set; }
 
         public string Exchange { get; set; }
+
+        public string FullNAme { get; set; }
     }
 }

@@ -1,11 +1,11 @@
 ﻿CREATE TABLE [dbo].[Symbol]
 (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
-	[Name] VARCHAR(5) NOT NULL,
+	[Ticker] VARCHAR(5) NOT NULL,
+	[FullName] VARCHAR(50) NOT NULL,
 	[ExchangeName] VARCHAR(10) NOT NULL,
     CONSTRAINT FK_Symbol_ExchangeName FOREIGN KEY (ExchangeName) REFERENCES Exchange(Name),
-	CONSTRAINT AK_Symbol_Name_Exchange UNIQUE(Name, ExchangeName),
-
+	CONSTRAINT AK_Symbol_Name_Ticker UNIQUE(Ticker, ExchangeName)
 )
 GO;
 
