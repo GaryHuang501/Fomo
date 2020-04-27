@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Application.Commands.Portfolio
 {
-    public class AddPortfolioSymbolCommand
+    public class ReorderPortfolioCommand
     {
-        public int SymbolId { get; set; }
+        public Dictionary<string, int> PortfolioSymbolIdToSortOrder { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace FomoAPI.AutoFacModules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
         }
     }
 }

@@ -57,6 +57,9 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="DataSetup" />
+    <Folder Include="TableTypes" />
+    <Folder Include="Stored Procedures" />
+    <Folder Include="Stored Procedures\Portfolio" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="AspNetRoleClaims.sql" />
@@ -72,6 +75,8 @@
     <Build Include="Symbol.sql" />
     <Build Include="Exchange.sql" />
     <Build Include="PriceAlert.sql" />
+    <Build Include="TableTypes\PortfolioSymbolSortOrderType.sql" />
+    <Build Include="Stored Procedures\Portfolio\UpdatePortfolioSortOrder.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DataSetup\Exchanges.sql" />

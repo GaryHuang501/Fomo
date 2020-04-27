@@ -1,18 +1,19 @@
 ﻿using Dapper;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.ConfigurationOptions;
+using FomoAPI.Infrastructure.Enums;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Repositories
 {
     /// <summary>
-    /// Repository class for CRUD operations on a user's portfolio.
-    /// Security layer should be responsible for restricting 
-    /// portfolio access to the user.
+    /// Repository for CRUD operations on a user's portfolio.
     /// </summary>
     public class PortfolioRepository : IPortfolioRepository
     {
@@ -45,45 +46,71 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Add symbol to portfolio
         /// </summary>
         /// <param name="portfolioId">Id of Portfolio to add symbols to</param>
-        /// <param name="symbolId"></param>
-        /// <returns>Successfully added row or not.</returns>
-        public async Task<bool> AddPortfolioSymbol(int portfolioId, string ticker, string exchange)
+        /// <param name="symbolId">Id of symbol to add</param>
+        /// <returns>Newly Added PortfolioSymbol. Return null if symbol was not added: either symbol Id not found or symbol already exists.</returns>
+        public async Task<PortfolioSymbol> AddPortfolioSymbol(int portfolioId, int symbolId)
         {
-            var sql = @"INSERT INTO PortfolioSymbol (PortfolioId, SymbolID, SortOrder)
+            var sql = @"DECLARE @InsertedId TABLE 
+                        (
+                            Id INT NOT NULL
+                        );
+
+                        INSERT INTO PortfolioSymbol (PortfolioId, SymbolID, SortOrder)      
+                        OUTPUT INSERTED.Id INTO @InsertedId(Id)          
                         SELECT TOP 1
                             @portfolioId,
                             Symbol.Id,
-                            COALESCE((SELECT MAX(SortOrder) FROM PortfolioSymbol WHERE PortfolioId = @portfolioId), 1)
-                        FROM Symbol
+                            COALESCE((SELECT MAX(SortOrder) + 1 FROM PortfolioSymbol WHERE PortfolioId = @portfolioId), 1) SortOrder
+                        FROM 
+                            Symbol
                         WHERE
-                            Ticker = @ticker
-                            AND ExchangeName = @exchange";
+                            Symbol.Id = @symbolId
+                            AND
+	                        NOT EXISTS(
+		                        SELECT 1 FROM PortfolioSymbol WHERE PortfolioId = @portfolioId AND SymbolId = Symbol.Id
+	                        );
+
+                        SELECT 
+                            PortfolioSymbol.Id,
+                            PortfolioSymbol.SymbolId,
+                            Symbol.Ticker,
+                            Symbol.ExchangeName,
+                            Symbol.FullName,
+                            PortfolioSymbol.SortOrder
+                        FROM 
+                            PortfolioSymbol
+                        INNER JOIN 
+                            Symbol
+                        ON
+                            Symbol.Id = PortfolioSymbol.SymbolId
+                        INNER JOIN
+                            @InsertedId InsertedId
+                        ON
+                            InsertedId.Id = PortfolioSymbol.Id;
+                        ";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsAffected = await connection.ExecuteAsync(sql, new { portfolioId, ticker, exchange });
-
-                return rowsAffected > 0;
+                var portfolioSymbol = await connection.QueryAsync<PortfolioSymbol>(sql, new { portfolioId, symbolId});
+                return portfolioSymbol.SingleOrDefault();
             }
         }
 
         /// <summary>
-        /// Remove symbol from portfolio
+        /// Delete symbol from portfolio
         /// </summary>
-        /// <param name="portfolioId">Id of portfolio to remove symbol from</param>
-        /// <param name="symbolId">Id of symbol to remove</param>
+        /// <param name="portfolioId">Id of portfolio to delete symbol from</param>
+        /// <param name="symbolId">Id of symbol to delete</param>
         /// <returns>Task</returns>
-        public async Task RemovePortfolioSymbol(int portfolioId, int symbolId)
+        public async Task DeletePortfolioSymbol(int portfolioSymbolID)
         {
             var sql = @"DELETE PortfolioSymbol 
                         WHERE 
-                            PortfolioId = @portfolioId
-                            AND
-                            SymbolId = @symbolId";
+                            Id = @portfolioSymbolID";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync(sql, new { portfolioId, symbolId });
+                await connection.ExecuteAsync(sql, new { portfolioSymbolID });
             }
         }
 
@@ -95,8 +122,10 @@ namespace FomoAPI.Infrastructure.Repositories
         public async Task DeletePortfolio(int portfolioId)
         {
             var sql = @"DELETE PriceAlert FROM PriceAlert
-                        INNER JOIN PortfolioSymbol
-                        ON  PortfolioSymbol.Id = PriceAlert.PortfolioSymbolId
+                        INNER JOIN 
+                            PortfolioSymbol
+                        ON  
+                            PortfolioSymbol.Id = PriceAlert.PortfolioSymbolId
                         WHERE
                             PortfolioSymbol.PortfolioId = @portfolioId;
 
@@ -143,6 +172,43 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
+        /// <summary>
+        /// Reorder the given portfolio symbol and update  ort order of other PortfolioSymbol in portfolio
+        /// to match new ordering.
+        /// </summary>
+        /// <param name="portfolioId">Id of portfolio</param>
+        /// <param name="portfolioSymbolId">Id of reordered portfolioSymbol</param>
+        /// <param name="newSortOrder">New sort order</param>
+        /// <returns>True if rows updated. Otherwise portfolio symbol was not found.</returns>
+        public async Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<string, int> portfolioSymbolIdToSortOrder)
+        {
+            var reorderSQL = @"	UPDATE PortfolioSymbol
+	                            SET	
+		                            SortOrder = tvpNewSortOrder.SortOrder
+	                            FROM 
+		                            PortfolioSymbol
+	                            INNER JOIN
+		                            @tvpNewSortOrder tvpNewSortOrder
+	                            ON
+		                            PortfolioSymbol.Id = tvpNewSortOrder.PortfolioSymbolId
+                                WHERE
+                                    PortfolioSymbol.PortfolioId = @portfolioId";
+
+
+            var reorderTableValueData = portfolioSymbolIdToSortOrder.ToDataTable("PortfolioSymbolId", "SortOrder");
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var rowsUpdated = await connection.ExecuteAsync(reorderSQL, 
+                    new { 
+                        portfolioId, 
+                        tvpNewSortOrder = reorderTableValueData.AsTableValuedParameter(TableTypes.PortfolioSymbolSortOrderType) }
+                    );
+
+                return rowsUpdated > 0;
+            }
+        }
+
         public async Task AddPriceAlert(Guid userId)
         {
             throw new NotImplementedException();
@@ -168,10 +234,12 @@ namespace FomoAPI.Infrastructure.Repositories
                                         Id = @portfolioId
 
                                     SELECT
-                                        Symbol.Id,
+                                        PortfolioSymbol.Id,
+                                        PortfolioSymbol.SymbolId,
                                         Symbol.Ticker,
                                         Symbol.FullName,
-                                        Symbol.ExchangeName
+                                        Symbol.ExchangeName,                        
+                                        PortfolioSymbol.SortOrder
                                     FROM
                                         PortfolioSymbol
                                     INNER JOIN
@@ -186,7 +254,7 @@ namespace FomoAPI.Infrastructure.Repositories
                 using (var multiCommand = await connection.QueryMultipleAsync(getPortfolioSql, new { portfolioId }))
                 {
                     var portfolioResultSet = await multiCommand.ReadAsync<Portfolio>();
-                    var portfolioSymbolsResultSet = await multiCommand.ReadAsync<Symbol>();
+                    var portfolioSymbolsResultSet = await multiCommand.ReadAsync<PortfolioSymbol>();
 
                     portfolio = portfolioResultSet.FirstOrDefault();
 

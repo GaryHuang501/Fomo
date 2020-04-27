@@ -5,17 +5,18 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
-    /// <summary>
-    /// A Stock Symbol such as TSLA, MSFT, AAPL.
-    /// </summary>
-    public class Symbol
+    public class PortfolioSymbol
     {
         public int Id { get; set; }
+
+        public int SymbolId { get; set; }
 
         public string Ticker { get; set; }
 
         public string ExchangeName { get; set; }
 
         public string FullName { get; set; }
+
+        public int SortOrder { get; set; }
     }
 }

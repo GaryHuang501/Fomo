@@ -30,7 +30,6 @@ namespace FomoAPIIntegrationTests
             });
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
-            client.BaseAddress = new System.Uri($"{client.BaseAddress}{apiEndPoint}");
             return client;
         }
     }

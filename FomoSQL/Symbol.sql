@@ -9,5 +9,11 @@
 )
 GO;
 
-CREATE NONCLUSTERED INDEX IX_Symbol_FK_ExchangeName ON Portfolio(UserId);
+CREATE NONCLUSTERED INDEX IX_Symbol_FK_ExchangeName ON Symbol(ExchangeName);
+GO;
+
+CREATE NONCLUSTERED INDEX IX_Symbol_Ticker ON Symbol(Ticker);
+GO;
+
+CREATE NONCLUSTERED INDEX IX_Symbol_FullName ON Symbol(FullName);
 GO;

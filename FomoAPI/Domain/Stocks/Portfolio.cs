@@ -20,6 +20,6 @@ namespace FomoAPI.Domain.Stocks
 
         public DateTime DateCreated { get; set; }
 
-        public IEnumerable<Symbol> Symbols { get; set; }
+        public IEnumerable<PortfolioSymbol> Symbols { get; set; }
     }
 }

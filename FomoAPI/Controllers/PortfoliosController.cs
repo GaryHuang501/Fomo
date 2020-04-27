@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -62,25 +63,45 @@ namespace FomoAPI.Controllers
             return Ok(newPortfolio);
         }
 
-        [HttpPost("{id}/symbols")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
-        {          
-           var success = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.Ticker, addPortfolioSymbolCommand.Exchange);
-
-            if (!success)
-            {
-                return NotFound("Portfolio or symbol does not exist.");
-            }
-
-            return Ok();
-        }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             await _portfolioRepository.DeletePortfolio(id);
+
+            return Ok();
+        }
+
+        [HttpPost("{id}/portfolioSymbols")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
+        {          
+           var portfolioSymbol = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.SymbolId);
+
+            if (portfolioSymbol == null)
+            {
+                return BadRequest("Symbol does not exist or already exists in portfolio");
+            }
+
+            return Ok(portfolioSymbol);
+        }
+
+        [HttpPatch("{id}/portfolioSymbols/reorder")]
+        public async Task<IActionResult> ReorderPortfolioSymbol(int id, [FromBody] ReorderPortfolioCommand reorderPortfolioCommand)
+        {
+            var success = await _portfolioRepository.ReorderPortfolioSymbol(id, reorderPortfolioCommand.PortfolioSymbolIdToSortOrder);
+
+            if (!success)
+            {
+                NotFound("Portfolio or PortfolioSymbol was not found.");
+            }
+            return Ok();
+        }
+
+        [HttpDelete("{id}/portfolioSymbols/{portfolioSymbolid}")]
+        public async Task<IActionResult> DeletePortfolioSymbol(int portfolioSymbolid)
+        {
+            await _portfolioRepository.DeletePortfolioSymbol(portfolioSymbolid);
 
             return Ok();
         }

@@ -1,5 +1,7 @@
 ﻿using FomoAPI.Domain.Stocks;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Repositories
@@ -11,7 +13,7 @@ namespace FomoAPI.Infrastructure.Repositories
     /// </summary>
     public interface IPortfolioRepository
     {
-        Task<bool> AddPortfolioSymbol(int portfolioId, string ticker, string exchange);
+        Task<PortfolioSymbol> AddPortfolioSymbol(int portfolioId, int symbolId);
 
         Task AddPriceAlert(Guid userId);
 
@@ -21,8 +23,10 @@ namespace FomoAPI.Infrastructure.Repositories
 
         Task<Portfolio> GetPortfolio(int portfolioId);
 
-        Task RemovePortfolioSymbol(int portfolioId, int symbolId);
+        Task DeletePortfolioSymbol(int portfolioSymbolID);
 
         Task<bool> RenamePortfolio(int portfolioId, string newName);
+
+        Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<string, int> portfolioSymbolIdToSortOrder);
     }
 }
