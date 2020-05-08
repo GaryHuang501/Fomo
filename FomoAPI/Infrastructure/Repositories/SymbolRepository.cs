@@ -30,12 +30,16 @@ namespace FomoAPI.Infrastructure.Repositories
         public async Task<IEnumerable<Symbol>> GetSymbols(string keyword)
         {
             var sql = @"SELECT TOP 5
-                            Id,
-                            Ticker,
-                            FullName,
-                            ExchangeName
+                            Symbol.Id,
+                            Symbol.Ticker,
+                            Symbol.FullName,
+                            Exchange.Name [ExchangeName]
                         FROM
                             Symbol
+                        INNER JOIN
+                            Exchange
+                        ON
+                            Exchange.Id = Symbol.ExchangeId
                         WHERE
                             Ticker LIKE @tickerSearch
                             OR

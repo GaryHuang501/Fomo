@@ -19,6 +19,5 @@ namespace FomoAPI.Infrastructure.Enums
         {
             Name = name;
         }
-
     }
 }

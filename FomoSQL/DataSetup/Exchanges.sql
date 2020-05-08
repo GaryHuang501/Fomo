@@ -1,3 +1,5 @@
-﻿INSERT INTO Exchange (Name) VALUES
-('NASDAQ'),
-('NYSE')
+﻿INSERT INTO Exchange (ID, Name) VALUES
+(1, 'NASDAQ'),
+(2, 'NYSE'),
+(3, 'NYSE ARCA'),
+(4, 'NYSE AMERICAN');

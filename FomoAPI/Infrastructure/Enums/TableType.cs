@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Enums
 {
-    public class TableTypes
+    public class TableType
     {
         public const string PortfolioSymbolSortOrderType = "PortfolioSymbolSortOrderType";
     }

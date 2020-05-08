@@ -85,11 +85,11 @@ namespace FomoAPI.Application.EventBuses
         /// <returns>Task to await</returns>
         public async Task ExecutePendingQueriesAsync()
         {
-            _logger.LogTrace($"Fetching query priority list");
+            _logger.LogTrace("Fetching query priority list");
 
             var queriesToExecute = _queryQueue.Take(_maxQueryPerIntervalThreshold);
 
-            _logger.LogInformation($"{queriesToExecute.Count()} queries pended up");
+            _logger.LogInformation("{queryCount} queries pended up", queriesToExecute.Count());
 
             var queryTasks = queriesToExecute.Select(x => ExecuteQuery(x));
             await Task.WhenAll(queryTasks);
@@ -99,7 +99,7 @@ namespace FomoAPI.Application.EventBuses
         {
             try
             {
-                _logger.LogTrace($"Executing query {query.Symbol}");
+                _logger.LogTrace("Executing query for symbol {symbol}", query.Symbol);
 
                 var executorContext = _queryExecutorContextRegistry.GetExecutorContext(query);
 
@@ -123,13 +123,13 @@ namespace FomoAPI.Application.EventBuses
 
                 await ExecuteQueryResultTriggers(executorContext, queryResult);
 
-                _logger.LogTrace($"Finished processing query {query.Symbol}");
+                _logger.LogTrace("Finished processing symbol query", query.Symbol);
 
             }
             catch (Exception ex)
             {
                 _queryQueue.Remove(query);
-                _logger.LogError(ex, $"Unexpected error in event bus for query {query.Symbol}");
+                _logger.LogError(ex, "Unexpected error in event bus for query {Symbol}", query.Symbol);
             }
         }
 
@@ -137,11 +137,11 @@ namespace FomoAPI.Application.EventBuses
         {
            var queryResult = await executorContext.FetchQueryResultAsync(query);
 
-            _logger.LogTrace($"Saving query results {query.Symbol}");
+            _logger.LogTrace("Saving query results for {symbol}", query.Symbol);
 
             if (queryResult.HasError)
             {
-                _logger.LogError($"Error running query {query.Symbol}: {queryResult.ErrorMessage}");
+                _logger.LogError("Error running query for {symbol}: {error}", query.Symbol, queryResult.ErrorMessage);
             }
 
             return queryResult;
@@ -151,7 +151,7 @@ namespace FomoAPI.Application.EventBuses
         {
             var queryResultTriggers = executorContext.GetQueryResultTriggers();
 
-            _logger.LogTrace($"Executing Query Result Triggers");
+            _logger.LogTrace("Executing Query Result Triggers");
 
             foreach (var trigger in queryResultTriggers)
             {

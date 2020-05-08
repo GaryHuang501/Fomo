@@ -154,10 +154,9 @@ namespace FomoAPI
         public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration config)
         {
             services.AddHttpClient("AlphaVantage", c =>
-            {
-                c.BaseAddress = new Uri(config.GetValue<string>("AlphaVantageUrl"));
-            });
-
+                    {
+                        c.BaseAddress = new Uri(config["AlphaVantage:AlphaVantageUrl"]);
+                    });
             return services;
         }
 

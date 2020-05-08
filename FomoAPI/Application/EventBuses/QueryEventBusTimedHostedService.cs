@@ -67,7 +67,7 @@ namespace FomoAPI.Application.EventBuses
 
         private void SetEventBusState()
         {
-            _logger.LogInformation($"Resetting Event Bus state");
+            _logger.LogInformation("Resetting Event Bus state");
             _logger.LogInformation($"Max queries to run per interval is {_eventBusOptions.MaxQueriesPerInterval}");
 
             try
@@ -77,13 +77,13 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error refreshing event bus state state" );
+                _logger.LogError(ex, "Error refreshing event bus state state" );
             }
         }
 
         private async Task ExecuteEventBus()
         {
-            _logger.LogInformation($"Scheduling event bus queries");
+            _logger.LogInformation("Scheduling event bus queries");
 
             try
             {
@@ -91,7 +91,7 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error executing queries");
+                _logger.LogError(ex, "Error executing queries");
             }
         }
 

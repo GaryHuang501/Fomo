@@ -31,7 +31,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
             _mockAlphaVantageClient = new Mock<IAlphaVantageClient>();
 
             var mockCacheOptions = new Mock<IOptionsMonitor<CacheOptions>>();
-            mockCacheOptions.Setup(x => x.CurrentValue).Returns(new CacheOptions
+            mockCacheOptions.Setup(x => x.Get(SingleQuoteCache.CacheName)).Returns(new CacheOptions
             {
                 CacheItemSize = 10,
                 CacheExpiryTimeMinutes = 1,

@@ -22,6 +22,11 @@ namespace FomoAPIIntegrationTests
             get { return _appSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
         }
 
+        public NasdaqOptions NasdaqOptions
+        {
+            get { return _appSettingsConfig.GetSection("Nasdaq").Get<NasdaqOptions>(); }
+        }
+
         public string FomoApiURL
         {
             get

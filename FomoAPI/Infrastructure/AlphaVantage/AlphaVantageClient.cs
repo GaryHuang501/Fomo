@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
+using System.Web.Http;
 
 namespace FomoAPI.Infrastructure.AlphaVantage
 {
@@ -58,12 +59,11 @@ namespace FomoAPI.Infrastructure.AlphaVantage
                 var urlWithQueryString = QueryHelpers.AddQueryString(_alphaVantageOptions.Url, query.GetParameters());
                 urlWithQueryString = QueryHelpers.AddQueryString(urlWithQueryString, AlphaVantageQueryKeys.ApiKey, _alphaVantageOptions.ApiKey);
 
-                var request = new HttpRequestMessage(HttpMethod.Get, urlWithQueryString);
                 var client = _clientFactory.CreateClient(_alphaVantageOptions.ClientName);
 
-                _logger.LogTrace($"Executing query http request: {urlWithQueryString}");
+                _logger.LogTrace("Executing query http request url: {url}", urlWithQueryString);
 
-                var response = await client.SendAsync(request);
+                var response = await client.GetAsync(urlWithQueryString);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -87,12 +87,13 @@ namespace FomoAPI.Infrastructure.AlphaVantage
                 }
                 else
                 {
+                    _logger.LogError("Failed to retrieve data from AlphaVantage: {reason}", response.ReasonPhrase);
                     queryResult = new AlphaVantageQueryResult<T>(error: response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error Executing query http request");
+                _logger.LogError(ex, "Error Executing query http request");
                 queryResult = new AlphaVantageQueryResult<T>(error: ex.Message);
             }
 

@@ -31,10 +31,10 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <returns></returns>
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
-            var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated)
+            var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
                         OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateCreated
                         VALUES
-                        (@userId, @name, GETUTCDATE());";
+                        (@userId, @name, GETUTCDATE(), GETUTCDATE());";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -74,7 +74,7 @@ namespace FomoAPI.Infrastructure.Repositories
                             PortfolioSymbol.Id,
                             PortfolioSymbol.SymbolId,
                             Symbol.Ticker,
-                            Symbol.ExchangeName,
+                            Exchange.ExchangeName,
                             Symbol.FullName,
                             PortfolioSymbol.SortOrder
                         FROM 
@@ -83,6 +83,10 @@ namespace FomoAPI.Infrastructure.Repositories
                             Symbol
                         ON
                             Symbol.Id = PortfolioSymbol.SymbolId
+                        INNER JOIN
+                            Exchange
+                        ON
+                            Exchange.Id = Symbol.ExchangeId
                         INNER JOIN
                             @InsertedId InsertedId
                         ON
@@ -202,7 +206,7 @@ namespace FomoAPI.Infrastructure.Repositories
                 var rowsUpdated = await connection.ExecuteAsync(reorderSQL, 
                     new { 
                         portfolioId, 
-                        tvpNewSortOrder = reorderTableValueData.AsTableValuedParameter(TableTypes.PortfolioSymbolSortOrderType) }
+                        tvpNewSortOrder = reorderTableValueData.AsTableValuedParameter(TableType.PortfolioSymbolSortOrderType) }
                     );
 
                 return rowsUpdated > 0;
@@ -238,7 +242,7 @@ namespace FomoAPI.Infrastructure.Repositories
                                         PortfolioSymbol.SymbolId,
                                         Symbol.Ticker,
                                         Symbol.FullName,
-                                        Symbol.ExchangeName,                        
+                                        Exchange.ExchangeName,                        
                                         PortfolioSymbol.SortOrder
                                     FROM
                                         PortfolioSymbol
@@ -246,6 +250,10 @@ namespace FomoAPI.Infrastructure.Repositories
                                         Symbol
                                     ON
                                         Symbol.Id = PortfolioSymbol.SymbolId
+                                    INNER JOIN
+                                        Exchange
+                                    ON
+                                        Exchange.Id = Symbol.ExchangeId
                                     WHERE
                                         PortfolioSymbol.PortfolioId = @portfolioId";
 
