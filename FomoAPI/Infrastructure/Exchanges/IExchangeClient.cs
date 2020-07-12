@@ -11,9 +11,10 @@ namespace FomoAPI.Infrastructure.Exchanges
     public interface IExchangeClient
     {
         /// <summary>
-        /// Get all the listed traded symbols for for stock exchanges
+        /// Get all the listed traded symbols for for all major stock exchanges
         /// </summary>
-        /// <returns>Dictionary with Ticker Symbol as key and the downloaded symbol as the value.</returns>
-        public Task<IDictionary<string, DownloadedSymbol>> GetTradedSymbols();
+        /// <param name="syncSettings">The <see cref="ExchangeSyncSetting"/> containing sync settings.</ExchangeSyncSetting> </param>
+        /// <returns>IReadOnlyDictionary with <see cref="SymbolKey"/> as key and <see cref="DownloadedSymbol"/> for the value.</returns>
+        Task<IReadOnlyDictionary<SymbolKey, DownloadedSymbol>> GetTradedSymbols(ExchangeSyncSetting syncSettings);
     }
 }

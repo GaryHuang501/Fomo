@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace FomoAPIIntegrationTests
 {
+    /// <summary>
+    /// Settings wrapper for settings from actual App
+    /// </summary>
     public class AppSettings
     {
         private static readonly Lazy<AppSettings> _instance = new Lazy<AppSettings>(new AppSettings());
@@ -15,17 +18,12 @@ namespace FomoAPIIntegrationTests
 
         private readonly IConfiguration _launchSettingsConfig;
 
-        private readonly IConfiguration _credentialsConfig;
 
         public AlphaVantageOptions AlphaVantageOptions
         {
             get { return _appSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
         }
 
-        public NasdaqOptions NasdaqOptions
-        {
-            get { return _appSettingsConfig.GetSection("Nasdaq").Get<NasdaqOptions>(); }
-        }
 
         public string FomoApiURL
         {
@@ -41,16 +39,10 @@ namespace FomoAPIIntegrationTests
             }
         }
 
-        public Guid TestUserId
-        {
-            get { return Guid.Parse(_credentialsConfig["TestUser:UserId"]); }
-        }
-
         public AppSettings()
         {
             _appSettingsConfig = CreateConfiguration("appSettings.json");
             _launchSettingsConfig = CreateConfiguration("launchSettings.json");
-            _credentialsConfig = CreateConfiguration("credentials.json");
         }
 
         private IConfiguration CreateConfiguration(string fileName)

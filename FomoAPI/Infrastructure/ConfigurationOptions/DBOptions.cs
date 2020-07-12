@@ -6,5 +6,9 @@ namespace FomoAPI.Infrastructure.ConfigurationOptions
     {
         [Required]
         public string ConnectionString { get; set; }
+
+        [Required]
+        [Range(1, 10000)]
+        public int DefaultBulkCopyBatchSize { get; set; }
     }
 }

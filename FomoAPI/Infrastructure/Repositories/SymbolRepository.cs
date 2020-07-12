@@ -27,13 +27,43 @@ namespace FomoAPI.Infrastructure.Repositories
         /// </summary>
         /// <param name="keyword">keyword to search for</param>
         /// <returns>IEnumerable of Symbols</returns>
+        public async Task<Symbol> GetSymbol(string ticker)
+        {
+            var sql = @"SELECT
+                            Symbol.Id,
+                            Symbol.Ticker,
+                            Symbol.FullName,
+                            Exchange.Id [ExchangeId],
+                            Exchange.Name [ExchangeName],
+                            Symbol.Delisted
+                        FROM
+                            Symbol
+                        INNER JOIN
+                            Exchange
+                        ON
+                            Exchange.Id = Symbol.ExchangeId
+                        WHERE
+                            Ticker = @ticker;";
+
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QuerySingleAsync<Symbol>(sql, new { ticker });
+        }
+
+        /// <summary>
+        /// Get symbols matching the keyword. 
+        /// Will return symbols wherhe ticker start with the keyword or full name contains key word.
+        /// </summary>
+        /// <param name="keyword">keyword to search for</param>
+        /// <returns>IEnumerable of Symbols</returns>
         public async Task<IEnumerable<Symbol>> GetSymbols(string keyword)
         {
             var sql = @"SELECT TOP 5
                             Symbol.Id,
                             Symbol.Ticker,
                             Symbol.FullName,
-                            Exchange.Name [ExchangeName]
+                            Exchange.ExchangeId,
+                            Exchange.Name [ExchangeName],
+                            Symbol.Delisted
                         FROM
                             Symbol
                         INNER JOIN
@@ -45,10 +75,8 @@ namespace FomoAPI.Infrastructure.Repositories
                             OR
                             FullName LIKE @fullNameSearch;";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                return await connection.QueryAsync<Symbol>(sql, new { tickerSearch = $"{keyword}%", fullNameSearch = $"%{keyword}%" });
-            }
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<Symbol>(sql, new { tickerSearch = $"{keyword}%", fullNameSearch = $"%{keyword}%" });
         }
     }
 }

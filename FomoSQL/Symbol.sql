@@ -1,9 +1,10 @@
 ﻿CREATE TABLE [dbo].[Symbol]
 (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
-	[Ticker] VARCHAR(5) NOT NULL,
-	[FullName] VARCHAR(50) NOT NULL,
+	[Ticker] VARCHAR(20) NOT NULL,
+	[FullName] VARCHAR(400) NOT NULL,
 	[ExchangeId] INT NOT NULL,
+	[Delisted] BIT NOT NULL,
     CONSTRAINT FK_Symbol_ExchangeId FOREIGN KEY (ExchangeId) REFERENCES Exchange(Id),
 	CONSTRAINT AK_Symbol_Name_Ticker UNIQUE(Ticker, ExchangeId)
 )

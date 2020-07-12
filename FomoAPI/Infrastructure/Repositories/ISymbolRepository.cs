@@ -9,5 +9,7 @@ namespace FomoAPI.Infrastructure.Repositories
     public interface ISymbolRepository
     {
         Task<IEnumerable<Symbol>> GetSymbols(string keyword);
+
+        Task<Symbol> GetSymbol(string ticker);
     }
 }

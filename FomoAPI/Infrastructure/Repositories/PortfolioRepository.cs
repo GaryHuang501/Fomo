@@ -6,7 +6,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -74,8 +73,10 @@ namespace FomoAPI.Infrastructure.Repositories
                             PortfolioSymbol.Id,
                             PortfolioSymbol.SymbolId,
                             Symbol.Ticker,
+                            Symbol.ExchangeId,
                             Exchange.ExchangeName,
                             Symbol.FullName,
+                            Symbol.Delisted,
                             PortfolioSymbol.SortOrder
                         FROM 
                             PortfolioSymbol
@@ -147,11 +148,18 @@ namespace FomoAPI.Infrastructure.Repositories
 
                 using (var transaction = await connection.BeginTransactionAsync())
                 {
-                    await connection.ExecuteAsync(sql, new { portfolioId }, transaction: transaction);
-                    await transaction.CommitAsync();
+                    try
+                    {
+                        await connection.ExecuteAsync(sql, new { portfolioId }, transaction: transaction);
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
                 }
             }
-
         }
 
         /// <summary>
@@ -203,13 +211,31 @@ namespace FomoAPI.Infrastructure.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsUpdated = await connection.ExecuteAsync(reorderSQL, 
-                    new { 
-                        portfolioId, 
-                        tvpNewSortOrder = reorderTableValueData.AsTableValuedParameter(TableType.PortfolioSymbolSortOrderType) }
-                    );
+                await connection.OpenAsync();
 
-                return rowsUpdated > 0;
+                using (var transaction = await connection.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var rowsUpdated = await connection.ExecuteAsync(reorderSQL,
+                            new
+                            {
+                                portfolioId,
+                                tvpNewSortOrder = reorderTableValueData.AsTableValuedParameter(TableType.PortfolioSymbolSortOrderType)
+                            },
+                            transaction
+                        );
+
+                        await transaction.CommitAsync();
+
+                        return rowsUpdated > 0;
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
             }
         }
 
@@ -242,6 +268,8 @@ namespace FomoAPI.Infrastructure.Repositories
                                         PortfolioSymbol.SymbolId,
                                         Symbol.Ticker,
                                         Symbol.FullName,
+                                        Symbol.ExchangeId,
+                                        Symbol.Delisted,
                                         Exchange.ExchangeName,                        
                                         PortfolioSymbol.SortOrder
                                     FROM

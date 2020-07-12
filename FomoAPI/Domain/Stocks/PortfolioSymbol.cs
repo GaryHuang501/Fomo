@@ -17,6 +17,8 @@ namespace FomoAPI.Domain.Stocks
 
         public string FullName { get; set; }
 
+        public bool Delisted { get; set; }
+
         public int SortOrder { get; set; }
     }
 }

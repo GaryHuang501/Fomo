@@ -16,6 +16,10 @@ namespace FomoAPI.Domain.Stocks
 
         public string ExchangeName { get; set; }
 
+        public int ExchangeId { get; set; }
+
         public string FullName { get; set; }
+
+        public bool Delisted { get; set; }
     }
 }

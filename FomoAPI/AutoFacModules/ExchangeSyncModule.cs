@@ -1,0 +1,24 @@
+﻿using Autofac;
+using FomoAPI.Infrastructure;
+using FomoAPI.Infrastructure.Exchanges;
+using FomoAPI.Infrastructure.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace FomoAPI.AutoFacModules
+{
+    public class ExchangeSyncModule : Module
+    {
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder.RegisterType<FtpClient>().As<IFtpClient>().InstancePerDependency();
+            builder.RegisterType<NasdaqParser>().As<IExchangeParser>().InstancePerDependency();
+            builder.RegisterType<ExchangeClient>().As<IExchangeClient>().InstancePerDependency();
+            builder.RegisterType<ExchangeSyncChangesetsFactory>().As<IExchangeSyncChangesetsFactory>().InstancePerDependency();
+            builder.RegisterType<ExchangeSyncRepository>().As<IExchangeSyncRepository>().InstancePerDependency();
+            builder.RegisterType<ExchangeSync>().InstancePerLifetimeScope();
+        }
+    }
+}

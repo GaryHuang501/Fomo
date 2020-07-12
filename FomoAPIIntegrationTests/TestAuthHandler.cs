@@ -22,7 +22,7 @@ namespace FomoAPIIntegrationTests
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, "Test user"),
-                new Claim(ClaimTypes.NameIdentifier, AppSettings.Instance.TestUserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier, TestAppSettings.Instance.TestUserId.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, "Test");

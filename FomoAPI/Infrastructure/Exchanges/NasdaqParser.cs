@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Exchanges
 {
+    /// <summary>
+    /// Parser for downloaded list of symbols from Nasdaq Exchange
+    /// </summary>
     public class NasdaqParser : IExchangeParser
     {
         private readonly ILogger<NasdaqParser> _logger;
@@ -17,9 +20,16 @@ namespace FomoAPI.Infrastructure.Exchanges
             _logger = logger;
         }
 
-        public async Task<IDictionary<string, DownloadedSymbol>> GetTickerToSymbolMap(StreamReader reader, string delimiter, string[] suffixBlackList)
+        /// <summary>
+        /// Create a dictionary that maps the stock ticker to downloaded symbol data.
+        /// </summary>
+        /// <param name="reader">The stream reader containing the download data</param>
+        /// <param name="delimiter">Delimiter for the file columns</param>
+        /// <param name="suffixBlackList">Will remove the list suffixes and any characters after it.</param>
+        /// <returns>IDictionary<string, DownloadedSymbol> dictionary that maps the stock ticker to downloaded symbol data</returns>
+        public async Task<IDictionary<SymbolKey, DownloadedSymbol>> GetSymbolMap(StreamReader reader, string delimiter, string[] suffixBlackList)
         {
-            var tickerToSymbolMap = new Dictionary<string, DownloadedSymbol>();
+            var tickerToSymbolMap = new Dictionary<SymbolKey, DownloadedSymbol>();
             var headers = reader.ReadLine().Split(delimiter);
 
             int symbolIndex = GetHeaderIndex("Symbol", headers);
@@ -51,7 +61,7 @@ namespace FomoAPI.Infrastructure.Exchanges
 
                 _logger.LogTrace("Added ticker {ticker} for exchange {exchange}", columns[symbolIndex], columns[exchangeIndex]);
 
-                tickerToSymbolMap.Add(symbol.Ticker, symbol);
+                tickerToSymbolMap.Add(new SymbolKey(symbol.Ticker, symbol.ExchangeId), symbol);
             }
 
             if (tickerToSymbolMap.Keys.Count == 0) 

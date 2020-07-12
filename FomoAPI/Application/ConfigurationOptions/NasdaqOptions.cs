@@ -17,8 +17,5 @@ namespace FomoAPI.Application.ConfigurationOptions
         public string Delimiter { get; set; }
 
         public string[] SuffixBlackList { get; set; }
-
-        [Range(1, 100)]
-        public int CircuitBreakerPercentChanges { get; set; }
     }
 }

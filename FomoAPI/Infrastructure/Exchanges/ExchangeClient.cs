@@ -1,10 +1,8 @@
-﻿using FomoAPI.Application.ConfigurationOptions;
-using Microsoft.Extensions.Options;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace FomoAPI.Infrastructure.Exchanges
 {
@@ -13,18 +11,15 @@ namespace FomoAPI.Infrastructure.Exchanges
     /// </summary>
     public class ExchangeClient : IExchangeClient
     {
-        private readonly IExchangeOptions _exchangeOptions;
-
         private readonly IExchangeParser _parser;
 
         private readonly ILogger _logger;
 
         private readonly IFtpClient _ftpClient;
 
-        public ExchangeClient(IFtpClient ftpClient, IOptionsMonitor<IExchangeOptions> optionsAccessor, IExchangeParser parser, ILogger<ExchangeClient> logger)
+        public ExchangeClient(IFtpClient ftpClient, IExchangeParser parser, ILogger<ExchangeClient> logger)
         { 
             _ftpClient = ftpClient;
-            _exchangeOptions = optionsAccessor.CurrentValue;
             _parser = parser;
             _logger = logger;
         }
@@ -32,20 +27,19 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <summary>
         /// Get all the listed traded symbols for for all major stock exchanges from nasdaq ftp
         /// </summary>
-        /// <returns>Dictionary with Ticker Symbol as key and the downloaded symbol as the value.</returns>
-        public async Task<IDictionary<string, DownloadedSymbol>> GetTradedSymbols()
+        /// <param name="syncSettings">The <see cref="ExchangeSyncSetting"/> containing sync settings.</ExchangeSyncSetting> </param>
+        /// <returns>IReadOnlyDictionary with <see cref="SymbolKey"/> as key and <see cref="DownloadedSymbol"/> for the value.</returns>
+        public async Task<IReadOnlyDictionary<SymbolKey, DownloadedSymbol>> GetTradedSymbols(ExchangeSyncSetting syncSettings)
         {
-            IDictionary<string, DownloadedSymbol> tickerToSymbolMap = new Dictionary<string, DownloadedSymbol>();
-
-            _logger.LogTrace("Executing query http request url: {url}", _exchangeOptions.Url);
+            _logger.LogTrace("Executing query http request url: {url}", syncSettings.Url);
 
             // no login necessary
-            using var stream = _ftpClient.DownloadFile(_exchangeOptions.Url, string.Empty, string.Empty);
+            using var stream = _ftpClient.DownloadFile(syncSettings.Url, string.Empty, string.Empty);
             using StreamReader reader = new StreamReader(stream);
 
-            tickerToSymbolMap = await _parser.GetTickerToSymbolMap(reader, _exchangeOptions.Delimiter, _exchangeOptions.SuffixBlackList);
+            var tickerToSymbols = await _parser.GetSymbolMap(reader, syncSettings.Delimiter, syncSettings.SuffixBlackList);
   
-            return tickerToSymbolMap;
+            return new ReadOnlyDictionary<SymbolKey, DownloadedSymbol>(tickerToSymbols);
         }
     }
 }
