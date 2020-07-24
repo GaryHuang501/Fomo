@@ -70,7 +70,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = 5,
-                DelayMSRunScheduleEventBus = 10000,
+                IntervalLengthMS = 10000,
             };
 
             SetupEventBusStub(options);
@@ -101,7 +101,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = 5,
-                DelayMSRunScheduleEventBus = 100, // use a bigger interval for less noise
+                IntervalLengthMS = 100, // use a bigger interval for less noise
             };
 
             SetupEventBusStub(options);
@@ -111,7 +111,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
                 await hostedService.StartAsync(new CancellationToken());
                 await Task.Delay(waitMs);
 
-                var approximateNumberOfExpectedCalls = (waitMs / options.DelayMSRunScheduleEventBus);
+                var approximateNumberOfExpectedCalls = (waitMs / options.IntervalLengthMS);
                 var actualNumberOfCalls = _eventList.Count(e => e == EventType.ResetQueryExecutedCounter);
                 Assert.True(Math.Abs(actualNumberOfCalls - approximateNumberOfExpectedCalls)  < 2 );
             }
@@ -125,7 +125,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = settingValue,
-                DelayMSRunScheduleEventBus = 100, // use a bigger interval for less noise
+                IntervalLengthMS = 100, // use a bigger interval for less noise
             };
 
             SetupEventBusStub(options);
@@ -145,7 +145,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = 100,
-                DelayMSRunScheduleEventBus = settingValue, // use a bigger interval for less noise
+                IntervalLengthMS = settingValue, // use a bigger interval for less noise
             };
 
             SetupEventBusStub(options);

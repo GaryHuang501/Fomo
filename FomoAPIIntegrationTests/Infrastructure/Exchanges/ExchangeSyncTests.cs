@@ -1,14 +1,10 @@
 ﻿using Dapper;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure;
-using FomoAPI.Infrastructure.ConfigurationOptions;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPI.Infrastructure.Exchanges;
 using FomoAPI.Infrastructure.Repositories;
+using FomoAPIIntegrationTests.Fixtures;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,9 +17,9 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
         
         private ExchangeSyncRepository _syncRepo;
 
-        private SymbolRepository _symbolRepository;
+        private SymbolRepository _symbolRepo;
 
-        private string _connectionString = TestAppSettings.Instance.TestDBConnectionString;
+        private string _connectionString = AppTestSettings.Instance.TestDBConnectionString;
 
         public ExchangeSyncTests()
         {
@@ -31,54 +27,20 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
 
         public async Task InitializeAsync()
         {
-            var mockDbOptions = new Mock<IOptionsMonitor<DbOptions>>();
-            mockDbOptions.Setup(x => x.CurrentValue).Returns(new DbOptions
-            {
-                ConnectionString = TestAppSettings.Instance.TestDBConnectionString,
-                DefaultBulkCopyBatchSize = TestAppSettings.Instance.DefaultBulkCopyBatchSize
-            });
+            var cleanFixture = new CleanDBFixture();
+            var exchangeSyncSetupFixture = new ExchangeSyncSetupFixture();
 
-            var nasdaqLogger = new Mock<ILogger<NasdaqParser>>();
-            var exchangeClientLogger = new Mock<ILogger<ExchangeClient>>();
+            await cleanFixture.InitializeAsync();
+            await exchangeSyncSetupFixture.InitializeAsync();
 
-            // Setup dependencies
-            _syncRepo = new ExchangeSyncRepository(mockDbOptions.Object);
-            _symbolRepository = new SymbolRepository(mockDbOptions.Object);
-
-            string nasdaqDownloadUrl = (await _syncRepo.GetSyncSettings()).Url;
-
-            // Stub FTP so we use downloaded file from disk instead of every test run
-            var stubFTPClient = new StubNasdaqFtpClient(nasdaqDownloadUrl);
-
-            var exchangeClient = new ExchangeClient(
-                            ftpClient: stubFTPClient,
-                            parser: new NasdaqParser(nasdaqLogger.Object),
-                            logger: exchangeClientLogger.Object);
-
-            var changesetFactory = new ExchangeSyncChangesetsFactory();
-
-            _sync = new ExchangeSync(exchangeClient, _syncRepo, changesetFactory, new Mock<ILogger<ExchangeSync>>().Object);
-
-            await PrepareDB();
+            _sync = exchangeSyncSetupFixture.ExchangeSync;
+            _syncRepo = exchangeSyncSetupFixture.ExchangeSyncRepo;
+            _symbolRepo = exchangeSyncSetupFixture.SymbolRepo;
         }
 
         public Task DisposeAsync()
         {
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// At the start of every test clear the table and resync the symbols table
-        /// </summary>
-        /// <returns>Task</returns>
-        private async Task PrepareDB()
-        {
-            await ClearSavedData();
-
-            // Disable sync changes threshold since we just cleared the entire table
-            await ToggleSyncThreshold(false);
-            await _sync.Sync();
-            await ToggleSyncThreshold(true);
         }
 
         [Fact]
@@ -88,8 +50,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             Assert.True(symbolCountFirstSync > 8000);
 
             // Check for major tickers
-            var jpmSymbol = (await _symbolRepository.GetSymbol("JPM"));
-            var msftSymbol = (await _symbolRepository.GetSymbol("MSFT"));
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM", ExchangeType.NYSE);
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT", ExchangeType.NASDAQ);
 
             Assert.Equal("JPM", jpmSymbol.Ticker);
             Assert.Equal("NYSE", jpmSymbol.ExchangeName);
@@ -110,8 +72,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
         public async Task Should_AddNewSymbols_WhenExistingData()
         {
             int symbolCountFirstSync = await GetSymbolCount();
-            var jpmSymbol = (await _symbolRepository.GetSymbol("JPM"));
-            var msftSymbol = (await _symbolRepository.GetSymbol("MSFT"));
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM", ExchangeType.NYSE);
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT", ExchangeType.NASDAQ);
 
             await DeleteSymbol(jpmSymbol.Ticker, jpmSymbol.ExchangeId);
             await DeleteSymbol(msftSymbol.Ticker, msftSymbol.ExchangeId);
@@ -140,7 +102,7 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
 
             var testSymbol2 = new Symbol
             {
-                ExchangeId = ExchangeType.NASDAQ.Id,
+                ExchangeId = ExchangeType.NYSE.Id,
                 FullName = "Test Symbol 2",
                 Ticker = "Test@2",
             };
@@ -148,8 +110,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             await _syncRepo.AddSymbols(new List<Symbol> { testSymbol1, testSymbol2 });
             await _sync.Sync();
 
-            var test1Symbol = (await _symbolRepository.GetSymbol("Test@1"));
-            var test2Symbol = (await _symbolRepository.GetSymbol("Test@2"));
+            var test1Symbol = await _symbolRepo.GetSymbol("Test@1", ExchangeType.NASDAQ);
+            var test2Symbol = await _symbolRepo.GetSymbol("Test@2", ExchangeType.NYSE);
 
             Assert.True(test1Symbol.Delisted);
             Assert.True(test2Symbol.Delisted);
@@ -166,8 +128,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             await UpdateSymbolFullName("DKNG", ExchangeType.NASDAQ.Id, "FAKE");
             await _sync.Sync();
 
-            var snapSymbol = (await _symbolRepository.GetSymbol("SNAP"));
-            var dkngSymbol = (await _symbolRepository.GetSymbol("DKNG"));
+            var snapSymbol = await _symbolRepo.GetSymbol("SNAP", ExchangeType.NYSE);
+            var dkngSymbol = await _symbolRepo.GetSymbol("DKNG", ExchangeType.NASDAQ);
 
             Assert.DoesNotContain("FAKE", snapSymbol.FullName);
             Assert.DoesNotContain("FAKE", dkngSymbol.FullName);
@@ -176,21 +138,44 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             Assert.Equal(nameof(SymbolDetailsChangeset), updateSyncHistory.ActionName);
             Assert.Equal(2, updateSyncHistory.SymbolsChanged);
         }
-   
+
         [Fact]
-        public async Task Should_ThrowException_WhenThresholdExeeded()
+        public async Task Should_ThrowException_WhenThresholdEnabledAndZeroSymbols()
         {
             await ClearSavedData();
             await ToggleSyncThreshold(true);
             await Assert.ThrowsAsync<ExchangeSyncException>(async () => await _sync.Sync());
         }
 
+        [Fact]
+        public async Task Should_ThrowException_WhenThresholdExeeded()
+        {
+            int currentSymbolCount = await GetSymbolCount();
+            int deleteCountToKeep100Symbols = currentSymbolCount - 100;
+            await DeleteRandomSymbols(deleteCountToKeep100Symbols);
+            await ToggleSyncThreshold(true);
+            await Assert.ThrowsAsync<ExchangeSyncException>(async () => await _sync.Sync());
+        }
+
+        private async Task ToggleSyncThreshold(bool enable)
+        {
+            var sql = @"UPDATE ExchangeSyncSetting SET DisableThresholds = @disable";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(sql, new { disable = !enable });
+        }
 
         private async Task<int> GetSymbolCount()
         {
             var sql = @"SELECT COUNT(Id) FROM Symbol";
             using var connection = new SqlConnection(_connectionString);
             return await connection.ExecuteScalarAsync<int>(sql);     
+        }
+
+        private async Task DeleteRandomSymbols(int count)
+        {
+            var sql = @"DELETE TOP(@count) FROM Symbol";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(sql, new { count});
         }
 
         private async Task DeleteSymbol(string ticker, int exchangeId)
@@ -215,13 +200,6 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             var sql = @"SELECT TOP 1 * FROM ExchangeSyncHistory ORDER BY DateCreated DESC";
             using var connection = new SqlConnection(_connectionString);
             return await connection.QuerySingleAsync<ExchangeSyncHistory>(sql);
-        }
-
-        private async Task ToggleSyncThreshold(bool enable)
-        {
-            var sql = @"UPDATE ExchangeSyncSetting SET DisableThresholds = @disable";
-            using var connection = new SqlConnection(_connectionString);
-            await connection.ExecuteAsync(sql, new{ disable = !enable});
         }
 
         private async Task UpdateSymbolFullName(string ticker, int exchangeId, string fullName)

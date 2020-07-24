@@ -29,7 +29,7 @@ namespace FomoAPI.Application.EventBuses
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is starting");
-            _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} will reset state and run any pending queries every {_eventBusOptions.DelayMSRunScheduleEventBus} seconds");
+            _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} will reset state and run any pending queries every {_eventBusOptions.IntervalLengthMS} milliseconds");
 
             ValidateOptions();
 
@@ -38,16 +38,16 @@ namespace FomoAPI.Application.EventBuses
                 SetEventBusState();
                 EnqueuePendingQueries();
                 await ExecuteEventBus();
-            }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(_eventBusOptions.DelayMSRunScheduleEventBus));
+            }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(_eventBusOptions.IntervalLengthMS));
 
             return Task.CompletedTask;
         }
 
         private void ValidateOptions()
         {
-            if (_eventBusOptions.DelayMSRunScheduleEventBus <= 0)
+            if (_eventBusOptions.IntervalLengthMS <= 0)
             {
-                var error = $"{nameof(_eventBusOptions.DelayMSRunScheduleEventBus)} cannot be less than or equal to 0";
+                var error = $"{nameof(_eventBusOptions.IntervalLengthMS)} cannot be less than or equal to 0";
                 _logger.LogError(error);
                 throw new ArgumentException(error);
             }

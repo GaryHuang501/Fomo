@@ -21,8 +21,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
         public AlphaVantageContractTests()
         {
             _mockAlphaVantageOptionsAccessor = new Mock<IOptionsMonitor<AlphaVantageOptions>>();
-            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppSettings.Instance.AlphaVantageOptions);
-            _mockHttpFactory = new MockHttpClientFactory(AppSettings.Instance.AlphaVantageOptions.Url);
+            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppTestSettings.Instance.AlphaVantageOptions);
+            _mockHttpFactory = new MockHttpClientFactory(AppTestSettings.Instance.AlphaVantageOptions.Url);
             _parserFactory = new AlphaVantageParserFactory();
             _mockLogger = new Mock<ILogger<AlphaVantageClient>>();
         }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +17,17 @@ namespace FomoAPI
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+
             return Host.CreateDefaultBuilder(args)
                     .ConfigureAppConfiguration((hostingContext, config) =>
                     {
+                        var env = hostingContext.HostingEnvironment;
                         config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("authentication.json", optional: true, reloadOnChange: true);
+                        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                              .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                              .AddJsonFile("authentication.json", optional: true, reloadOnChange: true);
+
+                        config.AddEnvironmentVariables();
                     })
                     .ConfigureWebHostDefaults(webBuilder =>
                     {
@@ -32,7 +39,6 @@ namespace FomoAPI
                         logging.AddConsole();
                     })
                     .UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
         }
     }
 }

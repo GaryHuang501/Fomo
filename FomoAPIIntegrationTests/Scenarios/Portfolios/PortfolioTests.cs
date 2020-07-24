@@ -1,4 +1,6 @@
 ﻿using FomoAPI.Domain.Stocks;
+using FomoAPI.Infrastructure.Enums;
+using FomoAPIIntegrationTests.Fixtures;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,13 +12,13 @@ using Xunit;
 
 namespace FomoAPIIntegrationTests.Scenarios.Portfolios
 {
-    public class PortfolioTests: IClassFixture<FomoApiApplicationFactory>
+    public class PortfolioTests: IClassFixture<ExchangeSyncSetupFixture>
     {
         private readonly HttpClient _client;
 
-        public PortfolioTests(FomoApiApplicationFactory clientFactory)
+        public PortfolioTests()
         {
-            _client = clientFactory.CreateClientNoAuth("api/portfolios/");
+            _client = (new FomoApiApplicationFactory()).CreateClientNoAuth("api/portfolios/");
         }
 
         private string PortfolioPath(int? portfolioId = null) => $"api/portfolios/{portfolioId}";
@@ -25,7 +27,7 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
 
         private string PortfolioSymbolsReorderPath(int portfolioId) => $"api/portfolios/{portfolioId}/portfolioSymbols/reorder";
 
-        private string SymbolsSearchPath(string keyword) => $"api/Symbols/?keyword={keyword}";
+        private string SymbolFetchPath(string ticker, ExchangeType exchange) => $"api/Symbols/?ticker={ticker}&exchangeId={exchange.Id}";
 
         [Fact]
         public async Task Should_GetNewPortfolioWithCorrectSymbolsAddedInCorrectOrder()
@@ -47,14 +49,8 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.Equal(portfolio.Name, portfolioName);
 
             // Search for symbols by keyword
-            var searchTSLASymbolResponse = await _client.GetAsync(SymbolsSearchPath("TSLA"));
-            searchTSLASymbolResponse.EnsureSuccessStatusCode();
-
-            var searchJPMSymbolResponse = await _client.GetAsync(SymbolsSearchPath("JPM"));
-            searchJPMSymbolResponse.EnsureSuccessStatusCode();
-
-            var tslaSymbol = (await searchTSLASymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
-            var jpmSymbol = (await searchJPMSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
+            var tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
+            var jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to portfolio
             var addTSLAResponse =  await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.Id }.ToJsonPayload());
@@ -111,10 +107,7 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.True(portfolio.Id > 0);
 
             // Search for symbols by keyword
-            var searchTSLASymbolResponse = await _client.GetAsync(SymbolsSearchPath("TSLA"));
-            searchTSLASymbolResponse.EnsureSuccessStatusCode();
-
-            var tslaSymbol = (await searchTSLASymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
+            Symbol tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
 
             // Add symbols to portfolio
             var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.Id }.ToJsonPayload());
@@ -152,10 +145,7 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.True(portfolio.Id > 0);
 
             // Search for symbols by keyword
-            var searchJPMSymbolResponse = await _client.GetAsync(SymbolsSearchPath("JPM"));
-            searchJPMSymbolResponse.EnsureSuccessStatusCode();
-
-            var jpmSymbol = (await searchJPMSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
+            Symbol jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to portfolio
             var addJPMResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.Id }.ToJsonPayload());
@@ -185,14 +175,8 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.True(portfolio.Id > 0);
 
             // Search for symbols by keyword
-            var searchTSLASymbolResponse = await _client.GetAsync(SymbolsSearchPath("TSLA"));
-            searchTSLASymbolResponse.EnsureSuccessStatusCode();
-
-            var searchJPMSymbolResponse = await _client.GetAsync(SymbolsSearchPath("JPM"));
-            searchJPMSymbolResponse.EnsureSuccessStatusCode();
-
-            var tslaSymbol = (await searchTSLASymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
-            var jpmSymbol = (await searchJPMSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
+            Symbol tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
+            Symbol jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to portfolio
             var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.Id }.ToJsonPayload());
@@ -257,22 +241,10 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.True(portfolio.Id > 0);
 
             // Search for symbols by keyword
-            var searchTSLASymbolResponse = await _client.GetAsync(SymbolsSearchPath("TSLA"));
-            searchTSLASymbolResponse.EnsureSuccessStatusCode();
-
-            var searchJPMSymbolResponse = await _client.GetAsync(SymbolsSearchPath("JPM"));
-            searchJPMSymbolResponse.EnsureSuccessStatusCode();
-
-            var searchFBSymbolResponse = await _client.GetAsync(SymbolsSearchPath("FB"));
-            searchFBSymbolResponse.EnsureSuccessStatusCode();
-
-            var searchMSFTSymbolResponse = await _client.GetAsync(SymbolsSearchPath("MSFT"));
-            searchMSFTSymbolResponse.EnsureSuccessStatusCode();
-
-            var tslaSymbol = (await searchTSLASymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
-            var jpmSymbol = (await searchJPMSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
-            var fbSymbol = (await searchFBSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
-            var msftSymbol = (await searchMSFTSymbolResponse.Content.ReadAsAsync<IEnumerable<Symbol>>()).First();
+            Symbol tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
+            Symbol jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
+            Symbol fbSymbol = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            Symbol msftSymbol = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // Add symbols to portfolio
             var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.Id }.ToJsonPayload());
@@ -328,6 +300,13 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             Assert.Equal(2, tsla.SortOrder);
             Assert.Equal(3, msft.SortOrder);
             Assert.Equal(4, jpm.SortOrder);
+        }
+
+        private async Task<Symbol> FetchSymbol(string ticker, ExchangeType exchange)
+        {
+            var response = await _client.GetAsync(SymbolFetchPath(ticker, exchange));
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsAsync<Symbol>();
         }
     }
 }

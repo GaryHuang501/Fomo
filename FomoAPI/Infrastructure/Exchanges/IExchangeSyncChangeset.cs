@@ -16,6 +16,6 @@ namespace FomoAPI.Infrastructure.Exchanges
 
         Task SaveChangeset(IExchangeSyncRepository repository);
 
-        bool SafeThreshold(ExchangeSyncSetting setting, out string error);
+        ThresholdCheck GetThresholdCheck(ExchangeSyncSetting setting);
     }
 }

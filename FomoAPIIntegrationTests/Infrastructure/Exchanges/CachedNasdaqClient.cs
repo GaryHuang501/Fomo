@@ -8,10 +8,13 @@ using System.IO;
 
 namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
 {
-    public class StubNasdaqFtpClient : IFtpClient
+    /// <summary>
+    /// Client to download and cache symbol data from nasdaq to disk.
+    /// </summary>
+    public class CachedNasdaqClient : IFtpClient
     {
         private readonly string _fileUrl;
-        public StubNasdaqFtpClient(string fileUrl)
+        public CachedNasdaqClient(string fileUrl)
         {
             _fileUrl = fileUrl;
         }
@@ -22,7 +25,7 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
 
             mockDbOptions.Setup(x => x.CurrentValue).Returns(new DbOptions
             {
-                ConnectionString = TestAppSettings.Instance.TestDBConnectionString
+                ConnectionString = AppTestSettings.Instance.TestDBConnectionString
             });
 
             var syncRepo = new ExchangeSyncRepository(mockDbOptions.Object);

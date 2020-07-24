@@ -48,20 +48,12 @@ namespace FomoAPI.Infrastructure.Exchanges
             return !_existingSymbolsMap.ContainsKey(symbolKey) && _downloadedSymbolsMap.ContainsKey(symbolKey);
         }
 
-        public bool SafeThreshold(ExchangeSyncSetting setting, out string error)
+        public ThresholdCheck GetThresholdCheck(ExchangeSyncSetting setting)
         {
-            error = null;
-            int changePercent = _newSymbols.Count / _existingSymbolsMap.Count * 100;
-
-            if (changePercent < setting.InsertThresholdPercent)
-            {
-                return true;
-            }
-            else
-            {
-                error = $"Threshold exceeded for {nameof(NewSymbolChangeset)}: actual:{changePercent} vs threshold: {setting.InsertThresholdPercent}";
-                return false;
-            }
+            return new ThresholdCheck(
+                nameof(NewSymbolChangeset),
+                _newSymbols.Count,
+                setting.InsertThresholdPercent);
         }
 
         /// <summary>

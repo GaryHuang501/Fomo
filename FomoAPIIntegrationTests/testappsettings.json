@@ -1,6 +1,0 @@
-{
-  "Database": {
-    "ConnectionString": "Data Source=DESKTOP-BRSPT0C;Initial Catalog=test;User ID=gary;Password=test",
-    "DefaultBulkCopyBatchSize": 4000
-  }
-}

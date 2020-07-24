@@ -49,11 +49,16 @@ namespace FomoAPI.Infrastructure.Exchanges
 
                 foreach (var changeset in syncChangesets)
                 {
-
-                    if (!syncSettings.DisableThresholds && !changeset.SafeThreshold(syncSettings, out string error))
+                    if (!syncSettings.DisableThresholds)
                     {
-                        _logger.LogError(error);
-                        throw new ExchangeSyncException(error);
+                        ThresholdCheck thresholdCheck = changeset.GetThresholdCheck(syncSettings);
+                        bool success = thresholdCheck.CheckThreshold(tickerToExistingSymbolMap.Count, out string error);
+
+                        if (!success)
+                        {
+                            _logger.LogError(error);
+                            throw new ExchangeSyncException(error);
+                        }
                     }
 
                     await changeset.SaveChangeset(_syncRepository);

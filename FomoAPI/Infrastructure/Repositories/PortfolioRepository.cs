@@ -74,7 +74,7 @@ namespace FomoAPI.Infrastructure.Repositories
                             PortfolioSymbol.SymbolId,
                             Symbol.Ticker,
                             Symbol.ExchangeId,
-                            Exchange.ExchangeName,
+                            Exchange.Name [ExchangeName],
                             Symbol.FullName,
                             Symbol.Delisted,
                             PortfolioSymbol.SortOrder
@@ -270,7 +270,7 @@ namespace FomoAPI.Infrastructure.Repositories
                                         Symbol.FullName,
                                         Symbol.ExchangeId,
                                         Symbol.Delisted,
-                                        Exchange.ExchangeName,                        
+                                        Exchange.Name [ExchangeName],                        
                                         PortfolioSymbol.SortOrder
                                     FROM
                                         PortfolioSymbol

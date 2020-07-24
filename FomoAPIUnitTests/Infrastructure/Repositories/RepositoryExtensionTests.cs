@@ -102,7 +102,7 @@ namespace FomoAPIUnitTests.Infrastructure.Repositories
                 new ColumnSchema<TestObject>("Integer1", typeof(int), (o => o.Integer1))
              );
 
-            Assert.Equal(3, dataTable.Columns.Count);
+            Assert.Equal(2, dataTable.Columns.Count);
             Assert.Empty(dataTable.Rows);
 
             Assert.Equal("DateTime1", dataTable.Columns[0].ColumnName);

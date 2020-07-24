@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FomoAPI.Domain.Stocks;
+using FomoAPI.Infrastructure.Enums;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +26,16 @@ namespace FomoAPI.Controllers
         }
 
         [HttpGet()]
-        public async Task<IActionResult> GetAsync([FromQuery]string keyword)
+        public async Task<IActionResult> GetAsync([FromQuery] string ticker, [FromQuery] int exchangeId)
         {
-            var symbols = await _symbolRepository.GetSymbols(keyword);
+            Symbol symbol = await _symbolRepository.GetSymbol(ticker, ExchangeType.ToExchange(exchangeId));
 
-            return Ok(symbols);
+            if(symbol == null)
+            {
+                NotFound();
+            }
+
+            return Ok(symbol);
         }
     }
 }

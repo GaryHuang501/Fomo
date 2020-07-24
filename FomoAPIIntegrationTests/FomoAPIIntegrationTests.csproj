@@ -7,10 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.Test.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\FomoAPI\appsettings.Development.json" Link="appsettings.Development.json" />
-    <Content Include="..\FomoAPI\appsettings.json" Link="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="..\FomoAPI\appsettings.json" Link="appsettings.json" />
+    <Content Include="..\FomoAPI\appsettings.Test.json" Link="appsettings.Test.json" />
   </ItemGroup>
 
   <ItemGroup>

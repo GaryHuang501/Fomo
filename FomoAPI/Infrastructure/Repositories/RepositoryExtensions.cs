@@ -82,11 +82,5 @@ namespace FomoAPI.Infrastructure.Repositories
 
             return dataTable;
         }
-
-        public static async Task<AutoRollBackTransaction> BeginAutoRollBackTransactionAsync(this SqlConnection connection)
-        {
-            var autoRollBackTransaction = new AutoRollBackTransaction();
-            return await autoRollBackTransaction.BeginTransactionAsync(connection);
-        }      
     }
 }

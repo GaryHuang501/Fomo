@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FomoAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase

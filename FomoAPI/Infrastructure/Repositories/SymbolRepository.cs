@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.ConfigurationOptions;
+using FomoAPI.Infrastructure.Enums;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System;
@@ -22,12 +23,12 @@ namespace FomoAPI.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Get symbols matching the keyword. 
-        /// Will return symbols wherhe ticker start with the keyword or full name contains key word.
+        /// Get symbols matching the ticker and exchange. 
         /// </summary>
-        /// <param name="keyword">keyword to search for</param>
-        /// <returns>IEnumerable of Symbols</returns>
-        public async Task<Symbol> GetSymbol(string ticker)
+        /// <param name="ticker">Ticker to match</param>
+        /// <param name="exchange">Exchange for ticker</param>
+        /// <returns>Matching Symbol <see cref="Symbol"/>. Null if not found.</returns>
+        public async Task<Symbol> GetSymbol(string ticker, ExchangeType exchange)
         {
             var sql = @"SELECT
                             Symbol.Id,
@@ -43,10 +44,12 @@ namespace FomoAPI.Infrastructure.Repositories
                         ON
                             Exchange.Id = Symbol.ExchangeId
                         WHERE
-                            Ticker = @ticker;";
+                            Ticker = @ticker
+                            AND
+                            Exchange.Id = @exchangeId;";
 
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QuerySingleAsync<Symbol>(sql, new { ticker });
+            return await connection.QuerySingleOrDefaultAsync<Symbol>(sql, new { ticker, exchangeId = exchange.Id });
         }
 
         /// <summary>
@@ -61,7 +64,7 @@ namespace FomoAPI.Infrastructure.Repositories
                             Symbol.Id,
                             Symbol.Ticker,
                             Symbol.FullName,
-                            Exchange.ExchangeId,
+                            Exchange.Id [ExchangeId],
                             Exchange.Name [ExchangeName],
                             Symbol.Delisted
                         FROM

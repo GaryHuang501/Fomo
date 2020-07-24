@@ -12,7 +12,7 @@ namespace FomoAPI.Application.ConfigurationOptions
         /// How often the event bus should execute the queries
         /// </summary>
         [Range(1, int.MaxValue)]
-        public int DelayMSRunScheduleEventBus { get; set; }
+        public int IntervalLengthMS { get; set; }
 
         /// <summary>
         /// How many queries can be run for each delay specified by DelayMSRunScheduleEventBus

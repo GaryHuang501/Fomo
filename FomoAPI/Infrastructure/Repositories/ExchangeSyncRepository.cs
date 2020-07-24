@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace FomoAPI.Infrastructure.Repositories
 {
@@ -177,7 +176,7 @@ namespace FomoAPI.Infrastructure.Repositories
 
         public async Task AddSyncHistory(string actionName, int symbolsChanged, string message, string error = null)
         {
-            error = error != null ? error.Substring(0, 300) : null;
+            error = error != null ? error.Substring(0, Math.Min(300, error.Length)) : null;
 
             var insertSql = @"INSERT INTO ExchangeSyncHistory (ActionName, Message, SymbolsChanged, Error, DateCreated)
                               VALUES (@actionName, @message, @symbolsChanged, @error, GETDATE())";

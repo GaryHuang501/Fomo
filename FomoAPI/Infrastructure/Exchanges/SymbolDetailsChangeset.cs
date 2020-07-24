@@ -1,6 +1,5 @@
 ﻿using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -52,20 +51,12 @@ namespace FomoAPI.Infrastructure.Exchanges
             return false;
         }
 
-        public bool SafeThreshold(ExchangeSyncSetting setting, out string error)
+        public ThresholdCheck GetThresholdCheck(ExchangeSyncSetting setting)
         {
-            error = null;
-
-            int changePercent = _changedSymbols.Count / _existingSymbolsMap.Count * 100;
-
-            if (changePercent < setting.UpdateThresholdPercent){
-                return true;
-            }
-            else
-            {
-                error = $"Threshold exceeded for {nameof(SymbolDelistChangeset)}: actual:{changePercent} vs threshold: {setting.UpdateThresholdPercent}";
-                return false;
-            }
+            return new ThresholdCheck(
+                nameof(SymbolDetailsChangeset),
+                _changedSymbols.Count, 
+                setting.UpdateThresholdPercent);
         }
 
         /// <summary>

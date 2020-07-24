@@ -1,29 +1,36 @@
-﻿using System;
-using System.IO;
-using FomoAPI.Application.ConfigurationOptions;
+﻿using FomoAPI.Application.ConfigurationOptions;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
 
 namespace FomoAPIIntegrationTests
 {
     /// <summary>
-    /// Settings wrapper for settings from actual App
+    /// Wrapper for settings for tests
     /// </summary>
-    public class AppSettings
+    public class AppTestSettings
     {
-        private static readonly Lazy<AppSettings> _instance = new Lazy<AppSettings>(new AppSettings());
+        private static readonly Lazy<AppTestSettings> _instance = new Lazy<AppTestSettings>(new AppTestSettings());
 
-        public static AppSettings Instance { get { return _instance.Value; } }
-
-        private readonly IConfiguration _appSettingsConfig;
+        public static AppTestSettings Instance { get { return _instance.Value; } }
 
         private readonly IConfiguration _launchSettingsConfig;
+        private readonly IConfiguration _testAppSettingsConfig;
 
+        public Guid TestUserId
+        {
+            get { return Guid.Parse(_testAppSettingsConfig["TestUser:UserId"]); }
+        }
+
+        public string TestDBConnectionString
+        {
+            get { return _testAppSettingsConfig["Database:ConnectionString"]; }
+        }
 
         public AlphaVantageOptions AlphaVantageOptions
         {
-            get { return _appSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
+            get { return _testAppSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
         }
-
 
         public string FomoApiURL
         {
@@ -39,9 +46,13 @@ namespace FomoAPIIntegrationTests
             }
         }
 
-        public AppSettings()
+        public int DefaultBulkCopyBatchSize
         {
-            _appSettingsConfig = CreateConfiguration("appSettings.json");
+            get { return int.Parse(_testAppSettingsConfig["Database:DefaultBulkCopyBatchSize"]); }
+        }
+        public AppTestSettings()
+        {
+            _testAppSettingsConfig = CreateConfiguration("appsettings.Test.json");
             _launchSettingsConfig = CreateConfiguration("launchSettings.json");
         }
 

@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace FomoAPIIntegrationTests
+namespace FomoAPIIntegrationTests.Fixtures
 {
     public static class FomoApiApplicationFactoryExtensions
     {
@@ -13,7 +15,8 @@ namespace FomoAPIIntegrationTests
         {
             var client =  factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureTestServices(services =>
+                builder
+                       .ConfigureTestServices(services =>
                 {
                     services.AddAuthentication(options =>
                     {
