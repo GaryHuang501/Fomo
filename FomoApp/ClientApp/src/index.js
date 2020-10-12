@@ -1,32 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FomoApp from './FomoApp';
-import registerServiceWorker from './registerServiceWorker';
+import './index.css';
+import App from './App';
+import store from './app/store';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import { createStore, applyMiddleware } from 'redux';
-import { createLogger } from 'redux-logger';
-import rootReducer from './reducers/rootReducer';
-import thunkMiddleware from 'redux-thunk';
-
-const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
-const rootElement = document.getElementById('root');
-const loggerMiddleware = createLogger();
-const store = createStore(
-    rootReducer,
-    applyMiddleware(
-        thunkMiddleware,
-        loggerMiddleware
-    )
-);
+import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-    <BrowserRouter basename={baseUrl}>
-        <Provider store={store}>
-            <FomoApp />
-        </Provider>
-    </BrowserRouter>
+  <React.StrictMode>
+    <Provider store={store}>
+      <App/>
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
 
-    , rootElement);
-
-registerServiceWorker();
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

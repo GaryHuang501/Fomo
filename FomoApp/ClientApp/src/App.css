@@ -1,0 +1,30 @@
+:root {
+  --lightorangegrey: #f1ebe4;
+}
+
+#root {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(16, [col-start] 1fr);
+  grid-gap: 20px;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* LAYOUT */
+#app-header {
+  background-color: limegreen;
+  grid-column: col-start 1 / span  16;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(16, [col-start] 1fr);
+}
+
+#portfolio-page {
+  background-color: white;
+  grid-column: col-start 1 / span 16;
+  grid-row: 2;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(16, [col-start] 1fr);
+  grid-template-rows: 50px auto;
+}

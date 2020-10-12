@@ -1,0 +1,61 @@
+#header-title {
+    grid-row: 1;
+    grid-column: col-start 3 / span 16;
+    color: white;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-left: 1rem;
+  }
+  
+  #header-nav-bar {
+    display: flex;
+    grid-column: col-start 3 / span 16;
+    grid-row: 2;
+    height: 4rem;
+  }
+  
+  .nav-header-item {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 1rem;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-header-item:hover {
+    background-color: darkgreen;
+  }
+  
+  .nav-header-item-selected {
+    border-style: solid;
+    border-width: 0 0 0.25rem 0;
+    border-color: lightgreen;
+  }
+  
+  .nav-header-item a {
+    text-decoration: none;
+    color: white;
+  }
+  
+  .github-link {
+    content: url("../assets/GitHub-Mark-32px.png");
+    display: inline;
+  }
+  
+  .check.icon {
+    color: white;
+    position: absolute;
+    margin-left: 0.25rem;
+    margin-top: 0.4rem;
+    width: 1rem;
+    height: 0.4rem;
+    border-bottom: solid 1px currentColor;
+    border-left: solid 1px currentColor;
+    -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+  }
+  
+  
+  
+  

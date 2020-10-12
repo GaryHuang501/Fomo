@@ -1,0 +1,43 @@
+#stock-search-bar {
+    display: flex;
+    border: 0.1rem solid lightgrey;
+    width: 100%;
+    height: 3rem;
+    border-radius: 1rem;
+    align-items: center;
+    align-content: center;
+}
+
+#stock-search-bar:hover {
+    border: 0.2rem solid grey;
+}
+
+#stock-search-bar input {
+    font-weight: bold;
+    flex-grow: 15;
+    border:none;
+    background-image:none;
+    background-color:transparent;
+    box-shadow: none;
+    height: 2rem;
+    outline:none;
+    font-size: 1rem;
+    color: grey;
+}
+
+#stock-search-bar input::placeholder {
+    font-size: 0.8rem;
+    color: grey;
+}
+
+
+#stock-search-bar .search-icon {
+    flex-grow: 1;
+    font-size: 1.25rem;
+    border: none;
+    background: transparent;
+    color: grey;
+    opacity: 0.5;
+    text-align: center;
+
+}

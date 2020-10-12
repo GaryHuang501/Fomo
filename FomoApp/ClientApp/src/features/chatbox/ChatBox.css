@@ -1,0 +1,6 @@
+#chatbox{
+    height: 100%;
+    width: 100%;
+    border: 0.1rem solid lightgrey;
+    border-radius: 1rem;
+}
