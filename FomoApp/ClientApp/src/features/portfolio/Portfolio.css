@@ -19,7 +19,6 @@
     height: 2rem;
 }
 
-
 .portfolio-header{
     height: 6rem;
 }
@@ -42,7 +41,6 @@
     background-color: var(--lightorangegrey);
 }
 
-
 /* Table bordering rules */
 #portfolio td:first-child{
     border-left: var(--portfolio-border-size) solid lightgrey;
@@ -52,7 +50,7 @@
     border-right: var(--portfolio-border-size) solid lightgrey;
 }
 
-#portfolio tr:nth-child(3) td{
+#portfolio tr:nth-child(2) td{
     border-top: var(--portfolio-border-size) solid lightgrey;
 }
 
@@ -60,11 +58,11 @@
     border-bottom: var(--portfolio-border-size) solid lightgrey;
 }
 
-#portfolio tr:nth-child(3) td:first-child{
+#portfolio tr:nth-child(2) td:first-child{
     border-top-left-radius: var(--portfolio-border-radius-size);
 }
 
-#portfolio tr:nth-child(3) td:last-child{
+#portfolio tr:nth-child(2) td:last-child{
     border-top-right-radius: var(--portfolio-border-radius-size);
 }
 

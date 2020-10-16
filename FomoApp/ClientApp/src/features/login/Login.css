@@ -1,0 +1,39 @@
+#login-modal-form{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20rem;
+    background-color: white;
+    border: 0.1rem solid lightgrey;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+#login-modal h3{
+    text-align: center;
+}
+
+#login-modal ul{
+    list-style: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+
+#login-modal .login-button{
+    margin:0.5rem;
+    cursor: pointer;
+}
+
+#login-modal .login-test-button{
+    width: 191px;
+    height: 45px;
+    background: green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
