@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FomoAPI.Application.Services;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPI.Infrastructure.Repositories;
@@ -19,23 +20,27 @@ namespace FomoAPI.Controllers
 
         private ILogger<SymbolsController> _logger;
 
-        public SymbolsController(ISymbolRepository symbolRepository, ILogger<SymbolsController> logger)
+        private ISymbolSearchService _searchService;
+        public SymbolsController(ISymbolRepository symbolRepository, ISymbolSearchService searchService, ILogger<SymbolsController> logger)
         {
             _symbolRepository = symbolRepository;
+            _searchService = searchService;
             _logger = logger;
         }
 
         [HttpGet()]
-        public async Task<IActionResult> GetAsync([FromQuery] string ticker, [FromQuery] int exchangeId)
+        public async Task<IActionResult> GetSearchResults([FromQuery] string keywords)
         {
-            Symbol symbol = await _symbolRepository.GetSymbol(ticker, ExchangeType.ToExchange(exchangeId));
-
-            if(symbol == null)
+            if(string.IsNullOrWhiteSpace(keywords))
             {
-                NotFound();
+                return NotFound("Search result is empty");
             }
 
-            return Ok(symbol);
+            IEnumerable<SymbolSearchResult> matches = await _searchService.GetSearchedTickers(keywords);
+
+            var descendingMatches = matches.OrderByDescending(m => m.Match).ThenBy(m => m.Symbol);
+
+            return Ok(descendingMatches);
         }
     }
 }

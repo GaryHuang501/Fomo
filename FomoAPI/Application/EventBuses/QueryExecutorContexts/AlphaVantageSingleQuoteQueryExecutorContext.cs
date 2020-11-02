@@ -1,7 +1,7 @@
 ﻿using FomoAPI.Application.Stores;
 using FomoAPI.Application.EventBuses.Triggers;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +13,10 @@ namespace FomoAPI.Application.EventBuses.QueryExecutorContexts
 
         private readonly IQueryResultStore _queryResultCache;
 
-        private readonly IAlphaVantageClient _alphaVantageClient;
+        private readonly IStockClient _alphaVantageClient;
 
         public AlphaVantageSingleQuoteQueryExecutorContext(
-            IAlphaVantageClient alphaVantageClient,
+            IStockClient alphaVantageClient,
             IQueryResultStore queryResultCache)
         {
             _alphaVantageClient = alphaVantageClient;

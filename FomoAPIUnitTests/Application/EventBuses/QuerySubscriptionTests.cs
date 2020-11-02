@@ -1,5 +1,5 @@
 ﻿using FomoAPI.Application.EventBuses;
-using FomoAPI.Infrastructure.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using System;
 using System.Linq;
 using Xunit;

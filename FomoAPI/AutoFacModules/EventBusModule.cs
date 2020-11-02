@@ -3,8 +3,8 @@ using FomoAPI.Application.EventBuses;
 using FomoAPI.Application.EventBuses.QueryExecutorContexts;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
 using FomoAPI.Application.Stores;
-using FomoAPI.Infrastructure.AlphaVantage;
-using FomoAPI.Infrastructure.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Hosting;
 
 namespace FomoAPI.AutoFacModules
@@ -25,7 +25,7 @@ namespace FomoAPI.AutoFacModules
 
             builder.RegisterType<AlphaVantageSingleQuoteQueryExecutorContext>();
             builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>();
-            builder.RegisterType<AlphaVantageClient>().As<IAlphaVantageClient>();
+            builder.RegisterType<AlphaVantageClient>().As<IStockClient>();
         }
     }
 }

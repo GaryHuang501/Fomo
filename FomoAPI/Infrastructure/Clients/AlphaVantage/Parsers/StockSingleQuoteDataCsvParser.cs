@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks;
 
-namespace FomoAPI.Infrastructure.AlphaVantage.Parsers
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
     /// <summary>
     /// Parser class used in AlphaVantage to map CSV query response data to StockSingleQuoteData.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands;
-using FomoAPI.Infrastructure.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

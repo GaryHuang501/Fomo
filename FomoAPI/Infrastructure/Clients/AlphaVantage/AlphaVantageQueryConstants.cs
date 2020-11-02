@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Infrastructure.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
     /// <summary>
     /// Constants representing the Url Query Parameters Keys when fetching data from AlphaVantage
@@ -17,5 +17,7 @@ namespace FomoAPI.Infrastructure.AlphaVantage
         public const string ApiKey = "apikey";
 
         public const string DataType = "datatype";
+
+        public const string KeyWords = "keywords";
     }
 }

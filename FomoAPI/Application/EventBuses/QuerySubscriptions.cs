@@ -1,5 +1,5 @@
 ﻿using System;
-using FomoAPI.Infrastructure.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;

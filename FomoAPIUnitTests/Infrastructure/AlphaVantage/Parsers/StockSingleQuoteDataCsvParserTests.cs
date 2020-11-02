@@ -1,4 +1,4 @@
-﻿using FomoAPI.Infrastructure.AlphaVantage.Parsers;
+﻿using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using System;
 using System.Collections.Generic;
 using System.IO;

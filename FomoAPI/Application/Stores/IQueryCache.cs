@@ -8,6 +8,6 @@ namespace FomoAPI.Application.Stores
 
         bool TryGet(ISubscribableQuery query, out ISubscriptionQueryResult result);
 
-        void RemoveQuery(ISubscribableQuery query);
+        void Remove(ISubscribableQuery query);
     }
 }

@@ -1,4 +1,4 @@
-﻿using FomoAPI.Infrastructure.AlphaVantage;
+﻿using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Enums;
 using System;
 using System.Collections.Generic;

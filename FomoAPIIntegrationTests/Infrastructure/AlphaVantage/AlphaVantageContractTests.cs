@@ -1,6 +1,6 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
-using FomoAPI.Infrastructure.AlphaVantage;
-using FomoAPI.Infrastructure.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

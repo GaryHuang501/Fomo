@@ -155,7 +155,7 @@ namespace FomoAPI
         {
             services.AddHttpClient("AlphaVantage", c =>
                     {
-                        c.BaseAddress = new Uri(config["AlphaVantage:AlphaVantageUrl"]);
+                        c.BaseAddress = new Uri(config["AlphaVantage:Url"]);
                     });
             return services;
         }

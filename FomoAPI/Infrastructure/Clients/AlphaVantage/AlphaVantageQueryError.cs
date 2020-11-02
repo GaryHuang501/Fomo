@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Infrastructure.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
     /// <summary>
     /// Error JSON object returned by AlphaVantage when query fails

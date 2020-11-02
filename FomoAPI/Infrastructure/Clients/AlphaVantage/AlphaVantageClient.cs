@@ -7,16 +7,17 @@ using System.IO;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
 using System.Web.Http;
+using System.Collections.Generic;
+using System.Linq;
+using FomoAPI.Application.Services;
 
-namespace FomoAPI.Infrastructure.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
-    /// <summary>
-    /// HTTP Client wrapper class to fetch data from Alpha Vantage API
-    /// </summary>
-    public class AlphaVantageClient : IAlphaVantageClient
+    /// <inheritdoc cref="IStockClient"/>
+    public class AlphaVantageClient : IStockClient
     {
         private readonly AlphaVantageOptions _alphaVantageOptions;
 
@@ -33,11 +34,31 @@ namespace FomoAPI.Infrastructure.AlphaVantage
             _logger = logger;
         }
 
-        /// <summary>
-        /// Execute Query for Single Quote (Global Quote) Data
-        /// </summary>
-        /// <param name="query">Query Object for Single Quote Data</param>
-        /// <returns></returns>
+        public async Task<IEnumerable<SymbolSearchResult>> GetSearchedTickers(string keywords)
+        {
+            //  ?function = SYMBOL_SEARCH & keywords = tesco & apikey = demo
+            var queryValues = new Dictionary<string, string>
+                {
+                    {AlphaVantageQueryKeys.Function, "SYMBOL_SEARCH" },
+                    {AlphaVantageQueryKeys.KeyWords, keywords},
+                    {AlphaVantageQueryKeys.ApiKey, _alphaVantageOptions.ApiKey}
+                };
+
+            string urlWithQueryString = QueryHelpers.AddQueryString(_alphaVantageOptions.Url, queryValues);
+
+            var client = _clientFactory.CreateClient(_alphaVantageOptions.ClientName);
+
+            var response = await client.GetAsync(urlWithQueryString);         
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsAsync<AlphaVantageSymbolSearchResponse>();
+
+            _logger.LogTrace("Executing query http request url: {url}", urlWithQueryString);
+
+            return content.BestMatches.Select(m => new SymbolSearchResult(symbol: m.Symbol, fullName: m.Name, m.MatchScore));
+        }
+
         public async Task<AlphaVantageQueryResult<StockSingleQuoteData>> GetSingleQuoteData(AlphaVantageSingleQuoteQuery query)
         {
             return await GetQueryData<StockSingleQuoteData>(query, _parserFactory.GetSingleQuoteDataParser());
@@ -56,7 +77,7 @@ namespace FomoAPI.Infrastructure.AlphaVantage
 
             try
             {
-                var urlWithQueryString = QueryHelpers.AddQueryString(_alphaVantageOptions.Url, query.GetParameters());
+                string urlWithQueryString = QueryHelpers.AddQueryString(_alphaVantageOptions.Url, query.GetParameters());
                 urlWithQueryString = QueryHelpers.AddQueryString(urlWithQueryString, AlphaVantageQueryKeys.ApiKey, _alphaVantageOptions.ApiKey);
 
                 var client = _clientFactory.CreateClient(_alphaVantageOptions.ClientName);

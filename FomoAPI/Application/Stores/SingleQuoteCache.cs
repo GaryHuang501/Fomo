@@ -1,9 +1,10 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Application.EventBuses;
 using Microsoft.Extensions.Options;
 
 namespace FomoAPI.Application.Stores
 {
-    public class SingleQuoteCache : AbstractQueryResultCache
+    public class SingleQuoteCache : ResultCache<ISubscribableQuery, ISubscriptionQueryResult>, IQueryCache
     {
         public const string CacheName = "SingleQuoteCache";
 

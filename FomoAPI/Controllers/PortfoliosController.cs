@@ -93,7 +93,7 @@ namespace FomoAPI.Controllers
 
             if (!success)
             {
-                NotFound("Portfolio or PortfolioSymbol was not found.");
+                return NotFound("Portfolio or PortfolioSymbol was not found.");
             }
             return Ok();
         }

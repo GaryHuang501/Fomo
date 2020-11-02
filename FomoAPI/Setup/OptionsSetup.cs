@@ -23,6 +23,10 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("SingleQuoteCache"))
                     .ValidateDataAnnotations();
 
+            services.AddOptions<CacheOptions>("StockSearchCache")
+                    .Bind(config.GetSection("StockSearchCache"))
+                    .ValidateDataAnnotations();
+
             services.AddOptions<DbOptions>()
                     .Bind(config.GetSection("Database"))
                     .ValidateDataAnnotations();

@@ -1,6 +1,6 @@
 ﻿using FomoAPI.Application.EventBuses;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using FomoAPI.Infrastructure.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,10 +10,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Infrastructure.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
     /// <summary>
-    /// Query object for different function types to run against AlphaVantage
+    /// Query object for different function types to run against AlphaVantage stock data
     /// </summary>
     public interface IAlphaVantageQuery : ISubscribableQuery
     {

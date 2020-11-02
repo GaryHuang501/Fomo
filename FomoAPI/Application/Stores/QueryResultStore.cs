@@ -12,8 +12,6 @@ namespace FomoAPI.Application.Stores
     /// </summary>
     public class QueryResultStore : IQueryResultStore
     {
-        private static object _lock;
-
         private IQueryCache _cache;
 
         public QueryResultStore(IQueryCache cache)

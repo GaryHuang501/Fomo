@@ -1,5 +1,8 @@
 ﻿using Autofac;
+using FomoAPI.Application.Services;
+using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
+using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -14,6 +17,10 @@ namespace FomoAPI.AutoFacModules
         {
             builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerLifetimeScope();
+            builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<StockSearchCache>().As<ResultCache<string, IEnumerable<SymbolSearchResult>>>().SingleInstance();
         }
     }
 }

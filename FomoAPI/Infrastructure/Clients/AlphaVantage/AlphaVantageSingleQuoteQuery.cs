@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using FomoAPI.Common;
 
-namespace FomoAPI.Infrastructure.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
     /// <summary>
     /// Query class for Single Quote Data (Function is Global quote in AlphaVantage)
