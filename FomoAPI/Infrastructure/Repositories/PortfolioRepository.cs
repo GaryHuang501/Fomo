@@ -303,5 +303,26 @@ namespace FomoAPI.Infrastructure.Repositories
 
             return portfolio;
         }
+
+        /// <summary>
+        /// Get the ids of the portfolios the user owns.
+        /// </summary>
+        /// <param name="userId">User Guid ID</param>
+        /// <returns>IEnumerable<int> containing the portfolio ids.</returns>
+        public async Task<IEnumerable<int>> GetPortfolioIds(Guid userId)
+        {
+            var sql = @"SELECT 
+                        Portfolio.Id 
+                    FROM 
+                        Portfolio
+                    WHERE 
+                        Portfolio.UserId = @UserId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var ids = await connection.QueryAsync<int>(sql, new { userId });
+                return ids;
+            }
+        }
     }
 }

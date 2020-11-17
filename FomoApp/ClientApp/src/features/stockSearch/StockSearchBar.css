@@ -1,4 +1,8 @@
-#stock-search-bar {
+#stock-search-bar{
+    position: relative;
+}
+
+#stock-search-bar-form {
     display: flex;
     border: 0.1rem solid lightgrey;
     width: 100%;
@@ -6,13 +10,14 @@
     border-radius: 1rem;
     align-items: center;
     align-content: center;
+    margin: 0px;
 }
 
-#stock-search-bar:hover {
+#stock-search-bar-form:hover {
     border: 0.2rem solid grey;
 }
 
-#stock-search-bar input {
+#stock-search-bar-form input {
     font-weight: bold;
     flex-grow: 15;
     border:none;
@@ -20,18 +25,17 @@
     background-color:transparent;
     box-shadow: none;
     height: 2rem;
-    outline:none;
+    outline: none;
     font-size: 1rem;
     color: grey;
 }
 
-#stock-search-bar input::placeholder {
+#stock-search-bar-form input::placeholder {
     font-size: 0.8rem;
     color: grey;
 }
 
-
-#stock-search-bar .search-icon {
+#stock-search-bar-form .search-icon {
     flex-grow: 1;
     font-size: 1.25rem;
     border: none;
@@ -39,5 +43,15 @@
     color: grey;
     opacity: 0.5;
     text-align: center;
+}
 
+#stock-search-results{
+    position: absolute;
+    margin-left: 1rem;
+    z-index: 999;
+    padding: 1rem;
+    width: 90%;
+    background: white;
+    border: 0.1rem solid lightgrey;
+    border-top: 0;
 }

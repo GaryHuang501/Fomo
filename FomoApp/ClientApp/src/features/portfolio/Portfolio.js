@@ -1,14 +1,27 @@
-import React from 'react';
-import { PortfolioStock } from './PortfolioStock';
+import React, { useState, useEffect } from 'react';
 import './Portfolio.css';
+import { PortfolioStock } from './PortfolioStock';
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchPortfolio, fetchPortfolioIds, selectPortfolioIds } from './PortfolioSlice';
 
 export const Portfolio = function () {
 
-  const portfolioStocks = [];
+  const dispatch = useDispatch();
+  const portfolioIds = useSelector(selectPortfolioIds);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState('');
 
-  for (let i = 0; i < 30; i++) {
-    portfolioStocks.push(<PortfolioStock></PortfolioStock>)
-  }
+  useEffect(() => {
+    dispatch(fetchPortfolioIds());
+
+    if(portfolioIds.length > 0){
+      
+      // Currently only one portfolio is supported.
+      setSelectedPortfolioId(portfolioIds[0]);
+      console.log(portfolioIds[0]);
+    }
+  }, [portfolioIds]);
+
+  const portfolioStocks = [];
 
   return (
     <table id="portfolio">

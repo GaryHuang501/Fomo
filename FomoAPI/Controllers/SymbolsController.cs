@@ -29,14 +29,14 @@ namespace FomoAPI.Controllers
         }
 
         [HttpGet()]
-        public async Task<IActionResult> GetSearchResults([FromQuery] string keywords)
+        public async Task<IActionResult> GetSearchResults([FromQuery] string keywords, int limit)
         {
             if(string.IsNullOrWhiteSpace(keywords))
             {
                 return NotFound("Search result is empty");
             }
 
-            IEnumerable<SymbolSearchResult> matches = await _searchService.GetSearchedTickers(keywords);
+            IEnumerable<SymbolSearchResult> matches = await _searchService.GetSearchedTickers(keywords, limit);
 
             var descendingMatches = matches.OrderByDescending(m => m.Match).ThenBy(m => m.Symbol);
 

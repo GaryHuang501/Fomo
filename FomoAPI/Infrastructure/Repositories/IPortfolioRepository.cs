@@ -23,6 +23,8 @@ namespace FomoAPI.Infrastructure.Repositories
 
         Task<Portfolio> GetPortfolio(int portfolioId);
 
+        Task<IEnumerable<int>> GetPortfolioIds(Guid userId);
+
         Task DeletePortfolioSymbol(int portfolioSymbolID);
 
         Task<bool> RenamePortfolio(int portfolioId, string newName);

@@ -11,7 +11,6 @@ import { PortfolioPage } from './features/portfolio/PortfolioPage';
 import { LeaderBoardPage } from './features/leaderboard/LeaderBoardPage';
 import { MembersPage } from './features/members/MembersPage';
 import { LoginModal } from './features/login/LoginModal';
-
 import { useSelector, useDispatch } from 'react-redux'
 import './App.css';
 import { checkLogin, selectAuthenticatedState } from './features/login/LoginSlice';
@@ -28,10 +27,6 @@ function App() {
     setSetupFinished(true);
   }, []);
 
-  useEffect(() => {
-    console.log("isAuthChanged", isAuthenticated);
-  }, [isAuthenticated]);
-  
   return (
      <Router>
         <NavHeader></NavHeader>

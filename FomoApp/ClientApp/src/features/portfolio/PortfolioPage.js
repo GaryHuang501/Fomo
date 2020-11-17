@@ -1,10 +1,11 @@
 import React from 'react';
-import { StockSearchBar } from './StockSearchBar';
+import { StockSearchBar } from '../stockSearch/StockSearchBar';
 import { Portfolio } from './Portfolio';
 import { ChatBox } from '../chatbox/ChatBox';
 import './PortfolioPage.css';
 
 export const PortfolioPage = function() {
+
   return (
     <main id="portfolio-page">
         <section id='portfolio-stock-search-container'>

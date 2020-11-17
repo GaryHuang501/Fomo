@@ -11,7 +11,7 @@ export const NavHeader = function() {
           <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Leaderboard">Leaderboard</NavLink></div>
           <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Members">Members</NavLink></div>
           <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/About">About</NavLink></div>
-          <div className="nav-header-item"><a className="github-link" href="http://www.google.ca" aria-label="github"> </a></div>
+          <div className="nav-header-item"><a className="github-link" href="https://github.com/GaryHuang501/Fomo" aria-label="github"> </a></div>
       </nav>
     </header>
   );

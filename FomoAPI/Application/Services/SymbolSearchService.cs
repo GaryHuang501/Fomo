@@ -19,7 +19,7 @@ namespace FomoAPI.Application.Services
             _client = client;
             _cache = cache;
         }
-        public async Task<IEnumerable<SymbolSearchResult>> GetSearchedTickers(string keywords)
+        public async Task<IEnumerable<SymbolSearchResult>> GetSearchedTickers(string keywords, int limit)
         {
             if (!_cache.TryGet(keywords, out IEnumerable<SymbolSearchResult> result))
             {
@@ -27,7 +27,7 @@ namespace FomoAPI.Application.Services
                 _cache.Add(keywords, result);
             }
 
-            return result;
+            return result.Take(limit);
         }
     }
 }

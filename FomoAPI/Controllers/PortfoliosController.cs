@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
 using FomoAPI.Infrastructure.Repositories;
@@ -27,7 +29,7 @@ namespace FomoAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAsync(int id)
+        public async Task<IActionResult> GetPortfolio(int id)
         {
             var portfolio = await _portfolioRepository.GetPortfolio(id);
 
@@ -37,6 +39,23 @@ namespace FomoAPI.Controllers
             }
 
             return Ok(portfolio);
+        }
+
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<IEnumerable<int>>> GetPortfolioIds()
+        {
+            Guid userId = User.GetUserId();
+
+            var ids = await _portfolioRepository.GetPortfolioIds(userId);
+
+            if (ids == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(ids);
         }
 
         [HttpPatch("{id}/rename")]

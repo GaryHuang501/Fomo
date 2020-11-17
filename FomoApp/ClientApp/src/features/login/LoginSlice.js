@@ -1,14 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import config from '../../app/Config.json'
 
 export const authenticate = createAsyncThunk('login/authenticate', async () => {
-    console.log("authenticate");
-    const response = await axios.get('https://localhost:44328/api/accounts/authenticate')
+    const response = await axios.get(`${config.apiUrl}/accounts/authenticate`)
 });
 
 export const checkLogin = createAsyncThunk('login/checkLogin', async () => {
-    console.log("checklogin");
-    const response = await axios.get('https://localhost:44328/api/accounts/checklogin')
+    const response = await axios.get(`${config.apiUrl}/accounts/checklogin`)
 });
 
 export const loginSlice = createSlice({
