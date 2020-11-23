@@ -1,7 +1,9 @@
 ﻿using Autofac;
+using FomoAPI.Application.Exchanges;
 using FomoAPI.Infrastructure;
 using FomoAPI.Infrastructure.Exchanges;
 using FomoAPI.Infrastructure.Repositories;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,9 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<ExchangeClient>().As<IExchangeClient>().InstancePerDependency();
             builder.RegisterType<ExchangeSyncChangesetsFactory>().As<IExchangeSyncChangesetsFactory>().InstancePerDependency();
             builder.RegisterType<ExchangeSyncRepository>().As<IExchangeSyncRepository>().InstancePerDependency();
-            builder.RegisterType<ExchangeSync>().InstancePerLifetimeScope();
+            builder.RegisterType<ExchangeSync>().As<IExchangeSync>().InstancePerDependency();
+
+            builder.RegisterType<ExchangeSyncHostedService>().As<IHostedService>().SingleInstance();
         }
     }
 }

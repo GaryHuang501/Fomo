@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
@@ -20,7 +21,7 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerLifetimeScope();
             builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
 
-            builder.RegisterType<StockSearchCache>().As<ResultCache<string, IEnumerable<SymbolSearchResult>>>().SingleInstance();
+            builder.RegisterType<StockSearchCache>().As<ResultCache<string, IEnumerable<SymbolSearchResultDTO>>>().SingleInstance();
         }
     }
 }

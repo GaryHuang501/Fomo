@@ -13,8 +13,6 @@ namespace FomoAPI.AutoFacModules
     {  
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<QueryEventBusTimedHostedService>().As<IHostedService>().SingleInstance();
-
             builder.RegisterType<SingleQuoteCache>().As<IQueryCache>().SingleInstance();
             builder.RegisterType<QueryResultStore>().As<IQueryResultStore>().SingleInstance();
             builder.RegisterType<QueryExecutorContextRegistry>().As<IQueryExecutorContextRegistry>().SingleInstance();
@@ -26,6 +24,8 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<AlphaVantageSingleQuoteQueryExecutorContext>();
             builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>();
             builder.RegisterType<AlphaVantageClient>().As<IStockClient>();
+
+            builder.RegisterType<QueryEventBusTimedHostedService>().As<IHostedService>().SingleInstance();
         }
     }
 }
