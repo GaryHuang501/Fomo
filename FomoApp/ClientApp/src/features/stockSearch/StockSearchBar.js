@@ -5,7 +5,7 @@ import { DebounceInput } from 'react-debounce-input';
 import { useDispatch, useSelector} from 'react-redux'
 import './StockSearchBar.css';
 import { StockSearchMatch } from './StockSearchMatch'
-import { searchStocks, selectStockSearchResults } from './StockSearchSlice'
+import { searchStocks, selectStockSearchResults, selectStockSearchStatus } from './StockSearchSlice'
 import { addPortfolioStock, selectSelectedPortfolioId } from '../portfolio/PortfolioSlice'
 
 export const StockSearchBar = function () {
@@ -16,6 +16,7 @@ export const StockSearchBar = function () {
 
   const stockSearchResults = useSelector(state => selectStockSearchResults(state, searchKeywords));
   const selectedPortfolioId = useSelector(selectSelectedPortfolioId);
+  const stockSearchStatus = useSelector(selectStockSearchStatus);
 
   const closeResultsWhenOutsideClick = e => {
     if (thisStockSearchBarRef.current.contains(e.target)) {
@@ -70,7 +71,10 @@ export const StockSearchBar = function () {
     if(hasMatches){
       resultBox = <div id='stock-search-results'>{potentialMatches}</div>
     }
-    else if(searchKeywords.trim().length > 0){
+    else if(stockSearchStatus  == 'loading'){
+      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "Searching..."}} /></div>
+    }
+    else if(searchKeywords.trim().length > 0 && stockSearchStatus  == 'succeeded'){
       resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "No results found."}} /></div>
     }
     

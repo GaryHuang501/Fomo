@@ -27,7 +27,9 @@ export const portfolioSlice = createSlice({
         selectedPortfolioId: null,
         portfolios: {
 
-        }
+        },
+        fetchIdStatus: "idle",
+        fetchPortfolioStatus: "idle"
     },
     reducers: {
         setSelectedPortfolioId: (state, action) => {
@@ -36,24 +38,24 @@ export const portfolioSlice = createSlice({
     },
     extraReducers: {
         [fetchPortfolioIds.pending]: (state, action) => {
-            state.status = 'loading';
+            state.fetchIdStatus = 'loading';
         },
         [fetchPortfolioIds.fulfilled]: (state, action) => {
-            state.status = 'succeeded';
+            state.fetchIdStatus = 'succeeded';
             state.ids = action.payload ?? [];
         },
         [fetchPortfolioIds.rejected]: (state, action) => {
-            state.status = 'failed';
+            state.fetchIdStatus = 'failed';
         },
         [fetchPortfolio.pending]: (state, action) => {
-            state.status = 'loading';
+            state.fetchPortfolioStatus = 'loading';
         },
         [fetchPortfolio.fulfilled]: (state, action) => {
-            state.status = 'succeeded';
+            state.fetchPortfolioStatus = 'succeeded';
             state.portfolios[action.meta.arg] = action.payload;
         },
         [fetchPortfolio.rejected]: (state, action) => {
-            state.status = 'failed';
+            state.fetchPortfolioStatus = 'failed';
         }
     }
 });
