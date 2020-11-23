@@ -10,7 +10,7 @@
     border-radius: 1rem;
     align-items: center;
     align-content: center;
-    margin: 0px;
+    box-sizing: border-box;
 }
 
 #stock-search-bar-form:hover {
