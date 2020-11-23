@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Application.DTOs;
 using FomoAPI.Domain.Stocks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -13,7 +14,7 @@ namespace FomoAPI.Application.Stores
     /// Cache for storing stock symbol search results from client.
     /// Keyed by search keyword.
     /// </summary>
-    public class StockSearchCache : ResultCache<string, IEnumerable<SymbolSearchResult>>
+    public class StockSearchCache : ResultCache<string, IEnumerable<SymbolSearchResultDTO>>
     {
         public const string CacheName = "StockSearchCache";
 

@@ -25,19 +25,20 @@ function App() {
     axiosSetup(dispatch);
     dispatch(checkLogin());
     setSetupFinished(true);
-  }, []);
+  }, [dispatch]);
 
   return (
      <Router>
         <NavHeader></NavHeader>
         { isSetupFinished && !isAuthenticated ? <LoginModal></LoginModal> : null }
-        <Switch>
-          <Route exact path="/" component={PortfolioPage}/>
-          <Route exact path="/Leaderboard" component={LeaderBoardPage} />
-          <Route exact path="/Members" component={MembersPage} />
-          <Route exact path="/About" component={MembersPage} />
-          <Redirect to="/" />
-        </Switch>
+        { isSetupFinished && isAuthenticated ?
+          <Switch>
+            <Route exact path="/" component={PortfolioPage}/>
+            <Route exact path="/Leaderboard" component={LeaderBoardPage} />
+            <Route exact path="/Members" component={MembersPage} />
+            <Route exact path="/About" component={MembersPage} />
+            <Redirect to="/" />
+          </Switch> : null}
     </Router>
   );
 }

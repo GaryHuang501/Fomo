@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Exchanges
 {
-    public class ExchangeSync
+    public class ExchangeSync : IExchangeSync
     {
         private readonly IExchangeClient _exchangeClient;
         private readonly IExchangeSyncRepository _syncRepository;
@@ -64,7 +64,8 @@ namespace FomoAPI.Infrastructure.Exchanges
                     await changeset.SaveChangeset(_syncRepository);
                 }
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 await _syncRepository.AddSyncHistory("Exception", 0, ex.Message, ex.ToString());
                 _logger.LogError(ex.Message, ex);

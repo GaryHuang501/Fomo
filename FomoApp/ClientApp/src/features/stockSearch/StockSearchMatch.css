@@ -15,6 +15,7 @@
     font-weight: bold;
     display: inline-block;
     vertical-align: middle;
+    flex: none;
 }
 
 .stock-search-match-fullname{

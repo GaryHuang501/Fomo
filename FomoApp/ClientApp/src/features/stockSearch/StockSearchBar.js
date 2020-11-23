@@ -6,13 +6,16 @@ import { useDispatch, useSelector} from 'react-redux'
 import './StockSearchBar.css';
 import { StockSearchMatch } from './StockSearchMatch'
 import { searchStocks, selectStockSearchResults } from './StockSearchSlice'
+import { addPortfolioStock, selectSelectedPortfolioId } from '../portfolio/PortfolioSlice'
 
 export const StockSearchBar = function () {
 
   const thisStockSearchBarRef = useRef();
   const dispatch = useDispatch();
-  const stockSearchResults = useSelector(selectStockSearchResults);
   const [searchKeywords, setSearchKeywords] = useState('');
+
+  const stockSearchResults = useSelector(state => selectStockSearchResults(state, searchKeywords));
+  const selectedPortfolioId = useSelector(selectSelectedPortfolioId);
 
   const closeResultsWhenOutsideClick = e => {
     if (thisStockSearchBarRef.current.contains(e.target)) {
@@ -39,9 +42,9 @@ export const StockSearchBar = function () {
     event.preventDefault();
   }
 
-  function onClickStockMatch(symbol){
-    console.log(symbol);
+  function onClickStockMatch(symbolId){
     setSearchKeywords('');
+    dispatch(addPortfolioStock({symbolId: symbolId, portfolioId: selectedPortfolioId}));
   }
 
   function isSearchKeywordsSet(){
@@ -52,15 +55,14 @@ export const StockSearchBar = function () {
   function createSearchResultsBox(){
     let resultBox = null;
     const potentialMatches = [];
-  
-    const searchResultExists = stockSearchResults && isSearchKeywordsSet() && searchKeywords in stockSearchResults;
 
-    if (!searchResultExists) {
-      return null;
-    }
+    for (const result of stockSearchResults) {
+      const match = <StockSearchMatch 
+                      key={result.symbol} 
+                      match={result}
+                      onClick={onClickStockMatch}/>;
 
-    for (const result of stockSearchResults[searchKeywords]) {
-      potentialMatches.push(<StockSearchMatch key={result.symbol} symbol={result.symbol} fullName={result.fullName} onClick={onClickStockMatch}/>)
+      potentialMatches.push(match);
     }
       
     const hasMatches = potentialMatches.length > 0;
@@ -68,8 +70,8 @@ export const StockSearchBar = function () {
     if(hasMatches){
       resultBox = <div id='stock-search-results'>{potentialMatches}</div>
     }
-    else{
-      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} symbol={null} fullName={"No results found."} /></div>
+    else if(searchKeywords.trim().length > 0){
+      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "No results found."}} /></div>
     }
     
     return resultBox;

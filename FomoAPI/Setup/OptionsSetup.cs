@@ -19,6 +19,10 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("EventBus"))
                     .ValidateDataAnnotations();
 
+            services.AddOptions<ExchangeSyncOptions>()
+                    .Bind(config.GetSection("ExchangeSync"))
+                    .ValidateDataAnnotations();
+
             services.AddOptions<CacheOptions>("SingleQuoteCache")
                     .Bind(config.GetSection("SingleQuoteCache"))
                     .ValidateDataAnnotations();

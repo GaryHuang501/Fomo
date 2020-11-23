@@ -41,7 +41,13 @@ export const stockSearchSlice = createSlice({
   }
 });
 
-export const selectStockSearchResults = state => state.stockSearch.stocks;
+export const selectStockSearchResults = function(state, keywords){
+  if(keywords in state.stockSearch.stocks && Array.isArray(state.stockSearch.stocks[keywords])){
+    return state.stockSearch.stocks[keywords];
+  }
+
+  return [];
+}
 
 export const selectStockSearchStatus = state => state.stockSearch.status;
 

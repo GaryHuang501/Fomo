@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using FomoAPI.Application.EventBuses;
+using FomoAPI.Application.Exchanges;
 
 namespace FomoAPI
 {
@@ -76,6 +76,7 @@ namespace FomoAPI
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule(new ApiModule());
+            builder.RegisterModule(new ExchangeSyncModule());
             builder.RegisterModule(new EventBusModule());
         }
     }

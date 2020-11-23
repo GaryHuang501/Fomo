@@ -50,8 +50,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             Assert.True(symbolCountFirstSync > 8000);
 
             // Check for major tickers
-            var jpmSymbol = await _symbolRepo.GetSymbol("JPM", ExchangeType.NYSE);
-            var msftSymbol = await _symbolRepo.GetSymbol("MSFT", ExchangeType.NASDAQ);
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM");
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT");
 
             Assert.Equal("JPM", jpmSymbol.Ticker);
             Assert.Equal("NYSE", jpmSymbol.ExchangeName);
@@ -72,8 +72,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
         public async Task Should_AddNewSymbols_WhenExistingData()
         {
             int symbolCountFirstSync = await GetSymbolCount();
-            var jpmSymbol = await _symbolRepo.GetSymbol("JPM", ExchangeType.NYSE);
-            var msftSymbol = await _symbolRepo.GetSymbol("MSFT", ExchangeType.NASDAQ);
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM");
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT");
 
             await DeleteSymbol(jpmSymbol.Ticker, jpmSymbol.ExchangeId);
             await DeleteSymbol(msftSymbol.Ticker, msftSymbol.ExchangeId);
@@ -110,8 +110,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             await _syncRepo.AddSymbols(new List<Symbol> { testSymbol1, testSymbol2 });
             await _sync.Sync();
 
-            var test1Symbol = await _symbolRepo.GetSymbol("Test@1", ExchangeType.NASDAQ);
-            var test2Symbol = await _symbolRepo.GetSymbol("Test@2", ExchangeType.NYSE);
+            var test1Symbol = await _symbolRepo.GetSymbol("Test@1");
+            var test2Symbol = await _symbolRepo.GetSymbol("Test@2");
 
             Assert.True(test1Symbol.Delisted);
             Assert.True(test2Symbol.Delisted);
@@ -128,8 +128,8 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
             await UpdateSymbolFullName("DKNG", ExchangeType.NASDAQ.Id, "FAKE");
             await _sync.Sync();
 
-            var snapSymbol = await _symbolRepo.GetSymbol("SNAP", ExchangeType.NYSE);
-            var dkngSymbol = await _symbolRepo.GetSymbol("DKNG", ExchangeType.NASDAQ);
+            var snapSymbol = await _symbolRepo.GetSymbol("SNAP");
+            var dkngSymbol = await _symbolRepo.GetSymbol("DKNG");
 
             Assert.DoesNotContain("FAKE", snapSymbol.FullName);
             Assert.DoesNotContain("FAKE", dkngSymbol.FullName);
