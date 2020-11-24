@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = 5,
-                IntervalLengthMS = 10000,
+                RefreshIntervalMS = 10000,
+                PollingIntervalMS = 10000
             };
 
             SetupEventBusStub(options);
@@ -94,38 +96,47 @@ namespace FomoAPIUnitTests.Application.EventBuses
         }
 
         [Fact]
-        public async Task ShouldConfigureAndRunEventBus_MultipleIntervals()
+        public async Task ShouldRunAndRefreshEventBusPeriodically_MultipleIntervals()
         {
             int waitMs = 1000;
 
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = 5,
-                IntervalLengthMS = 100, // use a bigger interval for less noise
+                RefreshIntervalMS = 100, // use a bigger interval for less noise
+                PollingIntervalMS = 50
             };
 
             SetupEventBusStub(options);
 
             using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
             {
+                var stopwatch = new Stopwatch();
+
                 await hostedService.StartAsync(new CancellationToken());
                 await Task.Delay(waitMs);
 
-                var approximateNumberOfExpectedCalls = (waitMs / options.IntervalLengthMS);
-                var actualNumberOfCalls = _eventList.Count(e => e == EventType.ResetQueryExecutedCounter);
-                Assert.True(Math.Abs(actualNumberOfCalls - approximateNumberOfExpectedCalls)  < 2 );
+                var approxNumExecuteQueryCalls = (waitMs / options.PollingIntervalMS);
+                var approxNumRefreshCalls = (waitMs / options.RefreshIntervalMS);
+
+                var actualNumExecuteCalls = _eventList.Count(e => e == EventType.ExecutePendingQueriesAsync);
+                var actualNumRefreshCalls = _eventList.Count(e => e == EventType.ResetQueryExecutedCounter);
+
+                const int allowedDeviation = 3;
+
+                Assert.True(Math.Abs(actualNumExecuteCalls - approxNumExecuteQueryCalls) < allowedDeviation);
+                Assert.True(Math.Abs(actualNumRefreshCalls - approxNumRefreshCalls) < allowedDeviation);
             }
         }
 
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public async Task ShouldThrowExceptionWhenMaxQueriesSettingEqualOrLessThanZero(int settingValue)
+        public async Task ShouldThrowException_WhenMaxQueriesSettingEqualOrLessThanZero(int settingValue)
         {
             var options = new EventBusOptions
             {
                 MaxQueriesPerInterval = settingValue,
-                IntervalLengthMS = 100, // use a bigger interval for less noise
             };
 
             SetupEventBusStub(options);
@@ -140,12 +151,29 @@ namespace FomoAPIUnitTests.Application.EventBuses
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public async Task ShouldThrowExceptionWhenIntervalDelaySettingEqualOrLessThanZero(int settingValue)
+        public async Task ShouldThrowException_WhenRefreshIntervalMSIsEqualOrLessThanZero(int settingValue)
         {
             var options = new EventBusOptions
             {
-                MaxQueriesPerInterval = 100,
-                IntervalLengthMS = settingValue, // use a bigger interval for less noise
+                RefreshIntervalMS = settingValue, // use a bigger interval for less noise
+            };
+
+            SetupEventBusStub(options);
+
+            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
+            {
+                await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
+            }
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task ShouldThrowException_WhenPollingIntervalMSIsEqualOrLessThanZero(int settingValue)
+        {
+            var options = new EventBusOptions
+            {
+                PollingIntervalMS = settingValue, // use a bigger interval for less noise
             };
 
             SetupEventBusStub(options);

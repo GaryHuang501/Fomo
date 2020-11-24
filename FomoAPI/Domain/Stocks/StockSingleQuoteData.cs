@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
-    /// Stock data for a single point in time.
+    /// Latest stock data for a given stock.
     /// </summary>
     public class StockSingleQuoteData : IQueryableData
     {

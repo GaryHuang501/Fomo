@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
-    /// Snapshot of stock data for a speicfic time interval used in AlphaVantage TimeSeries queries
+    /// Snapshot data for a specific instance in time for a stock.
     /// </summary>
+    /// <remarks>Used when looking at stocks over a time interval.</remarks>
     public class StockSnapShot
     {
         public StockSnapShot(decimal high, decimal low, decimal close, decimal open, long volume)

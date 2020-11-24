@@ -1,19 +1,19 @@
 ﻿using FomoAPI.Application.EventBuses.QueryExecutorContexts;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
-using FomoAPI.Application.EventBuses.Triggers;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses
 {
     /// <summary>
     /// Thread-Safe Singleton class that will run the queries in the queue and save the results into a store (eg. cache)
-    /// Every scheduler run should reset the number of queries allowed per Interval
-    /// since Alphavantage allows only an x Amount of api calls per Interval.
+    /// Scheduler should periodically reset a counter the keeps track how many queries should be run
+    /// per interval. Alphavantage client only allows a certain amount of requests per minute.
     /// </summary>
+    /// <inheritdoc cref="IQueryEventBus"></inheritdoc>/>
     public class QueryEventBus : IQueryEventBus
     {
         private readonly QueryPrioritySet _queryQueue;
@@ -21,10 +21,15 @@ namespace FomoAPI.Application.EventBuses
         private readonly ILogger _logger;
         private readonly IQueuePriorityRule _queuePriorityRule;
         private readonly QuerySubscriptions _querySubscriptions;
-        private readonly object _queriesExecutedCounterLock;
+        private readonly object _queryCounterLock;
 
         private int _maxQueryPerIntervalThreshold;
-        private int _queriesExecutedCounter;
+
+        /// <summary>
+        /// Counter used to track how many queries left per interval.
+        /// Should be reset after each interval.
+        /// </summary>
+        private int _intervalNumQueriesLeft;
 
         public QueryEventBus(QueryPrioritySet queryQueue,
                              IQueryExecutorContextRegistry queryExecutorContextRegistry,
@@ -35,17 +40,11 @@ namespace FomoAPI.Application.EventBuses
             _queryQueue = queryQueue;
             _queryExecutorContextRegistry = queryExecutorContextRegistry;
             _logger = logger;
-            _queriesExecutedCounterLock = new object();
+            _queryCounterLock = new object();
             _queuePriorityRule = queuePriorityRule;
             _querySubscriptions = querySubscriptions;
         }
 
-        /// <summary>
-        /// Set the max query that can be run per Interval. 
-        /// </summary>
-        /// <remarks>If some queries get delayed from running on the previous interval, this will prevent too many
-        /// queries from being run on the next in</remarks>
-        /// <param name="maxQueryPerIntervalThreshold">Max number of queries per Interval allowed by the Data API</param>
         public void SetMaxQueryPerIntervalThreshold(int maxQueryPerIntervalThreshold)
         {
             _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
@@ -53,7 +52,10 @@ namespace FomoAPI.Application.EventBuses
 
         public void ResetQueryExecutedCounter()
         {
-            _queriesExecutedCounter = 0;
+            lock (_queryCounterLock)
+            {
+                _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold;
+            }
         }
 
         public void EnqueueNextQueries()
@@ -61,7 +63,7 @@ namespace FomoAPI.Application.EventBuses
             var prioritySortedQueries = _queuePriorityRule.Sort(_querySubscriptions).ToList();
             int queryEnqueueCount = 0;
 
-            foreach(var query in prioritySortedQueries)
+            foreach (var query in prioritySortedQueries)
             {
                 bool isSuccess = _queryQueue.TryAdd(query);
 
@@ -78,11 +80,10 @@ namespace FomoAPI.Application.EventBuses
         }
 
         /// <summary>
-        /// Executes the queries in the QuerySubscriptions in priority 
-        /// and saves the data in the cache and runs any result triggers for each query context.
-        /// Function will exit when the allowed query per Interval executed threshold has been exceeded.
+        /// Executes the queries pending in QuerySubscriptions by priority.
+        /// Then saves the data in the cache and runs any result triggers for against each query.
         /// </summary>
-        /// <returns>Task to await</returns>
+        /// <remarks> Function will exit when the max allowed query per Interval executed has been met</remarks>
         public async Task ExecutePendingQueriesAsync()
         {
             _logger.LogTrace("Fetching query priority list");
@@ -99,19 +100,18 @@ namespace FomoAPI.Application.EventBuses
         {
             try
             {
+                lock (_queryCounterLock)
+                {
+                    if (_intervalNumQueriesLeft > 0)
+                    {
+                        _logger.LogTrace("Query threshold for interval met. Exiting Execute Query.");
+                        return;
+                    }
+                }
+
                 _logger.LogTrace("Executing query for symbol {symbol}", query.Symbol);
 
                 var executorContext = _queryExecutorContextRegistry.GetExecutorContext(query);
-
-                // lock to prevent race condition where 2 queries get executed at same time
-                // when the counter is one less than the maximum. 
-                // This can happen if the scheduler schedules another run but the previous run's
-                // task gets delayed and overlaps the current run.
-                lock (_queriesExecutedCounterLock)
-                {
-                    _queriesExecutedCounter++;
-                    if (_queriesExecutedCounter >= _maxQueryPerIntervalThreshold) return;
-                }
 
                 var queryResult = await FetchQueryResultAsync(executorContext, query);
 
@@ -135,7 +135,7 @@ namespace FomoAPI.Application.EventBuses
 
         private async Task<ISubscriptionQueryResult> FetchQueryResultAsync(IQueryExecutorContext<ISubscribableQuery, ISubscriptionQueryResult> executorContext, ISubscribableQuery query)
         {
-           var queryResult = await executorContext.FetchQueryResultAsync(query);
+            var queryResult = await executorContext.FetchQueryResultAsync(query);
 
             _logger.LogTrace("Saving query results for {symbol}", query.Symbol);
 
