@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.Stores;
+using FomoAPI.Domain.Stocks.Queries;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,19 +17,19 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// The queue of queries to keep track of the next query to execute on the event bus
         /// </summary>
-        private readonly List<ISubscribableQuery> _queryList;
+        private readonly List<StockQuery> _queryList;
 
         /// <summary>
         /// Hashset to keep track what queries are in the queue. 
         /// </summary>
-        private readonly HashSet<ISubscribableQuery> _queryHashset;
+        private readonly HashSet<StockQuery> _queryHashset;
 
         private readonly object _lock;
 
         public QueryPrioritySet()
         {
-            _queryList = new List<ISubscribableQuery>();
-            _queryHashset = new HashSet<ISubscribableQuery>();
+            _queryList = new List<StockQuery>();
+            _queryHashset = new HashSet<StockQuery>();
             _lock = new object();
         }
 
@@ -40,7 +41,7 @@ namespace FomoAPI.Application.EventBuses
         /// Remove the query on the set 
         /// </summary>
         /// <param name="query">query to remove</param>
-        public bool Remove(ISubscribableQuery query)
+        public bool Remove(StockQuery query)
         {
             bool isSuccess;
 
@@ -63,7 +64,7 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         /// <param name="count">Number of queries to remove</param>
         /// <returns>The queries</returns>
-        public IEnumerable<ISubscribableQuery> Take(int count)
+        public IEnumerable<StockQuery> Take(int count)
         {
             lock (_lock)
             {
@@ -76,7 +77,7 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         /// <param name="query">Query to add</param>
         /// <returns>true if query was added. False if query already exists and is not added</returns>
-        public bool TryAdd(ISubscribableQuery query)
+        public bool TryAdd(StockQuery query)
         {
             lock (_lock)
             {

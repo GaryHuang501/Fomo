@@ -1,4 +1,6 @@
-﻿using FomoAPI.Domain.Stocks;
+﻿using Dapper;
+using FomoAPI.Domain.Stocks;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,18 @@ namespace FomoAPI.Application.DTOs
             Match = searchResult.Match;
             Symbol = searchResult.Symbol;
             SymbolId = symbol.Id;
+        }
+
+        [JsonConstructor]
+        public SymbolSearchResultDTO(bool delisted, int exchangeId, string exchangeName, string fullName, decimal match, int symbolId, string symbol)
+        {
+            Delisted = delisted;
+            ExchangeId = exchangeId;
+            ExchangeName = exchangeName;
+            FullName = fullName;
+            Match = match;
+            SymbolId = symbolId;
+            Symbol = symbol;
         }
     }
 }

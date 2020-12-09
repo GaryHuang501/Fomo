@@ -1,5 +1,4 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
-using FomoAPI.Application.EventBuses.QueryExecutorContexts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,7 +36,7 @@ namespace FomoAPI.Application.EventBuses
 
             _timerExecuteEventBus = new Timer(async (state) =>
             {
-                EnqueuePendingQueries();
+                await EnqueuePendingQueries();
                 await ExecuteEventBus();
             }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(_eventBusOptions.PollingIntervalMS));
 
@@ -68,10 +67,10 @@ namespace FomoAPI.Application.EventBuses
             }
         }
 
-        private void EnqueuePendingQueries()
+        private async Task EnqueuePendingQueries()
         {
             _logger.LogInformation($"Enqueuing next set of queries");
-            _queryEventBus.EnqueueNextQueries();
+            await _queryEventBus.EnqueueNextQueries();
         }
 
         private void RefreshEventBusState()
@@ -96,7 +95,7 @@ namespace FomoAPI.Application.EventBuses
 
             try
             {
-                await _queryEventBus.ExecutePendingQueriesAsync();
+                await _queryEventBus.ExecutePendingQueries();
             }
             catch (Exception ex)
             {

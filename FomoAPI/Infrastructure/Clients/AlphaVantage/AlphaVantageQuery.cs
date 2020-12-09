@@ -9,25 +9,38 @@ using FomoAPI.Common;
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
     /// <summary>
-    /// Query class for Single Quote Data (Function is Global quote in AlphaVantage)
+    /// Query that will be serialized as a web request to AlphaVantage for stock data.
     /// </summary>
-    public class AlphaVantageSingleQuoteQuery : AbstractSubscribableQuery, IAlphaVantageQuery
+    /// <remarks>Function is Global quote in AlphaVantage</remarks>
+    public class AlphaVantageQuery
     {
+        public QueryFunctionType FunctionType { get; }
+
+        public string Symbol { get; }
+
+        public DateTime CreateDate { get; }
+
+        public AlphaVantageQuery(QueryFunctionType functionType, string symbol)
+        {
+            if (string.IsNullOrEmpty(symbol)) throw new ArgumentNullException(nameof(symbol));
+
+            FunctionType = functionType;
+            Symbol = symbol;
+            CreateDate = DateTime.UtcNow;
+        }
+
         public QueryDataType DataType { get => QueryDataType.Csv; }
 
         public ReadOnlyDictionary<string, string> GetParameters()
         {
             return new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
             {
-                { AlphaVantageQueryKeys.Function, FunctionType.QueryFunctionName },
+                { AlphaVantageQueryKeys.Function, FunctionType.Name },
                 { AlphaVantageQueryKeys.Symbol, Symbol },
                 { AlphaVantageQueryKeys.DataType, DataType.Name }
             });
         }
 
-        public AlphaVantageSingleQuoteQuery(string symbol) 
-            : base(QueryFunctionType.SingleQuote, symbol)
-        {
-        }
+
     }
 }

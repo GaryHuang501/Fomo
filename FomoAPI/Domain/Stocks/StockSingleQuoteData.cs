@@ -1,18 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using Dapper;
+using FomoAPI.Domain.Stocks.Queries;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
     /// Latest stock data for a given stock.
     /// </summary>
-    public class StockSingleQuoteData : IQueryableData
+    public class StockSingleQuoteData : StockData, IEntity
     {
-        public string Symbol { get; private set; }
-
         public decimal High { get; private set; }
 
         public decimal Low { get; private set; }
@@ -27,10 +24,14 @@ namespace FomoAPI.Domain.Stocks
 
         public decimal Price { get; private set; }
 
-        public DateTime LastTradingDay { get; private set; }
-
         public long Volume { get; private set; }
 
+        public string Symbol { get; private set; }
+
+        public DateTime LastUpdated { get; private set; }
+
+        [JsonConstructor]
+        [ExplicitConstructor]
         public StockSingleQuoteData(
             string symbol,
             decimal high,
@@ -41,9 +42,8 @@ namespace FomoAPI.Domain.Stocks
             long volume,
             decimal change,
             string changePercent,
-            DateTime lastTradingDay)
+            DateTime lastUpdated)
         {
-            Symbol = symbol;
             High = high;
             Low = low;
             Open = open;
@@ -52,7 +52,8 @@ namespace FomoAPI.Domain.Stocks
             PreviousClose = previousClose;
             Change = change;
             ChangePercent = changePercent;
-            LastTradingDay = lastTradingDay;
+            LastUpdated = lastUpdated;
+            Symbol = symbol;
         }
     }
 }

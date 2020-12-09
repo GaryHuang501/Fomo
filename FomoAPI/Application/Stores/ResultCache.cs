@@ -31,7 +31,7 @@ namespace FomoAPI.Application.Stores
             _cache.Dispose();
         }
 
-        public virtual void Add(TKey key, TResult result)
+        public virtual void Upsert(TKey key, TResult result)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSize(_cacheItemSize)

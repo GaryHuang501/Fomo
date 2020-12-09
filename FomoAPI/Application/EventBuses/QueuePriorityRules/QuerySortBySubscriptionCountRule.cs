@@ -1,7 +1,10 @@
-﻿using FomoAPI.Application.Stores;
+﻿using FomoAPI.Application.EventBuses.QueryContexts;
+using FomoAPI.Application.Stores;
+using FomoAPI.Domain.Stocks.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses.QueuePriorityRules
 {
@@ -11,11 +14,11 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
     /// </summary>
     public class QuerySortBySubscriptionCountRule : IQueuePriorityRule
     {
-        private readonly IQueryResultStore _store;
+        private readonly IQueryContextFactory _contextFactory;
 
-        public QuerySortBySubscriptionCountRule(IQueryResultStore store)
+        public QuerySortBySubscriptionCountRule(IQueryContextFactory contextFactory)
         {
-            _store = store;
+            _contextFactory = contextFactory;
         }
 
         /// <summary>
@@ -23,34 +26,38 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
         /// </summary>
         /// <param name="querySubscriptions">QuerySubscription to sort</param>
         /// <returns>Sorted Queries</returns>
-        public IEnumerable<ISubscribableQuery> Sort(QuerySubscriptions querySubscriptions)
+        public async Task<IEnumerable<StockQuery>> Sort(QuerySubscriptions querySubscriptions)
         {
             var subscriptionInfos = querySubscriptions.GetSubscriptionInfos();
 
-            var sortedQueriesBySubscriberCountAndStaleResultsDesc = subscriptionInfos.Where(x => Filter(x, _store))
-                                                                                 .OrderByDescending(x => x.SubscriberCount)
-                                                                                 .Select(x => x.Query);
+            var subscriptionNeedRefreshing = await GetSubscriptionNeedRefreshing(querySubscriptions);
+            
+            var sortedQueriesBySubscriberCountAndStaleResultsDesc = subscriptionInfos.Where(s => s.HasSubscribers() && subscriptionNeedRefreshing.ContainsKey(s))
+                                                                                 .OrderByDescending(s => s.SubscriberCount)
+                                                                                 .Select(s => s.Query);
 
             return sortedQueriesBySubscriberCountAndStaleResultsDesc;
         }
 
-        private bool Filter(SubscriptionInfo info, IQueryResultStore store)
+        private async Task<Dictionary<SubscriptionInfo, StockQueryResult>> GetSubscriptionNeedRefreshing(QuerySubscriptions querySubscriptions)
         {
-            return HasSubscribers(info)
-                && IsDataStale(info.Query, store);
-        }
+            var results = new Dictionary<SubscriptionInfo, StockQueryResult>();
 
-        private bool HasSubscribers(SubscriptionInfo info) => info.SubscriberCount > 0;
+            foreach(var info in querySubscriptions.GetSubscriptionInfos())
+            {
+                IQueryContext queryContext = info.Query.CreateContext(_contextFactory);
 
-        private bool IsDataStale(ISubscribableQuery query, IQueryResultStore store)
-        {
-            var queryResult = store.GetQueryResult(query);
+                StockQueryResult queryResult = await queryContext.GetQueryResult(info.Query.SymbolId);
 
-            if(queryResult == null) return true;
+                bool queryNeedsRefresh = queryResult == null || info.Query.FunctionType.IsExpired(queryResult.CreateDateUtc, DateTime.UtcNow);
 
-            var isStaleData = query.FunctionType.IsExpired(queryResult.CreateDateUtc, DateTime.UtcNow);
+                if (queryNeedsRefresh)
+                {
+                    results.Add(info, queryResult);
+                }
+            }
 
-            return isStaleData;
+            return results;
         }
     }
 }

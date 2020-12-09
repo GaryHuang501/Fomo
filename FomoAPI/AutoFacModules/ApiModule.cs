@@ -16,12 +16,16 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerLifetimeScope();
-            builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
+            builder.RegisterType<StockSearchCache>().SingleInstance();
+            builder.RegisterType<SingleQuoteCache>().SingleInstance();
 
-            builder.RegisterType<StockSearchCache>().As<ResultCache<string, IEnumerable<SymbolSearchResultDTO>>>().SingleInstance();
+            builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<StockDataRepository>().As<IStockDataRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
+
+            builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerDependency();
+            builder.RegisterType<StockDataService>().As<IStockDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
         }
     }
 }

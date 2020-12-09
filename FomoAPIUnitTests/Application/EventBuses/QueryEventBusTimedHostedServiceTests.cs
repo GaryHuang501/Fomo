@@ -58,7 +58,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
                 _eventList.Add(EventType.EnqueueNextQueries);
             });
 
-            _mockEventBus.Setup(x => x.ExecutePendingQueriesAsync()).Callback(() =>
+            _mockEventBus.Setup(x => x.ExecutePendingQueries()).Callback(() =>
             {
                 _eventList.Add(EventType.ExecutePendingQueriesAsync);
             });

@@ -53,11 +53,11 @@ namespace FomoAPI.Infrastructure.Exchanges
                 }
 
                 var symbol = new DownloadedSymbol
-                {
-                    Ticker = ticker,
-                    FullName = fullName,
-                    ExchangeId = exchangeType.Id,
-                };
+                (
+                    ticker: ticker,
+                    fullName: fullName,
+                    exchangeId: exchangeType.Id
+                );
 
                 _logger.LogTrace("Added ticker {ticker} for exchange {exchange}", columns[symbolIndex], columns[exchangeIndex]);
 

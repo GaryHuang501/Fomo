@@ -1,25 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Dapper;
+using Newtonsoft.Json;
 
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
-    /// A Stock Symbol such as TSLA, MSFT, AAPL.
+    /// Represents the info on a stock.
     /// </summary>
-    public class Symbol
+    public class Symbol : IEntity
     {
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
-        public string Ticker { get; set; }
+        public string Ticker { get; private set; }
 
-        public string ExchangeName { get; set; }
+        public string ExchangeName { get; private set; }
 
-        public int ExchangeId { get; set; }
+        public int ExchangeId { get; private set; }
 
-        public string FullName { get; set; }
+        public string FullName { get; private set; }
 
-        public bool Delisted { get; set; }
+        public bool Delisted { get; private set; }
+
+        [JsonConstructor]
+        [ExplicitConstructor]
+        public Symbol(int id, string ticker, string exchangeName, int exchangeId, string fullName, bool delisted)
+        {
+            Id = id;
+            Ticker = ticker;
+            ExchangeName = exchangeName;
+            ExchangeId = exchangeId;
+            FullName = fullName;
+            Delisted = delisted;
+        }
     }
 }

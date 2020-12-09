@@ -1,11 +1,15 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Domain.Stocks;
+using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -31,17 +35,17 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
         public async Task GetSingleQuote_ShouldReturnSingleQuoteStockData()
         {
             var stockSymbol = "MSFT";
-            var alphaVantageQuery = new AlphaVantageSingleQuoteQuery(stockSymbol);
+            var alphaVantageQuery = new AlphaVantageQuery(QueryFunctionType.SingleQuote, stockSymbol);
             var alphaVantageClient = new AlphaVantageClient(_mockHttpFactory, _mockAlphaVantageOptionsAccessor.Object, _parserFactory, _mockLogger.Object);
 
-            var singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(alphaVantageQuery);
+            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(stockSymbol, "NASDAQ");
 
             Assert.False(singleQuoteResult.HasError);
 
             Assert.True(singleQuoteResult.Data.Low >= 0);
             Assert.True(singleQuoteResult.Data.High >= 0);
             Assert.True(singleQuoteResult.Data.Open >= 0);
-            Assert.NotEqual(new DateTime(), singleQuoteResult.Data.LastTradingDay);
+            Assert.NotEqual(new DateTime(), singleQuoteResult.Data.LastUpdated);
             Assert.Equal(stockSymbol, singleQuoteResult.Data.Symbol);
         }
 
@@ -49,13 +53,31 @@ namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
         public async Task GetSingleQuote_ShouldReturnErrorWhenUnknownSymbol()
         {
             var stockSymbol = "AB1234567890";
-            var alphaVantageQuery = new AlphaVantageSingleQuoteQuery(stockSymbol);
+            var alphaVantageQuery = new AlphaVantageQuery(QueryFunctionType.SingleQuote, stockSymbol);
             var alphaVantageClient = new AlphaVantageClient(_mockHttpFactory, _mockAlphaVantageOptionsAccessor.Object, _parserFactory, _mockLogger.Object);
 
-            var singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(alphaVantageQuery);
+            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(stockSymbol, "NYSE");
 
             Assert.True(singleQuoteResult.HasError);
             Assert.False(string.IsNullOrEmpty(singleQuoteResult.ErrorMessage));
+        }
+
+        [Fact]
+        public async Task GetSearchedTickers_ShouldReturnMatchingSymbols()
+        {
+            var stockSymbol = "MSFT";
+            var alphaVantageClient = new AlphaVantageClient(_mockHttpFactory, _mockAlphaVantageOptionsAccessor.Object, _parserFactory, _mockLogger.Object);
+
+            IEnumerable<SymbolSearchResult> searchResults = await alphaVantageClient.GetSearchedTickers(stockSymbol);
+
+            Assert.True(searchResults.Count() > 1);
+
+            Assert.Equal(stockSymbol, searchResults.First().Symbol);
+
+            SymbolSearchResult msftSymbol = searchResults.First();
+
+            Assert.Contains("Microsoft", msftSymbol.FullName);
+            Assert.Equal(1.0000m, msftSymbol.Match);
         }
 
         public void Dispose()

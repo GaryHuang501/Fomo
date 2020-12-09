@@ -1,13 +1,10 @@
 ﻿using FomoAPI.Domain.Stocks;
-using System;
-using System.Collections.Generic;
+using FomoAPI.Domain.Stocks.Queries;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
-    public interface IAlphaVantageDataParser<T> where T: IQueryableData
+    public interface IAlphaVantageDataParser<T> where T : StockData
     {
         T ParseData(StreamReader reader);
     }

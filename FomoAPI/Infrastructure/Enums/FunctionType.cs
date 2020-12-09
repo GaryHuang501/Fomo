@@ -27,19 +27,19 @@ namespace FomoAPI.Infrastructure.Enums
         public readonly static QueryFunctionType Weekly = new QueryFunctionType(WeeklyName, TimeSpan.FromMinutes(30));
         public readonly static QueryFunctionType Monthly = new QueryFunctionType(MonthlyName, TimeSpan.FromMinutes(30));
 
-        public string QueryFunctionName { get; private set; }
+        public string Name { get; private set; }
 
         public TimeSpan RenewalTime { get; private set; }
 
         private QueryFunctionType(string functionName, TimeSpan renewalTime)
         {
-            QueryFunctionName = functionName;
+            Name = functionName;
             RenewalTime = renewalTime;
         }
 
         public override int GetHashCode()
         {
-            return QueryFunctionName.GetHashCode();
+            return Name.GetHashCode();
         }
 
         public bool IsExpired(DateTime oldDateTime, DateTime newDateTime)

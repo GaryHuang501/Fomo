@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http;
 using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using FomoAPI.Domain.Stocks;
@@ -20,15 +21,21 @@ namespace FomoAPI.Controllers
         private ILogger<SymbolsController> _logger;
 
         private ISymbolSearchService _searchService;
-        public SymbolsController(ISymbolRepository symbolRepository, ISymbolSearchService searchService, ILogger<SymbolsController> logger)
+
+        private IStockDataService _stockDataService;
+        public SymbolsController(ISymbolRepository symbolRepository,
+                                 ISymbolSearchService searchService, 
+                                 IStockDataService stockDataService,
+                                 ILogger<SymbolsController> logger)
         {
             _symbolRepository = symbolRepository;
             _searchService = searchService;
+            _stockDataService = stockDataService;
             _logger = logger;
         }
 
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<SymbolSearchResultDTO>>> GetSearchResults([FromQuery] string keywords, int limit)
+        public async Task<ActionResult<IEnumerable<SymbolSearchResultDTO>>> GetSearchResults([FromQuery] string keywords, [FromQuery] int limit)
         {
             if(string.IsNullOrWhiteSpace(keywords))
             {
@@ -40,6 +47,23 @@ namespace FomoAPI.Controllers
             var descendingMatches = matches.OrderByDescending(m => m.Match).ThenBy(m => m.Symbol);
 
             return Ok(descendingMatches);
+        }
+
+        [HttpGet("singleQuoteData")]
+        public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteDatas([FromQuery] int[] symbolIds)
+        {
+            List<StockSingleQuoteDataDTO> dataset = new List<StockSingleQuoteDataDTO>();
+
+            foreach(int id in symbolIds)
+            {
+                // Fetching one stock at a time is better than at once due to caching.
+                StockSingleQuoteDataDTO quote = await _stockDataService.GetSingleQuoteData(id);
+                dataset.Add(quote);
+
+                _stockDataService.AddSubscriberToSingleQuote(id);
+            }
+
+            return Ok(dataset);
         }
     }
 }

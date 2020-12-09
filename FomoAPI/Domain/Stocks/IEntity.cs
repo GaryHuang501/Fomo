@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
-    /// Interface for classes the aggregrate roots that represent the data structure returned by Querys for stock data
+    /// Object that is created through the database
     /// </summary>
-    public interface IQueryableData
+    public interface IEntity
     {
     }
 }

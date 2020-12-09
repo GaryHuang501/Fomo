@@ -3,33 +3,33 @@ using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
-using FomoAPI.Application.Stores;
+using FomoAPI.Domain.Stocks.Queries;
 
 namespace FomoAPI.Application.EventBuses
 {
     /// <summary>
-    /// Thread-safe class to tracks how many subscribers to a given query of type T.
-    /// Used to determine which queries the event buses should run.
+    /// Thread-safe Singleton class to tracks how many subscribers to a given query.
+    /// This is used to determine which queries the event buses should run.
     /// </summary>
     public class QuerySubscriptions
     {
         /// <summary>
         /// Dictionary to map the query to the number of subscribers
         /// </summary>
-        private readonly ConcurrentDictionary<ISubscribableQuery, SubscriptionInfo> _pendingQueriesMap;
+        private readonly ConcurrentDictionary<StockQuery, SubscriptionInfo> _pendingQueriesMap;
 
         public int Count => _pendingQueriesMap.Keys.Count;
 
         public QuerySubscriptions()
         {
-            _pendingQueriesMap = new ConcurrentDictionary<ISubscribableQuery, SubscriptionInfo>();
+            _pendingQueriesMap = new ConcurrentDictionary<StockQuery, SubscriptionInfo>();
         }
 
         /// <summary>
         /// Add a subscriber to a query, incrementing the subscriber count
         /// </summary>
         /// <param name="query"></param>
-        public void AddSubscriber(ISubscribableQuery query)
+        public void AddSubscriber(StockQuery query)
         {
             const int initialNumOfSubscribers = 1;
 
@@ -40,7 +40,7 @@ namespace FomoAPI.Application.EventBuses
         /// Remove a subcriber for a query, reducing the subscriber count
         /// </summary>
         /// <param name="query"></param>
-        public void RemoveSubscriber(ISubscribableQuery query)
+        public void RemoveSubscriber(StockQuery query)
         {
             _pendingQueriesMap.AddOrUpdate(query, new SubscriptionInfo(query, 0), (key, oldValue) => new SubscriptionInfo(key, Math.Max(0, oldValue.SubscriberCount - 1)));
         }
@@ -49,7 +49,7 @@ namespace FomoAPI.Application.EventBuses
         /// Removes query from subscriptions, effectively setting subsriber count 0
         /// </summary>
         /// <param name="query"></param>
-        public void ClearQuery(ISubscribableQuery query)
+        public void ClearQuery(StockQuery query)
         {
             _pendingQueriesMap.TryRemove(query, out SubscriptionInfo subscriptionInfo);
         }

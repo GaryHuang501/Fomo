@@ -93,21 +93,10 @@ namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
         [Fact]
         public async Task Should_DelistSymbols_WhenSymbolNotInExchangeData()
         {
-            var testSymbol1 = new Symbol
-            {
-                ExchangeId = ExchangeType.NASDAQ.Id,
-                FullName = "Test Symbol 1",
-                Ticker = "Test@1",
-            };
+            var testSymbol1 = new InsertSymbolAction("Test@1", ExchangeType.NASDAQ.Id, "Test Symbol 1", false);
+            var testSymbol2 = new InsertSymbolAction("Test@2", ExchangeType.NYSE.Id, "Test Symbol 2", false);
 
-            var testSymbol2 = new Symbol
-            {
-                ExchangeId = ExchangeType.NYSE.Id,
-                FullName = "Test Symbol 2",
-                Ticker = "Test@2",
-            };
-
-            await _syncRepo.AddSymbols(new List<Symbol> { testSymbol1, testSymbol2 });
+            await _syncRepo.AddSymbols(new List<InsertSymbolAction> { testSymbol1, testSymbol2 });
             await _sync.Sync();
 
             var test1Symbol = await _symbolRepo.GetSymbol("Test@1");

@@ -15,9 +15,9 @@ namespace FomoAPI.Application.Services
     {
         private readonly IStockClient _client;
         private readonly ISymbolRepository _symbolRepository;
-        private readonly ResultCache<string, IEnumerable<SymbolSearchResultDTO>> _cache;
+        private readonly StockSearchCache _cache;
 
-        public SymbolSearchService(IStockClient client, ISymbolRepository symbolRepository, ResultCache<string, IEnumerable<SymbolSearchResultDTO>> cache)
+        public SymbolSearchService(IStockClient client, ISymbolRepository symbolRepository, StockSearchCache cache)
         {
             _client = client;
             _symbolRepository = symbolRepository;
@@ -30,7 +30,7 @@ namespace FomoAPI.Application.Services
                 var newDtos = await CreateMatchingSymbolDTOs(keywords);
 
                 dtos = newDtos;
-                _cache.Add(keywords, dtos);
+                _cache.Upsert(keywords, dtos);
             }
 
             return dtos.Take(limit);

@@ -15,8 +15,6 @@ namespace FomoAPI.Infrastructure.Repositories
     {
         Task<PortfolioSymbol> AddPortfolioSymbol(int portfolioId, int symbolId);
 
-        Task AddPriceAlert(Guid userId);
-
         Task<Portfolio> CreatePortfolio(Guid userId, string name);
 
         Task DeletePortfolio(int portfolioId);

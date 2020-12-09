@@ -3,7 +3,8 @@
 AS
 	UPDATE Symbol
 	SET	
-		FullName = tvpUpdateSymbol.FullName
+		FullName = tvpUpdateSymbol.FullName,
+		ExchangeId = tvpUpdateSymbol.ExchangeID
 	FROM 
 		Symbol
 	INNER JOIN

@@ -31,7 +31,7 @@ namespace FomoAPI.Infrastructure.Repositories
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
             var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
-                        OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateCreated
+                        OUTPUT Inserted.Id, Inserted.UserId, Inserted.Name, Inserted.DateModified, Inserted.DateCreated
                         VALUES
                         (@userId, @name, GETUTCDATE(), GETUTCDATE());";
 
@@ -239,11 +239,6 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        public async Task AddPriceAlert(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Get the portfolio and it's symbols
         /// </summary>
@@ -296,7 +291,13 @@ namespace FomoAPI.Infrastructure.Repositories
 
                     if(portfolio != null)
                     {
-                        portfolio.Symbols = portfolioSymbolsResultSet;
+                        portfolio = new Portfolio(
+                            id: portfolio.Id,
+                            userId: portfolio.UserId,
+                            name: portfolio.Name,
+                            dateModified: portfolio.DateModified,
+                            dateCreated: portfolio.DateCreated,
+                            symbols: portfolioSymbolsResultSet);
                     }
                 }
             }

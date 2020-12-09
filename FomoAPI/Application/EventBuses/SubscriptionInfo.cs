@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FomoAPI.Domain.Stocks.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,14 +8,16 @@ namespace FomoAPI.Application.EventBuses
 {
     public class SubscriptionInfo
     {
-        public ISubscribableQuery Query { get; private set; }
+        public StockQuery Query { get; private set; }
 
         public long SubscriberCount { get; private set; }
 
-        public SubscriptionInfo(ISubscribableQuery query, long subscriberCount)
+        public SubscriptionInfo(StockQuery query, long subscriberCount)
         {
             Query = query;
             SubscriberCount = subscriberCount;
         }
+
+        public bool HasSubscribers() => SubscriberCount > 0;
     }
 }

@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Exchanges
 {
+    /// <summary>
+    /// Changeset for any changes to symbols
+    /// </summary>
     public class SymbolDetailsChangeset : IExchangeSyncChangeset
     {
-        private List<Symbol> _changedSymbols;
+        private List<UpdateSymbolAction> _changedSymbols;
         private IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
         private IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
 
         public SymbolDetailsChangeset(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)
         {
-            _changedSymbols = new List<Symbol>();
+            _changedSymbols = new List<UpdateSymbolAction>();
             _existingSymbolsMap = existingSymbolsMap;
             _downloadedSymbolsMap = downloadedSymbolsMap;
         }
@@ -25,11 +28,11 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <param name="symbolKey">The <see cref="SymbolKey"/> to identify the symbol.</param>
         public void AddChange(SymbolKey symbolKey)
         {
-            var symbolForDb = new Symbol
-            {
-                Id = _existingSymbolsMap[symbolKey].Id,
-                FullName = _downloadedSymbolsMap[symbolKey].FullName,
-            };
+            var symbolForDb = new UpdateSymbolAction(
+                                    _existingSymbolsMap[symbolKey].Id,
+                                    _downloadedSymbolsMap[symbolKey].FullName,
+                                    _downloadedSymbolsMap[symbolKey].ExchangeId);
+
 
             _changedSymbols.Add(symbolForDb);
         }
@@ -44,7 +47,6 @@ namespace FomoAPI.Infrastructure.Exchanges
             if(_existingSymbolsMap.TryGetValue(symbolKey, out Symbol existingSymbol) && 
                _downloadedSymbolsMap.TryGetValue(symbolKey, out DownloadedSymbol downloadedSymbol))
             {
-
                 return existingSymbol.FullName != downloadedSymbol.FullName;
             }
 

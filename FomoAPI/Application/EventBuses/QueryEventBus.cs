@@ -1,9 +1,9 @@
-﻿using FomoAPI.Application.EventBuses.QueryExecutorContexts;
+﻿using FomoAPI.Application.EventBuses.QueryContexts;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
+using FomoAPI.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses
@@ -17,7 +17,7 @@ namespace FomoAPI.Application.EventBuses
     public class QueryEventBus : IQueryEventBus
     {
         private readonly QueryPrioritySet _queryQueue;
-        private readonly IQueryExecutorContextRegistry _queryExecutorContextRegistry;
+        private readonly IQueryContextFactory _queryContextFactory;
         private readonly ILogger _logger;
         private readonly IQueuePriorityRule _queuePriorityRule;
         private readonly QuerySubscriptions _querySubscriptions;
@@ -32,13 +32,13 @@ namespace FomoAPI.Application.EventBuses
         private int _intervalNumQueriesLeft;
 
         public QueryEventBus(QueryPrioritySet queryQueue,
-                             IQueryExecutorContextRegistry queryExecutorContextRegistry,
+                             IQueryContextFactory queryqueryContextRegistry,
                              IQueuePriorityRule queuePriorityRule,
                              ILogger<QueryEventBus> logger,
                              QuerySubscriptions querySubscriptions)
         {
             _queryQueue = queryQueue;
-            _queryExecutorContextRegistry = queryExecutorContextRegistry;
+            _queryContextFactory = queryqueryContextRegistry;
             _logger = logger;
             _queryCounterLock = new object();
             _queuePriorityRule = queuePriorityRule;
@@ -58,9 +58,9 @@ namespace FomoAPI.Application.EventBuses
             }
         }
 
-        public void EnqueueNextQueries()
+        public async Task EnqueueNextQueries()
         {
-            var prioritySortedQueries = _queuePriorityRule.Sort(_querySubscriptions).ToList();
+            var prioritySortedQueries = (await _queuePriorityRule.Sort(_querySubscriptions)).ToList();
             int queryEnqueueCount = 0;
 
             foreach (var query in prioritySortedQueries)
@@ -84,7 +84,7 @@ namespace FomoAPI.Application.EventBuses
         /// Then saves the data in the cache and runs any result triggers for against each query.
         /// </summary>
         /// <remarks> Function will exit when the max allowed query per Interval executed has been met</remarks>
-        public async Task ExecutePendingQueriesAsync()
+        public async Task ExecutePendingQueries()
         {
             _logger.LogTrace("Fetching query priority list");
 
@@ -96,67 +96,54 @@ namespace FomoAPI.Application.EventBuses
             await Task.WhenAll(queryTasks);
         }
 
-        private async Task ExecuteQuery(ISubscribableQuery query)
+        private async Task ExecuteQuery(StockQuery query)
         {
             try
             {
                 lock (_queryCounterLock)
                 {
-                    if (_intervalNumQueriesLeft > 0)
+                    if (_intervalNumQueriesLeft <= 0)
                     {
                         _logger.LogTrace("Query threshold for interval met. Exiting Execute Query.");
                         return;
                     }
                 }
 
-                _logger.LogTrace("Executing query for symbol {symbol}", query.Symbol);
+                _logger.LogTrace("Executing query for symbolId {symbol}", query.SymbolId);
 
-                var executorContext = _queryExecutorContextRegistry.GetExecutorContext(query);
+                var queryContext = query.CreateContext(_queryContextFactory);
 
-                var queryResult = await FetchQueryResultAsync(executorContext, query);
+                await SaveQueryResult(queryContext, query);
 
-                await executorContext.SaveToStoreAsync(query, queryResult);
 
                 // Now that the query result has been updated in the store, remove it from the queue
                 // so it can be requeued again when the data is stale
                 _queryQueue.Remove(query);
 
-                await ExecuteQueryResultTriggers(executorContext, queryResult);
+                await ExecuteQueryResultTriggers(queryContext);
 
-                _logger.LogTrace("Finished processing symbol query", query.Symbol);
+                _logger.LogTrace("Finished processing symbol query {SymbolId}", query.SymbolId);
 
             }
             catch (Exception ex)
             {
                 _queryQueue.Remove(query);
-                _logger.LogError(ex, "Unexpected error in event bus for query {Symbol}", query.Symbol);
+                _logger.LogError(ex, "Unexpected error in event bus for query {SymbolId}", query.SymbolId);
             }
         }
 
-        private async Task<ISubscriptionQueryResult> FetchQueryResultAsync(IQueryExecutorContext<ISubscribableQuery, ISubscriptionQueryResult> executorContext, ISubscribableQuery query)
+        private async Task SaveQueryResult(IQueryContext queryContext, StockQuery query)
         {
-            var queryResult = await executorContext.FetchQueryResultAsync(query);
+            await queryContext.SaveQueryResultToStore();
 
-            _logger.LogTrace("Saving query results for {symbol}", query.Symbol);
-
-            if (queryResult.HasError)
-            {
-                _logger.LogError("Error running query for {symbol}: {error}", query.Symbol, queryResult.ErrorMessage);
-            }
-
-            return queryResult;
+            _logger.LogTrace("Saving query results for {symbol}", query.SymbolId);
         }
 
-        private async Task ExecuteQueryResultTriggers(IQueryExecutorContext<ISubscribableQuery, ISubscriptionQueryResult> executorContext, ISubscriptionQueryResult result)
+        private async Task ExecuteQueryResultTriggers(IQueryContext queryContext)
         {
-            var queryResultTriggers = executorContext.GetQueryResultTriggers();
+            await queryContext.ExecuteResultTriggers();
 
             _logger.LogTrace("Executing Query Result Triggers");
-
-            foreach (var trigger in queryResultTriggers)
-            {
-                await trigger.ExecuteAsync(result);
-            }
         }
     }
 }

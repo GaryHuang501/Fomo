@@ -10,13 +10,13 @@ namespace FomoAPI.Infrastructure.Exchanges
     /// </summary>
     public class NewSymbolChangeset : IExchangeSyncChangeset
     {
-        private List<Symbol> _newSymbols;
+        private List<InsertSymbolAction> _newSymbols;
         private IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
         private IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
 
         public NewSymbolChangeset(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)
         {
-            _newSymbols = new List<Symbol>();
+            _newSymbols = new List<InsertSymbolAction>();
             _existingSymbolsMap = existingSymbolsMap;
             _downloadedSymbolsMap = downloadedSymbolsMap;
         }
@@ -26,14 +26,12 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// </summary>
         /// <param name="symbolKey">The <see cref="SymbolKey"/> to identify the symbol.</param>
         public void AddChange(SymbolKey symbolKey)
-        {  
-            var symbolForDb = new Symbol
-            {
-                ExchangeId = symbolKey.ExchangeId,
-                Delisted = false,
-                FullName = _downloadedSymbolsMap[symbolKey].FullName,
-                Ticker = symbolKey.Ticker
-            };
+        {
+            var symbolForDb = new InsertSymbolAction(
+                symbolKey.Ticker, 
+                symbolKey.ExchangeId, 
+                _downloadedSymbolsMap[symbolKey].FullName, 
+                false);
 
             _newSymbols.Add(symbolForDb);
         }

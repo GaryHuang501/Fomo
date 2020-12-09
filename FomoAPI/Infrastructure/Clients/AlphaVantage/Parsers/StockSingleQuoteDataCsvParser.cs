@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks;
+using FomoAPI.Domain.Stocks.Queries;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
@@ -78,7 +79,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
                     change: change,
                     price: price,
                     changePercent: changePercent,
-                    lastTradingDay: latestDay
+                    lastUpdated: latestDay
                 );
         }
     }

@@ -19,7 +19,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void IsEmpty_ShouldReturnFalse_WhenQueryAdded()
         {
             var querySet = new QueryPrioritySet();
-            var query = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query);
 
@@ -30,9 +30,9 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Count_ShouldReturnSetSize()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.IntraDay, "TSLA");
-            var query3 = new TestQuery(QueryFunctionType.Monthly, "GOOG");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
+            var query3 = new TestQuery(3, QueryFunctionType.Weekly);
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -45,8 +45,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Take_ShouldReturnTopFirstQueryInFifoOrder_WhenMultipleQueriesAdded()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.IntraDay, "TSLA");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -60,10 +60,11 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Take_ShouldReturnTopThreeQueryInFifoOrder_WhenMultipleQueriesAdded()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.IntraDay, "TSLA");
-            var query3 = new TestQuery(QueryFunctionType.Monthly, "GOOG");
-            var query4 = new TestQuery(QueryFunctionType.Monthly, "SHOP");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
+            var query3 = new TestQuery(3, QueryFunctionType.Weekly);
+            var query4 = new TestQuery(4, QueryFunctionType.Monthly);
+
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -81,9 +82,9 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Take_ShouldReturnAllItems_WhenItemsToTakeExceedsSetSize()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.IntraDay, "TSLA");
-            var query3 = new TestQuery(QueryFunctionType.Monthly, "GOOG");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
+            var query3 = new TestQuery(3, QueryFunctionType.Weekly);
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -98,7 +99,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void TryAdd_ShouldReturnTrue_WhenQueryIsAddedSuccessfully()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             bool isSuccessful = querySet.TryAdd(query1);
 
@@ -109,7 +110,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void TryAdd_ShouldReturnFalseAndNotAddQuery_WhenQueryExists()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             bool isSecondAddSuccessful = querySet.TryAdd(query1);
@@ -122,7 +123,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Remove_ShouldReturnTrue_WhenSingleSetHasItemRemoved()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             bool IsRemoveSuccessful = querySet.Remove(query1);
@@ -135,9 +136,9 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Remove_ShouldBeAbleToRemoveMultipleQueries()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.SingleQuote, "SHOP");
-            var query3 = new TestQuery(QueryFunctionType.SingleQuote, "AMD");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.SingleQuote);
+            var query3 = new TestQuery(3, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -155,9 +156,9 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Remove_ShouldBeAbleToRemoveMultipleQueriesInAnyOrder()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.SingleQuote, "SHOP");
-            var query3 = new TestQuery(QueryFunctionType.SingleQuote, "AMD");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.SingleQuote);
+            var query3 = new TestQuery(3, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             querySet.TryAdd(query2);
@@ -176,7 +177,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Remove_ShouldReturnFalse_WhenSetIsEmpty()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             bool isRemoveSuccessful = querySet.Remove(query1);
 
@@ -187,8 +188,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void Remove_ShouldReturnFalse_WhenQueryNotFound()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
-            var query2 = new TestQuery(QueryFunctionType.SingleQuote, "SHOP");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             bool isRemoveSuccessful = querySet.Remove(query2);
@@ -200,7 +201,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         public void TryAdd_ShouldReturnTrue_WhenQueryIsAddedAgainAfterItWasRemoved()
         {
             var querySet = new QueryPrioritySet();
-            var query1 = new TestQuery(QueryFunctionType.SingleQuote, "MSFT");
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
 
             querySet.TryAdd(query1);
             querySet.Remove(query1);

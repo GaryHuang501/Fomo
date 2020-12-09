@@ -29,20 +29,22 @@ namespace FomoAPI.Infrastructure.Repositories
         }
 
 
-        public async Task<int> AddSymbols(IEnumerable<Symbol> symbols, int? batchSize = null)
+        public async Task<int> AddSymbols(IEnumerable<InsertSymbolAction> symbols, int? batchSize = null)
         {
             if (batchSize == null)
             {
                 batchSize = _defaultBulkCopyBatchSize;
             }
 
-            var symbolDataTable = symbols.ToDataTable(
-                new ColumnSchema<Symbol>("Id", typeof(int), (s => s.Id)),
-                new ColumnSchema<Symbol>("Ticker", typeof(string), (s => s.Ticker)),
-                new ColumnSchema<Symbol>("FullName", typeof(string), (s => s.FullName)),
-                new ColumnSchema<Symbol>("ExchangeId", typeof(int), (s => s.ExchangeId)),
-                new ColumnSchema<Symbol>("Delisted", typeof(bool), (s => s.Delisted))
-             );
+            var columns = new ColumnSchema<InsertSymbolAction>[]
+                {
+                    new ColumnSchema<InsertSymbolAction>("Ticker", typeof(string), (s => s.Ticker)),
+                    new ColumnSchema<InsertSymbolAction>("FullName", typeof(string), (s => s.FullName)),
+                    new ColumnSchema<InsertSymbolAction>("ExchangeId", typeof(int), (s => s.ExchangeId)),
+                    new ColumnSchema<InsertSymbolAction>("Delisted", typeof(bool), (s => s.Delisted))
+                };
+
+            var symbolDataTable = symbols.ToDataTable(columns);
 
             symbolDataTable.TableName = "Symbol";
 
@@ -64,6 +66,12 @@ namespace FomoAPI.Infrastructure.Repositories
                         {
                             bulkCopy.DestinationTableName = "dbo.Symbol";
                             bulkCopy.BatchSize = batchSize.Value;
+
+                            foreach(var col in columns)
+                            {
+                                bulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(col.ColumnName, col.ColumnName));
+                            }
+
                             await bulkCopy.WriteToServerAsync(symbolDataTable);
                         }
                         await transaction.CommitAsync();
@@ -114,11 +122,12 @@ namespace FomoAPI.Infrastructure.Repositories
             }     
         }
 
-        public async Task<int> UpdateSymbols(IEnumerable<Symbol> symbols)
+        public async Task<int> UpdateSymbols(IEnumerable<UpdateSymbolAction> symbols)
         {
             var dataTable = symbols.ToDataTable(
-                    new ColumnSchema<Symbol>("Id", typeof(string), (s => s.Id)),
-                    new ColumnSchema<Symbol>("FullName", typeof(string), (s => s.FullName))
+                    new ColumnSchema<UpdateSymbolAction>("Id", typeof(string), (s => s.Id)),
+                    new ColumnSchema<UpdateSymbolAction>("FullName", typeof(string), (s => s.FullName)),
+                    new ColumnSchema<UpdateSymbolAction>("ExchangeId", typeof(string), (s => s.ExchangeId))
                 );
 
             var tvpParam = new { tvpUpdateSymbol = dataTable.AsTableValuedParameter(TableType.UpdateSymbolType) };
@@ -152,9 +161,10 @@ namespace FomoAPI.Infrastructure.Repositories
             var selectSql = @"SELECT
                                 Symbol.Id,
                                 Symbol.Ticker,
-                                Symbol.FullName,
+                                Exchange.Name [ExchangeName],
                                 Symbol.ExchangeId,
-                                Exchange.Name
+                                Symbol.FullName,
+                                Symbol.Delisted
                               FROM
                                 Symbol
                               INNER JOIN

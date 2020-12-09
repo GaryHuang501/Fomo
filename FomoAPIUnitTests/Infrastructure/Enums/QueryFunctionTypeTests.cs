@@ -31,7 +31,7 @@ namespace FomoAPIUnitTests.Infrastructure.Enums
         [MemberData(nameof(FunctionTypeToExpectedValues))]
         public void QueryFunctionName_ShouldMatchExpectedForEachFunctionType(QueryFunctionType functionType, ExpectedValues expectedValues)
         {
-            Assert.Equal(expectedValues.FunctionName, functionType.QueryFunctionName);
+            Assert.Equal(expectedValues.FunctionName, functionType.Name);
         }
 
         [Theory]
@@ -39,7 +39,7 @@ namespace FomoAPIUnitTests.Infrastructure.Enums
         public void GetHashCode_ShouldReturnHashCodeOfFunctionName(QueryFunctionType functionType, ExpectedValues expectedValues)
         {
 
-            Assert.Equal(expectedValues.FunctionName.GetHashCode(), functionType.QueryFunctionName.GetHashCode());
+            Assert.Equal(expectedValues.FunctionName.GetHashCode(), functionType.Name.GetHashCode());
         }
 
         [Theory]

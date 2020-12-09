@@ -13,10 +13,12 @@ using System.Web.Http;
 using System.Collections.Generic;
 using System.Linq;
 using FomoAPI.Application.Services;
+using FomoAPI.Domain.Stocks.Queries;
+using FomoAPI.Infrastructure.Enums;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
-    /// <inheritdoc cref="IStockClient"/>
+    /// Client to send requests to the third party AlphaVantage API for stock information.
     public class AlphaVantageClient : IStockClient
     {
         private readonly AlphaVantageOptions _alphaVantageOptions;
@@ -59,9 +61,18 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             return content.BestMatches.Select(m => new SymbolSearchResult(symbol: m.Symbol, fullName: m.Name, m.MatchScore));
         }
 
-        public async Task<AlphaVantageQueryResult<StockSingleQuoteData>> GetSingleQuoteData(AlphaVantageSingleQuoteQuery query)
+        public async Task<SingleQuoteQueryResult> GetSingleQuoteData(string ticker, string exchangeName)
         {
-            return await GetQueryData<StockSingleQuoteData>(query, _parserFactory.GetSingleQuoteDataParser());
+            var alphaVantageQuery = new AlphaVantageQuery(QueryFunctionType.SingleQuote, ticker);
+
+            var alphaVantageQueryResult = await GetQueryData<StockSingleQuoteData>(alphaVantageQuery, _parserFactory.GetSingleQuoteDataParser());
+
+            if(alphaVantageQueryResult.HasError)
+            {
+                return new SingleQuoteQueryResult(alphaVantageQueryResult.ErrorMessage);
+            }
+
+            return new SingleQuoteQueryResult(ticker, alphaVantageQueryResult.Data);
         }
 
         /// <summary>
@@ -70,10 +81,10 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
         /// </summary>
         /// <param name="query">Query object used to generate the request</param>
         /// <returns></returns>
-        private async Task<AlphaVantageQueryResult<T>> GetQueryData<T>(IAlphaVantageQuery query, IAlphaVantageDataParser<T> parser) where T: IQueryableData
+        private async Task<AlphaVantageQueryResult<TData>> GetQueryData<TData>(AlphaVantageQuery query, IAlphaVantageDataParser<TData> parser)
+            where TData : StockData  
         {
-            var parameters = query.GetParameters();
-            AlphaVantageQueryResult<T> queryResult;
+            AlphaVantageQueryResult<TData> queryResult;
 
             try
             {
@@ -86,36 +97,36 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
                 var response = await client.GetAsync(urlWithQueryString);
 
+                TData data = null;
+
                 if (response.IsSuccessStatusCode)
                 {
-                    T data = default;
-
                     using (Stream stream = await response.Content.ReadAsStreamAsync())
                     using (StreamReader reader = new StreamReader(stream))
                     {
                         try
                         {
                             data = parser.ParseData(reader);
-                            queryResult = new AlphaVantageQueryResult<T>(data);
+                            queryResult = new AlphaVantageQueryResult<TData>(data);
                         }
                         catch(Exception)
                         {
                             var errorJson = await response.Content.ReadAsStringAsync();
                             var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
-                            queryResult = new AlphaVantageQueryResult<T>(error: errorObject.ErrorMessage);
+                            queryResult = new AlphaVantageQueryResult<TData>(error: errorObject.ErrorMessage);
                         }
                     }
                 }
                 else
                 {
                     _logger.LogError("Failed to retrieve data from AlphaVantage: {reason}", response.ReasonPhrase);
-                    queryResult = new AlphaVantageQueryResult<T>(error: response.ReasonPhrase);
+                    queryResult = new AlphaVantageQueryResult<TData>(error: response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error Executing query http request");
-                queryResult = new AlphaVantageQueryResult<T>(error: ex.Message);
+                queryResult = new AlphaVantageQueryResult<TData>(error: ex.Message);
             }
 
             return queryResult;

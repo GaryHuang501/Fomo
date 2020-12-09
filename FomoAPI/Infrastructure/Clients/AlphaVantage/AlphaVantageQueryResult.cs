@@ -1,9 +1,6 @@
 ﻿using FomoAPI.Application.EventBuses;
 using FomoAPI.Domain.Stocks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
@@ -12,7 +9,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
     /// Or holds the error when the query failed
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class AlphaVantageQueryResult<T>: ISubscriptionQueryResult where T: IQueryableData
+    public class AlphaVantageQueryResult<T> where T : StockData
     {
         public DateTime CreateDateUtc { get; private set; }
 

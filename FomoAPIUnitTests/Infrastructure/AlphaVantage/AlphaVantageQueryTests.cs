@@ -7,13 +7,13 @@ using Xunit;
 
 namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
 {
-    public class AlphaVantageSingleQuoteQueryTests
+    public class AlphaVantageQueryTests
     {
         [Fact]
         public void GetParameters_ShouldReturnFunctionAndDataTypeAndSymbol()
         {
             string symbol = "TSLA";
-            var query = new AlphaVantageSingleQuoteQuery(symbol);
+            var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
             var parameters = query.GetParameters();
 
             Assert.Equal(symbol, parameters["symbol"]);
@@ -25,7 +25,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         public void Function_ShouldReturnSingleQuoteType()
         {
             string symbol = "TSLA";
-            var query = new AlphaVantageSingleQuoteQuery(symbol);
+            var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
 
             Assert.Equal(QueryFunctionType.SingleQuote, query.FunctionType);
         }
@@ -34,7 +34,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         public void DataType_ShouldReturnCsvType()
         {
             string symbol = "TSLA";
-            var query = new AlphaVantageSingleQuoteQuery(symbol);
+            var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
 
             Assert.Equal(QueryDataType.Csv, query.DataType);
         }
@@ -42,8 +42,8 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         [Fact]
         public void ShouldInstantiateWithCreateDateAndSymbol()
         {
-            string symbol = "TSLA";
-            var query = new AlphaVantageSingleQuoteQuery(symbol);
+            string symbol = "JPM";
+            var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
 
             Assert.Equal(symbol, query.Symbol);
             Assert.NotEqual(new DateTime(), query.CreateDate);
@@ -54,7 +54,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         [InlineData("")]
         public void ShouldThrowExceptionWhenSymbolNullOrEmptyForConstructor(string symbol)
         {
-            Assert.Throws<ArgumentNullException>(() => new AlphaVantageSingleQuoteQuery(symbol));
+            Assert.Throws<ArgumentNullException>(() => new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol));
         }
 
     }

@@ -12,7 +12,7 @@ export const Portfolio = function () {
   if(portfolio.symbols && Array.isArray(portfolio.symbols))
   {
     for(const symbol of portfolio.symbols){
-        var stock = <PortfolioStock key={symbol.symbolId} symbol={symbol}></PortfolioStock>
+        const stock = <PortfolioStock key={symbol.symbolId} symbol={symbol}></PortfolioStock>
         portfolioStocks.push(stock);
     }
   }

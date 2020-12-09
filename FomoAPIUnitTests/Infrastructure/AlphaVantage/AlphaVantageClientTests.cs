@@ -7,11 +7,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -73,12 +71,11 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         public async Task GetSingleQuoteData_ShouldReturnQueryResultWithError_WhenParsingError()
         {
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
             SetupMockHttpClient("", HttpStatusCode.OK);
             _singleQuoteDataCsvParser.Setup(x => x.ParseData(It.IsAny<StreamReader>())).Throws(new Exception());
 
 
-            var queryResult = await client.GetSingleQuoteData(query);
+            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
             Assert.NotNull(queryResult.ErrorMessage);
@@ -88,7 +85,6 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         public async Task GetSingleQuoteData_ShouldReturnQueryResultWithError_WhenErrorSendingRequestWithHttpClient()
         {
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
 
             _mockHttpFactory = new Mock<IHttpClientFactory>();
 
@@ -105,7 +101,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             var httpClient = new HttpClient(handlerMock.Object);
             _mockHttpFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            var queryResult = await client.GetSingleQuoteData(query);
+            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
             Assert.NotNull(queryResult.ErrorMessage);
@@ -115,10 +111,9 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         public async Task GetSingleQuoteData_ShouldReturnQueryResultWithError_WhenHttpRequestNotOK()
         {
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
             SetupMockHttpClient("", HttpStatusCode.Unauthorized);
 
-            var queryResult = await client.GetSingleQuoteData(query);
+            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
         }
@@ -136,15 +131,14 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
                     change: 6,
                     price: 7,
                     changePercent: "9%",
-                    lastTradingDay: DateTime.UtcNow
+                    lastUpdated: DateTime.UtcNow
                 );
 
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
             SetupMockHttpClient("mockData", HttpStatusCode.OK);
             _singleQuoteDataCsvParser.Setup(x => x.ParseData(It.IsAny<StreamReader>())).Returns(singleQuoteData);
 
-            var queryResult = await client.GetSingleQuoteData(query);
+            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
 
             Assert.False(queryResult.HasError);
             Assert.Equal("MSFT", queryResult.Data.Symbol);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace FomoAPI.Domain.Stocks
 
         public decimal Match { get; private set; }
 
+        [JsonConstructor]
         public SymbolSearchResult(string symbol, string fullName, decimal match)
         {
             Symbol = symbol;

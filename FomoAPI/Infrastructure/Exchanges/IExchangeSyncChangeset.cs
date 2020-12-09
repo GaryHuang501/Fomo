@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 namespace FomoAPI.Infrastructure.Exchanges
 {
     /// <summary>
-    /// A Collection of a specific changes needed to apply to database symbol table
-    /// to sync with exchanges.
+    /// Changes between symbols from exchange client and current database that need to be
+    /// synced to our database.
     /// </summary>
     public interface IExchangeSyncChangeset
     {

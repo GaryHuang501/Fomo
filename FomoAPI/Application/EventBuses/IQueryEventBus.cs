@@ -13,7 +13,7 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// Enqueue the next queries to be executed.
         /// </summary>
-        void EnqueueNextQueries();
+        Task EnqueueNextQueries();
 
         /// <summary>
         /// Execute the next set of pending queries.
@@ -22,7 +22,7 @@ namespace FomoAPI.Application.EventBuses
         /// If the number of executed queries exceeds the threshold for the interval, no queries
         /// will be run.
         /// </remarks>
-        Task ExecutePendingQueriesAsync();
+        Task ExecutePendingQueries();
 
         /// <summary>
         /// Set the max queries that can be run per threshold.

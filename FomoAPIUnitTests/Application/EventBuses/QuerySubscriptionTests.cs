@@ -1,5 +1,7 @@
 ﻿using FomoAPI.Application.EventBuses;
+using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Enums;
 using System;
 using System.Linq;
 using Xunit;
@@ -24,7 +26,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             var querySubscription = new QuerySubscriptions();
 
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             for(var i = 0; i < timesAdded; i++)
             {
@@ -45,7 +47,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             var querySubscription = new QuerySubscriptions();
 
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             for (var i = 0; i < timesAdded; i++)
             {
@@ -70,7 +72,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             var querySubscription = new QuerySubscriptions();
 
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             querySubscription.AddSubscriber(query);
 
@@ -91,10 +93,10 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var querySubscription = new QuerySubscriptions();
 
             var queryCount = 2;
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             var queryCount2 = 3;
-            var query2 = new AlphaVantageSingleQuoteQuery("TSLA");
+            var query2 = new SingleQuoteQuery(2);
 
             for (var i = 0; i < queryCount; i++)
             {
@@ -123,10 +125,10 @@ namespace FomoAPIUnitTests.Application.EventBuses
             var querySubscription = new QuerySubscriptions();
 
             var queryCount = 2;
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             var queryCount2 = 3;
-            var query2 = new AlphaVantageSingleQuoteQuery("TSLA");
+            var query2 = new SingleQuoteQuery(2);
 
             for (var i = 0; i < queryCount; i++)
             {
@@ -157,7 +159,7 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             var querySubscription = new QuerySubscriptions();
 
-            var query = new AlphaVantageSingleQuoteQuery("MSFT");
+            var query = new SingleQuoteQuery(1);
 
             querySubscription.AddSubscriber(query);
             querySubscription.ClearQuery(query);

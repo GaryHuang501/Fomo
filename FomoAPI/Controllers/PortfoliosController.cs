@@ -74,7 +74,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
+        public async Task<ActionResult<PortfolioRepository>> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
         {
             var userId = User.GetUserId();
             var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, createPortfolioCommand.Name);
