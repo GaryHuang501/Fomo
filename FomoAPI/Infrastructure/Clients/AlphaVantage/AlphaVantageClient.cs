@@ -3,18 +3,16 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.IO;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
-using System.Web.Http;
 using System.Collections.Generic;
 using System.Linq;
-using FomoAPI.Application.Services;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Enums;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {
@@ -101,20 +99,25 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
                 if (response.IsSuccessStatusCode)
                 {
-                    using (Stream stream = await response.Content.ReadAsStreamAsync())
-                    using (StreamReader reader = new StreamReader(stream))
+                    string json = null;
+
+                    try
                     {
-                        try
-                        {
-                            data = parser.ParseData(reader);
-                            queryResult = new AlphaVantageQueryResult<TData>(data);
-                        }
-                        catch(Exception)
-                        {
-                            var errorJson = await response.Content.ReadAsStringAsync();
-                            var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
-                            queryResult = new AlphaVantageQueryResult<TData>(error: errorObject.ErrorMessage);
-                        }
+                        json = await response.Content.ReadAsStringAsync();
+                        data = parser.ParseJson(json);
+                        queryResult = new AlphaVantageQueryResult<TData>(data);
+                    }
+                    catch(Exception) when (json.Contains("Error Message"))
+                    {
+                        var errorJson = await response.Content.ReadAsStringAsync();
+                        var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
+                        queryResult = new AlphaVantageQueryResult<TData>(error: errorObject.ErrorMessage);
+                        _logger.LogError("Alphavantage Error for query: {error}", query.Symbol, errorObject.ErrorMessage);
+                    }
+                    catch(Exception ex)
+                    {
+                        queryResult = new AlphaVantageQueryResult<TData>(error: $"Exception: {ex.Message}");
+                        _logger.LogError(ex, "Failed to parse alphavantage data for query {query}", query.Symbol);
                     }
                 }
                 else

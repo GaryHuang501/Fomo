@@ -10,7 +10,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
     {
         public IAlphaVantageDataParser<StockSingleQuoteData> GetSingleQuoteDataParser()
         {
-            return new StockSingleQuoteDataCsvParser();
+            return new SingleQuoteParser();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
+using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -74,7 +75,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PortfolioRepository>> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
+        public async Task<ActionResult<Portfolio>> CreateAsync([FromBody] CreatePortfolioCommand createPortfolioCommand)
         {
             var userId = User.GetUserId();
             var newPortfolio =  await _portfolioRepository.CreatePortfolio(userId, createPortfolioCommand.Name);

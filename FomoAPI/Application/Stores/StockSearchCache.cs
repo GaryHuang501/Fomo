@@ -1,12 +1,8 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Application.DTOs;
-using FomoAPI.Domain.Stocks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Application.Stores
 {

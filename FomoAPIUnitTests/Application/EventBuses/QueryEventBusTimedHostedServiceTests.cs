@@ -19,7 +19,6 @@ namespace FomoAPIUnitTests.Application.EventBuses
         {
             SetMaxQueryPerInterval,
             ResetQueryExecutedCounter,
-            EnqueueNextQueries,
             ExecutePendingQueriesAsync
         }
 
@@ -48,14 +47,9 @@ namespace FomoAPIUnitTests.Application.EventBuses
                 _mockEventBusSetInterval = x;
             });
 
-            _mockEventBus.Setup(x => x.ResetQueryExecutedCounter()).Callback(() =>
+            _mockEventBus.Setup(x => x.Reset()).Callback(() =>
             {
                 _eventList.Add(EventType.ResetQueryExecutedCounter);
-            });
-
-            _mockEventBus.Setup(x => x.EnqueueNextQueries()).Callback(() =>
-            {
-                _eventList.Add(EventType.EnqueueNextQueries);
             });
 
             _mockEventBus.Setup(x => x.ExecutePendingQueries()).Callback(() =>
@@ -82,13 +76,12 @@ namespace FomoAPIUnitTests.Application.EventBuses
                 await hostedService.StartAsync(new CancellationToken());
                 await WaitForEvent(EventType.ExecutePendingQueriesAsync);
 
-                Assert.Equal(4, _eventList.Count);
+                Assert.Equal(3, _eventList.Count);
 
                 Assert.Collection(_eventList,
                     event1 => Assert.Equal(EventType.SetMaxQueryPerInterval, event1),
                     event2 => Assert.Equal(EventType.ResetQueryExecutedCounter, event2),
-                    event3 => Assert.Equal(EventType.EnqueueNextQueries, event3),
-                    event4 => Assert.Equal(EventType.ExecutePendingQueriesAsync, event4)
+                    event3 => Assert.Equal(EventType.ExecutePendingQueriesAsync, event3)
                  );
 
                 Assert.Equal(options.MaxQueriesPerInterval, _mockEventBusSetInterval);

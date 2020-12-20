@@ -67,16 +67,17 @@ namespace FomoAPI.Infrastructure.Repositories
                                     Change = @Change,
                                     ChangePercent = @ChangePercent,
                                     Volume = @Volume,
-                                    LastUpdated = @LastUpdated
+                                    LastUpdated = @LastUpdated,
+                                    LastTradingDay = @LastTradingDay
                                 WHERE
                                     SymbolId = @SymbolId;
                             END
                         ELSE
                             BEGIN
                                 INSERT INTO SingleQuoteData
-                                (SymbolId, Price, High, Low, [Open], PreviousClose, Change, ChangePercent, Volume, LastUpdated)
+                                (SymbolId, Price, High, Low, [Open], PreviousClose, Change, ChangePercent, Volume, LastUpdated, LastTradingDay)
                                 VALUES
-                                (@SymbolId, @Price, @High, @Low, @Open, @PreviousClose, @Change, @ChangePercent, @Volume, @LastUpdated);
+                                (@SymbolId, @Price, @High, @Low, @Open, @PreviousClose, @Change, @ChangePercent, @Volume, @LastUpdated, @LastTradingDay);
                             END;";
 
             using (var connection = new SqlConnection(_connectionString))

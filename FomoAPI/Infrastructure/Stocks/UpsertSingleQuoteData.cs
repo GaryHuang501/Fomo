@@ -18,7 +18,7 @@ namespace FomoAPI.Infrastructure.Stocks
 
         public decimal Change { get; private set; }
 
-        public string ChangePercent { get; private set; }
+        public decimal ChangePercent { get; private set; }
 
         public decimal Price { get; private set; }
 
@@ -28,8 +28,13 @@ namespace FomoAPI.Infrastructure.Stocks
 
         public DateTime LastUpdated { get; private set; }
 
-        public UpsertSingleQuoteData(StockSingleQuoteData data)
+        public DateTime LastTradingDay { get; private set; }
+
+        public int SymbolId { get; private set; }
+
+        public UpsertSingleQuoteData(int symbolId, StockSingleQuoteData data)
         {
+            SymbolId = symbolId;
             High = data.High;
             Low = data.Low;
             Open = data.Open;
@@ -38,8 +43,9 @@ namespace FomoAPI.Infrastructure.Stocks
             PreviousClose = data.PreviousClose;
             Change = data.Change;
             ChangePercent = data.ChangePercent;
-            LastUpdated = data.LastUpdated;
             Symbol = data.Symbol;
+            LastUpdated = data.LastUpdated;
+            LastTradingDay = data.LastTradingDay;
         }
     }
 }

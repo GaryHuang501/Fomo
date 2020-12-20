@@ -16,8 +16,8 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<SingleQuoteCache>().SingleInstance();
             builder.RegisterType<QueryContextFactory>().As<IQueryContextFactory>().SingleInstance();
             builder.RegisterType<QuerySubscriptions>().SingleInstance();
-            builder.RegisterType<QueryPrioritySet>().SingleInstance();
-            builder.RegisterType<QuerySortBySubscriptionCountRule>().As<IQueuePriorityRule>().SingleInstance();
+            builder.RegisterType<QueryQueue>().SingleInstance();
+            builder.RegisterType<QuerySubscriptionCountRule>().As<IQueuePriorityRule>().SingleInstance();
             builder.RegisterType<QueryEventBus>().As<IQueryEventBus>().SingleInstance();
             builder.RegisterType<QueryEventBusTimedHostedService>().As<IHostedService>().SingleInstance();
 

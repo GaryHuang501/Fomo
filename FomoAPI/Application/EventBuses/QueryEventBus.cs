@@ -3,7 +3,9 @@ using FomoAPI.Application.EventBuses.QueuePriorityRules;
 using FomoAPI.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses
@@ -16,12 +18,12 @@ namespace FomoAPI.Application.EventBuses
     /// <inheritdoc cref="IQueryEventBus"></inheritdoc>/>
     public class QueryEventBus : IQueryEventBus
     {
-        private readonly QueryPrioritySet _queryQueue;
+        private readonly QueryQueue _queryQueue;
         private readonly IQueryContextFactory _queryContextFactory;
         private readonly ILogger _logger;
         private readonly IQueuePriorityRule _queuePriorityRule;
-        private readonly QuerySubscriptions _querySubscriptions;
-        private readonly object _queryCounterLock;
+
+        private readonly SemaphoreSlim _queryEnqueueLock;
 
         private int _maxQueryPerIntervalThreshold;
 
@@ -31,18 +33,16 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         private int _intervalNumQueriesLeft;
 
-        public QueryEventBus(QueryPrioritySet queryQueue,
+        public QueryEventBus(QueryQueue queryQueue,
                              IQueryContextFactory queryqueryContextRegistry,
                              IQueuePriorityRule queuePriorityRule,
-                             ILogger<QueryEventBus> logger,
-                             QuerySubscriptions querySubscriptions)
+                             ILogger<QueryEventBus> logger)
         {
             _queryQueue = queryQueue;
             _queryContextFactory = queryqueryContextRegistry;
             _logger = logger;
-            _queryCounterLock = new object();
+            _queryEnqueueLock = new SemaphoreSlim(1);
             _queuePriorityRule = queuePriorityRule;
-            _querySubscriptions = querySubscriptions;
         }
 
         public void SetMaxQueryPerIntervalThreshold(int maxQueryPerIntervalThreshold)
@@ -50,33 +50,21 @@ namespace FomoAPI.Application.EventBuses
             _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
         }
 
-        public void ResetQueryExecutedCounter()
+        /// <summary>
+        /// Reset back to starting state:
+        /// 1) Query execution limit reset to how many queries left for this interval.
+        /// 2) Queue is cleared.
+        /// </summary>
+        public async Task Reset()
         {
-            lock (_queryCounterLock)
-            {
-                _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold;
-            }
-        }
+            await _queryEnqueueLock.WaitAsync();
 
-        public async Task EnqueueNextQueries()
-        {
-            var prioritySortedQueries = (await _queuePriorityRule.Sort(_querySubscriptions)).ToList();
-            int queryEnqueueCount = 0;
+            int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();
 
-            foreach (var query in prioritySortedQueries)
-            {
-                bool isSuccess = _queryQueue.TryAdd(query);
+            _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold - queriesRanCurrentInterval;
 
-                if (isSuccess)
-                {
-                    queryEnqueueCount++;
-                }
-
-                if (queryEnqueueCount >= _maxQueryPerIntervalThreshold)
-                {
-                    break;
-                }
-            }
+            _queryQueue.ClearAll();
+            _queryEnqueueLock.Release();
         }
 
         /// <summary>
@@ -88,37 +76,61 @@ namespace FomoAPI.Application.EventBuses
         {
             _logger.LogTrace("Fetching query priority list");
 
-            var queriesToExecute = _queryQueue.Take(_maxQueryPerIntervalThreshold);
+            // Query is removed from queue but the query will not be enqueued again until 
+            // it is queries are cleared during the next refresh interval. This prevents a race condition
+            // from happening where query would be execute mulitple times.
+            await _queryEnqueueLock.WaitAsync();
+            await EnqueueNextQueries();
+            var queriesToExecute = _queryQueue.Dequeue(_maxQueryPerIntervalThreshold);
+            _queryEnqueueLock.Release();
 
             _logger.LogInformation("{queryCount} queries pended up", queriesToExecute.Count());
 
-            var queryTasks = queriesToExecute.Select(x => ExecuteQuery(x));
+            var queryTasks = queriesToExecute.Select(async q => await ExecuteQuery(q));
             await Task.WhenAll(queryTasks);
+        }
+
+        /// <summary>
+        /// Enqueue next prioritized queries to run.
+        /// </summary>
+        private async Task EnqueueNextQueries()
+        {
+            if (_intervalNumQueriesLeft <= 0)
+            {
+                return;
+            }
+
+            var prioritySortedQueries = await _queuePriorityRule.GetPrioritizedQueries();
+
+            foreach (var query in prioritySortedQueries)
+            {
+                bool success = _queryQueue.Enqueue(query);
+
+                if (success)
+                {
+                    _intervalNumQueriesLeft--;
+                    _queuePriorityRule.ResetPriority(query);
+                }
+
+                if (_intervalNumQueriesLeft <= 0)
+                {
+                    break;
+                }
+            }
         }
 
         private async Task ExecuteQuery(StockQuery query)
         {
             try
             {
-                lock (_queryCounterLock)
-                {
-                    if (_intervalNumQueriesLeft <= 0)
-                    {
-                        _logger.LogTrace("Query threshold for interval met. Exiting Execute Query.");
-                        return;
-                    }
-                }
-
                 _logger.LogTrace("Executing query for symbolId {symbol}", query.SymbolId);
 
                 var queryContext = query.CreateContext(_queryContextFactory);
 
                 await SaveQueryResult(queryContext, query);
+                _queryQueue.MarkAsExecuted(query);
 
-
-                // Now that the query result has been updated in the store, remove it from the queue
-                // so it can be requeued again when the data is stale
-                _queryQueue.Remove(query);
+                _logger.LogTrace("Query for symbolId {symbol} cleared from queue", query.SymbolId);
 
                 await ExecuteQueryResultTriggers(queryContext);
 
@@ -127,7 +139,6 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _queryQueue.Remove(query);
                 _logger.LogError(ex, "Unexpected error in event bus for query {SymbolId}", query.SymbolId);
             }
         }

@@ -1,25 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Domain.Stocks.Queries;
+using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
+using Newtonsoft.Json;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
     /// <summary>
     /// Parser class used in AlphaVantage to map CSV query response data to StockSingleQuoteData.
     /// </summary>
-    public class StockSingleQuoteDataCsvParser : IAlphaVantageDataParser<StockSingleQuoteData>
+    public class SingleQuoteParser : IAlphaVantageDataParser<StockSingleQuoteData>
     {
+        private readonly JsonSerializerSettings _settings;
+
+        public SingleQuoteParser()
+        {
+            _settings = new JsonSerializerSettings();
+            _settings.MissingMemberHandling = MissingMemberHandling.Error;
+            _settings.NullValueHandling = NullValueHandling.Include;
+        }
+
+        public StockSingleQuoteData ParseJson(string json)
+        {
+            var data =  JsonConvert.DeserializeObject<AlphaVantageSingleQuote>(json, _settings);
+            return data.ToDomain();
+        }
+
         /// <summary>
         /// Parse the csv data to StockSingleQuotedataCsvParser.
         /// Will throw exception if any field is missing.
         /// </summary>
         /// <param name="reader">Reader holding the response data</param>
         /// <returns></returns>
-        public StockSingleQuoteData ParseData(StreamReader reader)
+        public StockSingleQuoteData ParseCsv(StreamReader reader)
         {
             string headerLine = reader.ReadLine();
 
@@ -78,8 +92,9 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
                     volume: volume,
                     change: change,
                     price: price,
-                    changePercent: changePercent,
-                    lastUpdated: latestDay
+                    changePercent: decimal.Parse(changePercent.Trim().Replace("%", string.Empty)),
+                    lastTradingDay: latestDay,
+                    lastUpdated: DateTime.UtcNow
                 );
         }
     }

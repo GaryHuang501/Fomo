@@ -1,4 +1,5 @@
-﻿using FomoAPI.Infrastructure.ConfigurationOptions;
+﻿using FomoAPI.Application.Exchanges;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -19,6 +20,13 @@ namespace FomoAPIIntegrationTests.Fixtures
     {
         public ITestOutputHelper Output { get; set; }
 
+        private Action<IServiceCollection> _configureServices;
+
+        public FomoApiApplicationFactory(Action<IServiceCollection> configureServices)
+        {
+            _configureServices = configureServices;
+        }
+
         protected override IHostBuilder CreateHostBuilder()
         {
             var builder = base.CreateHostBuilder();
@@ -30,8 +38,18 @@ namespace FomoAPIIntegrationTests.Fixtures
                             .UseEnvironment("Test")
                             .ConfigureTestServices(services =>
                             {
-                                services.RemoveAll(typeof(IHostedService));
+                                _configureServices?.Invoke(services);
+
+                                // Disable authentication
+                                services.AddAuthentication(options =>
+                                {
+                                    options.DefaultAuthenticateScheme = "Test";
+                                    options.DefaultChallengeScheme = "Test";
+                                    options.DefaultSignInScheme = "Test";
+                                })
+                                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
                             });
+
                     });
 
             return builder;

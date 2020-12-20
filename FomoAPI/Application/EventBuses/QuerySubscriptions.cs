@@ -54,8 +54,21 @@ namespace FomoAPI.Application.EventBuses
             _pendingQueriesMap.TryRemove(query, out SubscriptionInfo subscriptionInfo);
         }
 
-        public IEnumerable<SubscriptionInfo> GetSubscriptionInfos(){
-            return _pendingQueriesMap.Values.ToList();
+        /// <summary>
+        /// Get all the <see cref="SubscriptionInfo"/> 
+        /// </summary>
+        /// <returns>Returns all the <see cref="SubscriptionInfo"/> as a <see cref="IList"/></returns>
+        /// <remarks>Using Enumerator to create the return list, improves performance by not locking. </remarks>
+        public IList<SubscriptionInfo> GetSubscriptionInfos()
+        {
+            var queries = new List<SubscriptionInfo>();
+
+            foreach(var kvp in _pendingQueriesMap)
+            {
+                queries.Add(kvp.Value);
+            }
+
+            return queries;
         }
     }
 }

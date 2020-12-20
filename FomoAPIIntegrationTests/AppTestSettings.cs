@@ -32,6 +32,11 @@ namespace FomoAPIIntegrationTests
             get { return _testAppSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
         }
 
+        public AlphaVantageOptions LiveAlphaVantageOptions
+        {
+            get { return _testAppSettingsConfig.GetSection("LiveAlphaVantage").Get<AlphaVantageOptions>(); }
+        }
+
         public string FomoApiURL
         {
             get

@@ -6,6 +6,8 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
     public interface IAlphaVantageDataParser<T> where T : StockData
     {
-        T ParseData(StreamReader reader);
+        T ParseCsv(StreamReader reader);
+
+        T ParseJson(string json);
     }
 }

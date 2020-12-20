@@ -29,7 +29,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             CreateDate = DateTime.UtcNow;
         }
 
-        public QueryDataType DataType { get => QueryDataType.Csv; }
+        public QueryDataType DataType { get => QueryDataType.Json; }
 
         public ReadOnlyDictionary<string, string> GetParameters()
         {

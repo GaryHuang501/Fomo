@@ -11,15 +11,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace FomoAPIIntegrationTests.Scenarios.Portfolios
+namespace FomoAPIIntegrationTests.Scenarios
 {
-    public class PortfolioTests: IClassFixture<ExchangeSyncSetupFixture>
+    /// <summary>
+    /// Test scenarios regarding the portfolio.
+    /// </summary>
+    public class PortfolioTests: IClassFixture<ExchangeSyncSetupFixture>, IClassFixture<FomoApiFixture>
     {
-        private static HttpClient _client = (new FomoApiApplicationFactory()).CreateClientNoAuth("api/Portfolios/");
-
-        public PortfolioTests()
-        {
-        }
+        private readonly HttpClient _client;
 
         private string PortfolioPath(int? portfolioId = null) => $"api/Portfolios/{portfolioId}";
 
@@ -28,6 +27,12 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
         private string PortfolioSymbolsReorderPath(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/reorder";
 
         private string SymbolSearchPath(string ticker, int limit) => $"api/Symbols/?keywords={ticker}&limit={limit}";
+
+        public PortfolioTests(FomoApiFixture webApiFactoryFixture)
+        {
+            webApiFactoryFixture.CreateServer(FomoApiFixture.WithNoHostedServices);
+            _client = webApiFactoryFixture.GetClientNotAuth();
+        }
 
         [Fact]
         public async Task Should_GetNewPortfolioWithCorrectSymbolsAddedInCorrectOrder()
@@ -45,7 +50,7 @@ namespace FomoAPIIntegrationTests.Scenarios.Portfolios
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
 
             Assert.True(portfolio.Id > 0);
-            Assert.True(portfolio.DateCreated > currentDateTimeUtc);
+            Assert.True(portfolio.DateCreated.ToUniversalTime() >= currentDateTimeUtc);
             Assert.Equal(portfolio.Name, portfolioName);
 
             // Search for symbols by keyword

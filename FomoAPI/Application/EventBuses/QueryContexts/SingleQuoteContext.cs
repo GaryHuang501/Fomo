@@ -10,6 +10,7 @@ using System;
 using Microsoft.Data.SqlClient;
 using FomoAPI.Infrastructure.Stocks;
 using FomoAPI.Application.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FomoAPI.Application.EventBuses.QueryContexts
 {
@@ -26,6 +27,8 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
 
         private readonly IStockDataRepository _stockDataRepository;
 
+        private readonly ILogger<SingleQuoteContext> _logger;
+
         private SingleQuoteQuery _query;
 
         private SingleQuoteQueryResult _queryResult;
@@ -35,13 +38,15 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
             SingleQuoteCache queryResultCache,
             ISymbolRepository symbolRepository,
             IStockDataRepository stockDataRepository,
-            SingleQuoteQuery query)
+            SingleQuoteQuery query, 
+            ILogger<SingleQuoteContext> logger)
         {
             _stockClient = stockClient;
             _queryResultCache = queryResultCache;
             _symbolRepository = symbolRepository;
             _stockDataRepository = stockDataRepository;
             _query = query;
+            _logger = logger;
         }
 
         /// <summary>
@@ -53,12 +58,14 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
             _queryResult = await _stockClient.GetSingleQuoteData(symbol.Ticker, symbol.ExchangeName);
 
             _queryResultCache.Upsert(_query.SymbolId, _queryResult);
+            _logger.LogTrace("Query SymbolId {id} added to cache", _query.SymbolId);
 
             const int primaryKeyViolationCode = 2627;
 
             try
             {
-                bool successfulSave = await _stockDataRepository.UpsertSingleQuoteData(new UpsertSingleQuoteData(_queryResult.Data));
+                bool successfulSave = await _stockDataRepository.UpsertSingleQuoteData(new UpsertSingleQuoteData(_query.SymbolId, _queryResult.Data));
+                _logger.LogTrace("Query SymbolId {id} saved to database", _query.SymbolId);
 
                 if (!successfulSave)
                 {
@@ -67,6 +74,8 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
             }
             catch (SqlException ex) when(ex.ErrorCode == primaryKeyViolationCode)
             {
+                _logger.LogError("Query SymbolId {id} was duplicate insert in database", _query.SymbolId);
+
                 // Ignore the error since it means a race condition where we tried insert twice.
                 // But that's fine since the stock data is unlikely to be different if it's that close in time.
                 // This is more performant than adding locks as this case should be very exceptional.

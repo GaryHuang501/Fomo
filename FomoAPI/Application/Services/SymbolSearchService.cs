@@ -33,7 +33,7 @@ namespace FomoAPI.Application.Services
                 _cache.Upsert(keywords, dtos);
             }
 
-            return dtos.Take(limit);
+            return dtos.Take(limit).ToList();
         }
 
         private async Task<IEnumerable<SymbolSearchResultDTO>> CreateMatchingSymbolDTOs(string keywords)

@@ -26,27 +26,26 @@ namespace FomoAPI.Application.EventBuses
             _eventBusOptions = eventBusOptionsAccessor.CurrentValue;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is starting");
             _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} will reset state and run any pending queries every {_eventBusOptions.RefreshIntervalMS} milliseconds");
-            RefreshEventBusState();
+            await RefreshEventBusState();
 
             ValidateOptions();
 
-            _timerExecuteEventBus = new Timer(async (state) =>
+            _timerExecuteEventBus = new Timer(async state =>
             {
-                await EnqueuePendingQueries();
                 await ExecuteEventBus();
             }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(_eventBusOptions.PollingIntervalMS));
 
 
-            _timerRefreshEventBus = new Timer( state =>
+            _timerRefreshEventBus = new Timer( async state =>
             {
-                RefreshEventBusState();
+                await RefreshEventBusState();
             }, null, TimeSpan.FromMilliseconds(_eventBusOptions.RefreshIntervalMS), TimeSpan.FromMilliseconds(_eventBusOptions.RefreshIntervalMS));
 
-            return Task.CompletedTask;
+            return;
         }
 
         private void ValidateOptions()
@@ -67,13 +66,7 @@ namespace FomoAPI.Application.EventBuses
             }
         }
 
-        private async Task EnqueuePendingQueries()
-        {
-            _logger.LogInformation($"Enqueuing next set of queries");
-            await _queryEventBus.EnqueueNextQueries();
-        }
-
-        private void RefreshEventBusState()
+        private async Task RefreshEventBusState()
         {
             _logger.LogInformation("Resetting Event Bus state");
             _logger.LogInformation($"Max queries to run per interval is {_eventBusOptions.MaxQueriesPerInterval}");
@@ -81,7 +74,7 @@ namespace FomoAPI.Application.EventBuses
             try
             {
                 _queryEventBus.SetMaxQueryPerIntervalThreshold(_eventBusOptions.MaxQueriesPerInterval);
-                _queryEventBus.ResetQueryExecutedCounter();
+                await _queryEventBus.Reset();
             }
             catch (Exception ex)
             {

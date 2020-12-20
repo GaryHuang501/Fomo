@@ -7,18 +7,18 @@ using Xunit;
 
 namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
 {
-    public class StockSingleQuoteDataCsvParserTests
+    public class SingleQuoteParserTests
     {
         [Fact]
-        public void ParseData_ShouldReturnStockSingleQuoteData_WhenValidCsvData()
+        public void ParseCsv_ShouldReturnStockSingleQuoteData_WhenValidCsvData()
         {
             var csvData ="symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent" + "\n" +
                          "MSFT,134.8800,139.1000,136.2800,137.8600,21877723,2019-08-30,138.1200,-0.2600,-0.1882%";
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
-            var parser = new StockSingleQuoteDataCsvParser();
-            var singleQuoteData = parser.ParseData(reader);
+            var parser = new SingleQuoteParser();
+            var singleQuoteData = parser.ParseCsv(reader);
 
             Assert.Equal("MSFT", singleQuoteData.Symbol);
             Assert.Equal(134.8800m, singleQuoteData.Open);
@@ -26,34 +26,34 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             Assert.Equal(136.2800m, singleQuoteData.Low);
             Assert.Equal(137.8600m, singleQuoteData.Price);
             Assert.Equal(21877723, singleQuoteData.Volume);
-            Assert.Equal(DateTime.Parse("2019-08-30"), singleQuoteData.LastUpdated);
+            Assert.Equal(DateTime.Parse("2019-08-30"), singleQuoteData.LastTradingDay);
             Assert.Equal(138.1200m, singleQuoteData.PreviousClose);
             Assert.Equal(-0.2600m, singleQuoteData.Change);
-            Assert.Equal("-0.1882%", singleQuoteData.ChangePercent);
+            Assert.Equal(-0.1882m, singleQuoteData.ChangePercent);
         }
 
         [Fact]
-        public void ParseData_ShouldThrowException_WhenEmptyResponseStream()
+        public void ParseCsv_ShouldThrowException_WhenEmptyResponseStream()
         {
             var csvData = string.Empty;
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
-            var parser = new StockSingleQuoteDataCsvParser();
+            var parser = new SingleQuoteParser();
 
-            Assert.Throws<ArgumentException>(() => parser.ParseData(reader));
+            Assert.Throws<ArgumentException>(() => parser.ParseCsv(reader));
         }
 
         [Fact]
-        public void ParseData_ShouldThrowException_WhenNoValuesLineInResponseStream()
+        public void ParseCsv_ShouldThrowException_WhenNoValuesLineInResponseStream()
         {
             var csvData = "symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent";
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
-            var parser = new StockSingleQuoteDataCsvParser();
+            var parser = new SingleQuoteParser();
 
-            Assert.Throws<ArgumentException>(() => parser.ParseData(reader));
+            Assert.Throws<ArgumentException>(() => parser.ParseCsv(reader));
         }
 
         [Theory]
@@ -67,7 +67,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
         [InlineData("previousClose")]
         [InlineData("change")]
         [InlineData("changePercent")]
-        public void ParseData_ShouldThrowException_WhenResponseStreamMissingOneDataColumn(string columnName)
+        public void ParseCsv_ShouldThrowException_WhenResponseStreamMissingOneDataColumn(string columnName)
         {
             var csvData = "symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent" + "\n" +
                          "MSFT,134.8800,139.1000,136.2800,137.8600,21877723,2019-08-30,138.1200,-0.2600,-0.1882%";
@@ -76,8 +76,8 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
-            var parser = new StockSingleQuoteDataCsvParser();
-            Assert.Throws<KeyNotFoundException>(() => parser.ParseData(reader));
+            var parser = new SingleQuoteParser();
+            Assert.Throws<KeyNotFoundException>(() => parser.ParseCsv(reader));
         }
 
     }

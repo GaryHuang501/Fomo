@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Data
 {
     public class AlphaVantageSymbolMatch
     {

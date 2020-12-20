@@ -20,7 +20,7 @@ namespace FomoAPI.Domain.Stocks
 
         public decimal Change { get; private set; }
 
-        public string ChangePercent { get; private set; }
+        public decimal ChangePercent { get; private set; }
 
         public decimal Price { get; private set; }
 
@@ -29,6 +29,9 @@ namespace FomoAPI.Domain.Stocks
         public string Symbol { get; private set; }
 
         public DateTime LastUpdated { get; private set; }
+
+        public DateTime LastTradingDay { get; private set; }
+
 
         [JsonConstructor]
         [ExplicitConstructor]
@@ -41,9 +44,11 @@ namespace FomoAPI.Domain.Stocks
             decimal previousClose,
             long volume,
             decimal change,
-            string changePercent,
-            DateTime lastUpdated)
+            decimal changePercent,
+            DateTime lastUpdated, 
+            DateTime lastTradingDay)
         {
+            Symbol = symbol;
             High = high;
             Low = low;
             Open = open;
@@ -53,7 +58,7 @@ namespace FomoAPI.Domain.Stocks
             Change = change;
             ChangePercent = changePercent;
             LastUpdated = lastUpdated;
-            Symbol = symbol;
+            LastTradingDay = lastTradingDay;
         }
     }
 }

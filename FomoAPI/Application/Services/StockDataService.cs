@@ -51,12 +51,14 @@ namespace FomoAPI.Application.Services
 
             data = await _stockDataRepository.GetSingleQuoteData(symbolId);
 
-            if(data == null)
+
+            if(data != null)
             {
-                return StockSingleQuoteDataDTO.CreateNoDataExists(symbolId);
+                _singleQuoteCache.Upsert(symbolId, queryResult);
+                return new StockSingleQuoteDataDTO(symbolId, data);
             }
 
-            return new StockSingleQuoteDataDTO(symbolId, data);
+            return StockSingleQuoteDataDTO.CreateNoDataExists(symbolId);
         }
 
         public void AddSubscriberToSingleQuote(int symbolId)

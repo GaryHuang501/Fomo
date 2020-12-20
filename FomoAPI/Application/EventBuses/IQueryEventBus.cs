@@ -11,11 +11,6 @@ namespace FomoAPI.Application.EventBuses
     public interface IQueryEventBus
     {
         /// <summary>
-        /// Enqueue the next queries to be executed.
-        /// </summary>
-        Task EnqueueNextQueries();
-
-        /// <summary>
         /// Execute the next set of pending queries.
         /// </summary>
         /// <remarks>
@@ -31,9 +26,8 @@ namespace FomoAPI.Application.EventBuses
         void SetMaxQueryPerIntervalThreshold(int maxQueryPerInterval);
 
         /// <summary>
-        /// Resets the query counter to zero, so max number of queries
-        /// per threshold can be run again for the next interval.
+        /// Resets to a starting state
         /// </summary>
-        void ResetQueryExecutedCounter();
+        Task Reset();
     }
 }

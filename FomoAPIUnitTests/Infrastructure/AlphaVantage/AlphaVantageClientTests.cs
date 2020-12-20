@@ -72,7 +72,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         {
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
             SetupMockHttpClient("", HttpStatusCode.OK);
-            _singleQuoteDataCsvParser.Setup(x => x.ParseData(It.IsAny<StreamReader>())).Throws(new Exception());
+            _singleQuoteDataCsvParser.Setup(x => x.ParseCsv(It.IsAny<StreamReader>())).Throws(new Exception());
 
 
             var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
@@ -130,13 +130,14 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
                     volume: 5,
                     change: 6,
                     price: 7,
-                    changePercent: "9%",
-                    lastUpdated: DateTime.UtcNow
+                    changePercent: 0.9m,
+                    lastUpdated: DateTime.UtcNow,
+                    lastTradingDay: DateTime.UtcNow
                 );
 
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
             SetupMockHttpClient("mockData", HttpStatusCode.OK);
-            _singleQuoteDataCsvParser.Setup(x => x.ParseData(It.IsAny<StreamReader>())).Returns(singleQuoteData);
+            _singleQuoteDataCsvParser.Setup(x => x.ParseCsv(It.IsAny<StreamReader>())).Returns(singleQuoteData);
 
             var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
 

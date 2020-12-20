@@ -1,15 +1,13 @@
-﻿using FomoAPI.Application.Stores;
-using FomoAPI.Application.EventBuses;
+﻿using FomoAPI.Application.EventBuses;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
 using FomoAPI.Infrastructure.Enums;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using FomoAPI.Application.EventBuses.QueryContexts;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
+using Microsoft.Extensions.Logging;
 
 namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
 {
@@ -48,14 +46,14 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             query2.SetMockQueryContext(_mockContext);
             query3.SetMockQueryContext(_mockContext);
 
-            var sortRule = new QuerySortBySubscriptionCountRule(_mockContextFactory.Object);
+            var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 
-            var sortedQueries = (await sortRule.Sort(querySubscriptions)).ToList();
+            var prioritizedQueries = (await priorityRule.GetPrioritizedQueries()).ToList();
 
-            Assert.Equal(3, sortedQueries.Count);
-            Assert.Equal(sortedQueries[0], query2);
-            Assert.Equal(sortedQueries[1], query3);
-            Assert.Equal(sortedQueries[1], query3);
+            Assert.Equal(3, prioritizedQueries.Count);
+            Assert.Equal(prioritizedQueries[0], query2);
+            Assert.Equal(prioritizedQueries[1], query3);
+            Assert.Equal(prioritizedQueries[1], query3);
         }
 
         [Fact]
@@ -74,12 +72,12 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             query1.SetMockQueryContext(_mockContext);
             query2.SetMockQueryContext(_mockContext);
 
-            var sortRule = new QuerySortBySubscriptionCountRule(new Mock<IQueryContextFactory>().Object);
+            var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 
-            var sortedQueries = (await sortRule.Sort(querySubscriptions)).ToList();
+            var prioritizedQueries = (await priorityRule.GetPrioritizedQueries()).ToList();
 
-            Assert.Single(sortedQueries);
-            Assert.Equal(sortedQueries[0], query1);
+            Assert.Single(prioritizedQueries);
+            Assert.Equal(prioritizedQueries[0], query1);
         }
 
         [Fact]
@@ -98,12 +96,12 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
 
             _mockContext.Setup(c => c.GetQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", null)));
 
-            var sortRule = new QuerySortBySubscriptionCountRule(new Mock<IQueryContextFactory>().Object);
+            var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 
-            var sortedQueries = (await sortRule.Sort(querySubscriptions)).ToList();
+            var prioritizedQueries = (await priorityRule.GetPrioritizedQueries()).ToList();
 
-            Assert.Single(sortedQueries);
-            Assert.Equal(sortedQueries[0], query1);
+            Assert.Single(prioritizedQueries);
+            Assert.Equal(prioritizedQueries[0], query1);
         }
     }
 }
