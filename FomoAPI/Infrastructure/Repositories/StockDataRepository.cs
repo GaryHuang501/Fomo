@@ -42,7 +42,8 @@ namespace FomoAPI.Infrastructure.Repositories
                             Change,
                             ChangePercent,
                             Volume,
-                            LastUpdated
+                            LastUpdated,
+                            LastTradingDay
                         FROM
                             SingleQuoteData
                         WHERE

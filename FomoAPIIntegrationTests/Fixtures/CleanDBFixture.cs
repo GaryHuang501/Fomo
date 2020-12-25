@@ -12,33 +12,28 @@ namespace FomoAPIIntegrationTests.Fixtures
     /// Fixture to clear out non user data from database
     /// to create allow for clean slate.
     /// </summary>
-    public class CleanDBFixture : IAsyncLifetime
+    public class CleanDBFixture : DBFixture
     {
-        private readonly SqlConnection _connection;
-
         public CleanDBFixture()
         {
-            _connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString);
         }
 
-        public async Task InitializeAsync()
+        public override async Task InitializeAsync()
         {
+            var deleteSingleQuoteDataSql = @"DELETE FROM SingleQuoteData;";
+            await Connection.ExecuteAsync(deleteSingleQuoteDataSql, null);
+
             var deletePortfolioSymbolSql = @"DELETE FROM PortfolioSymbol;";
-            await _connection.ExecuteAsync(deletePortfolioSymbolSql, null);
+            await Connection.ExecuteAsync(deletePortfolioSymbolSql, null);
 
             var deletePortfolioSql = @"DELETE FROM Portfolio;";
-            await _connection.ExecuteAsync(deletePortfolioSql, null);
+            await Connection.ExecuteAsync(deletePortfolioSql, null);
 
             var deleteSymbolSql = @"DELETE FROM Symbol";
-            await _connection.ExecuteAsync(deleteSymbolSql, null);
+            await Connection.ExecuteAsync(deleteSymbolSql, null);
 
             var deleteExchangeSyncHistory = @"DELETE FROM ExchangeSyncHistory";
-            await _connection.ExecuteAsync(deleteExchangeSyncHistory, null);
-        }
-
-        public async Task DisposeAsync()
-        {
-            await _connection.DisposeAsync();
+            await Connection.ExecuteAsync(deleteExchangeSyncHistory, null);
         }
     }
 }

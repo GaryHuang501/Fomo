@@ -24,9 +24,9 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         Task ExecuteResultTriggers();
 
         /// <summary>
-        /// Gets the query result for the given symbol ID
+        /// Gets the query result for the given symbol ID from the cache.
         /// </summary>
         /// <returns>The <see cref="StockQueryResult"/>. Returns Null if it doesn't exist in the cache.</returns>
-        Task<StockQueryResult> GetQueryResult(int symbolId);
+        Task<StockQueryResult> GetCachedQueryResult(int symbolId);
     }
 }

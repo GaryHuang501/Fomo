@@ -167,5 +167,32 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             Assert.Empty(querySubscriptionInfos);
         }
+
+        [Fact]
+        public void GetSubscriberCount_ShouldReturnSubcriberCount_ForQuery()
+        {
+            var querySubscription = new QuerySubscriptions();
+
+            var query = new SingleQuoteQuery(1);
+
+            querySubscription.AddSubscriber(query);
+            querySubscription.AddSubscriber(query);
+
+            long subscriberCount = querySubscription.GetSubscriberCount(query);
+
+            Assert.Equal(2, subscriberCount);
+        }
+
+        [Fact]
+        public void GetSubscriberCount_ShouldReturnZero_WhenQueryNotFound()
+        {
+            var querySubscription = new QuerySubscriptions();
+
+            var query = new SingleQuoteQuery(1);
+
+            long subscriberCount = querySubscription.GetSubscriberCount(query);
+
+            Assert.Equal(0, subscriberCount);
+        }
     }
 }

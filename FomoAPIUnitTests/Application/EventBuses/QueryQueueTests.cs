@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -244,7 +245,6 @@ namespace FomoAPIUnitTests.Application.EventBuses
             Assert.Equal(3, queryQueue.GetCurrentIntervalQueriesRanCount());
         }
 
-
         [Fact]
         public void GetCurrentIntervalQueriesRanCount_ShouldReturnZero_WhenAllPending()
         {
@@ -255,6 +255,54 @@ namespace FomoAPIUnitTests.Application.EventBuses
             queryQueue.Enqueue(query1);
             queryQueue.Enqueue(query2);
             queryQueue.Enqueue(query3);
+
+            Assert.Equal(0, queryQueue.GetCurrentIntervalQueriesRanCount());
+        }
+
+        [Fact]
+        public async Task GetCurrentIntervalQueriesRanCount_ShouldIncludeCurrentInterval()
+        {
+            var queryQueue = new QueryQueue();
+            queryQueue.SetIntervalKey(() => DateTime.UtcNow.Day);
+
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
+            var query3 = new TestQuery(3, QueryFunctionType.Weekly);
+            queryQueue.Enqueue(query1);
+            queryQueue.Enqueue(query2);
+            queryQueue.Enqueue(query3);
+
+            queryQueue.Dequeue(2);
+            queryQueue.MarkAsExecuted(query1);
+            queryQueue.MarkAsExecuted(query2);
+
+            Assert.Equal(2, queryQueue.GetCurrentIntervalQueriesRanCount());
+
+            await Task.Delay(100);
+
+            Assert.Equal(2, queryQueue.GetCurrentIntervalQueriesRanCount());
+        }
+
+        [Fact]
+        public async Task GetCurrentIntervalQueriesRanCount_ShouldResetOnNextInterval()
+        {
+            var queryQueue = new QueryQueue();
+            queryQueue.SetIntervalKey(() => DateTime.UtcNow.Millisecond);
+
+            var query1 = new TestQuery(1, QueryFunctionType.SingleQuote);
+            var query2 = new TestQuery(2, QueryFunctionType.IntraDay);
+            var query3 = new TestQuery(3, QueryFunctionType.Weekly);
+            queryQueue.Enqueue(query1);
+            queryQueue.Enqueue(query2);
+            queryQueue.Enqueue(query3);
+
+            queryQueue.Dequeue(2);
+            queryQueue.MarkAsExecuted(query1);
+            queryQueue.MarkAsExecuted(query2);
+
+            Assert.Equal(2, queryQueue.GetCurrentIntervalQueriesRanCount());
+
+            await Task.Delay(10);
 
             Assert.Equal(0, queryQueue.GetCurrentIntervalQueriesRanCount());
         }

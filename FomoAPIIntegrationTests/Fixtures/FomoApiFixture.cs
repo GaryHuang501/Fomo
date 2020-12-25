@@ -12,9 +12,11 @@ namespace FomoAPIIntegrationTests.Fixtures
 {
     public class FomoApiFixture : IDisposable
     {
-        public HttpClient HttpClientNoAuth { get; private set; }
+        private HttpClient _httpClientNoAuth;
 
         private FomoApiApplicationFactory _fomoApiFactory;
+
+        public bool Disposed { get; private set; }
 
         public FomoApiFixture()
         {
@@ -44,23 +46,23 @@ namespace FomoAPIIntegrationTests.Fixtures
 
         public HttpClient GetClientNotAuth()
         {
-            if(HttpClientNoAuth == null)
+            if(_httpClientNoAuth == null)
             {
-                HttpClientNoAuth = _fomoApiFactory.CreateClient(new WebApplicationFactoryClientOptions
+                _httpClientNoAuth = _fomoApiFactory.CreateClient(new WebApplicationFactoryClientOptions
                 {
                     AllowAutoRedirect = false,
                 });
             }
 
-            return HttpClientNoAuth;
+            return _httpClientNoAuth;
         }
 
         public void Dispose()
         {
-            if(HttpClientNoAuth != null)
+            if (_httpClientNoAuth != null)
             {
-                HttpClientNoAuth.Dispose();
-                HttpClientNoAuth = null;
+                _httpClientNoAuth.Dispose();
+                _httpClientNoAuth = null;
             }
 
             if (_fomoApiFactory != null)
@@ -68,6 +70,8 @@ namespace FomoAPIIntegrationTests.Fixtures
                 _fomoApiFactory.Dispose();
                 _fomoApiFactory = null;
             }
+
+            Disposed = true;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Domain.Stocks;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace FomoAPI.Application.DTOs
         public StockSingleQuoteDataDTO(int symbolId, StockSingleQuoteData singleQuoteData)
         {
             SymbolId = symbolId > 0 ? symbolId : throw new ArgumentException(nameof(symbolId), "must be greater than 0");
-            SingleQuoteData = singleQuoteData;
+            SingleQuoteData = singleQuoteData ?? throw new NullReferenceException(nameof(singleQuoteData));
             LastUpdated = singleQuoteData.LastUpdated;
         }
 
@@ -38,6 +39,14 @@ namespace FomoAPI.Application.DTOs
             SymbolId = symbolId > 0 ? symbolId : throw new ArgumentException(nameof(symbolId), "must be greater than 0");
             SingleQuoteData = null;
             LastUpdated = null;
+        }
+
+        [JsonConstructor]
+        public StockSingleQuoteDataDTO(int symbolId, StockSingleQuoteData singleQuoteData, DateTime? lastUpdated)
+        {
+            SymbolId = symbolId;
+            SingleQuoteData = singleQuoteData;
+            LastUpdated = lastUpdated;
         }
 
         public static StockSingleQuoteDataDTO CreateNoDataExists(int symbolId)

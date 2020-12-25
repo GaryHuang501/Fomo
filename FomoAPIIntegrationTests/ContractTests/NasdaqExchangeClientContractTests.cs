@@ -6,7 +6,7 @@ using Moq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
+namespace FomoAPIIntegrationTests.ContractTests
 {
     public class NasdaqExchangeClientContractTests
     {

@@ -20,14 +20,6 @@ namespace FomoAPIIntegrationTests.Scenarios
     {
         private readonly HttpClient _client;
 
-        private string PortfolioPath(int? portfolioId = null) => $"api/Portfolios/{portfolioId}";
-
-        private string PortfolioSymbolsPath(int portfolioId, int? portfolioSymbolId = null) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/{portfolioSymbolId}";
-
-        private string PortfolioSymbolsReorderPath(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/reorder";
-
-        private string SymbolSearchPath(string ticker, int limit) => $"api/Symbols/?keywords={ticker}&limit={limit}";
-
         public PortfolioTests(FomoApiFixture webApiFactoryFixture)
         {
             webApiFactoryFixture.CreateServer(FomoApiFixture.WithNoHostedServices);
@@ -44,7 +36,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             var currentDateTimeUtc = DateTime.UtcNow;
 
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), payload);
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), payload);
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -58,10 +50,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             var jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to Portfolio
-            var addTSLAResponse =  await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
+            var addTSLAResponse =  await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
             addTSLAResponse.EnsureSuccessStatusCode();
 
-            var addJPMResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
             addJPMResponse.EnsureSuccessStatusCode();
 
             var tslaPortfolioSymbol = await addTSLAResponse.Content.ReadAsAsync<PortfolioSymbol>();
@@ -79,7 +71,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.True(jpmPortfolioSymbol.SymbolId > 0);
 
             // Grab Portfolio and verify symbols returned
-            var getPortfolioResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             getPortfolioResponse.EnsureSuccessStatusCode();
 
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -105,7 +97,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         public async Task Should_ReturnBadRequestWhenSymbolAlreadyExistsInPortfolio()
         {
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -115,10 +107,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
 
             // Add symbols to Portfolio
-            var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
+            var addTSLAResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
             addTSLAResponse.EnsureSuccessStatusCode();
 
-            var addTSLAResponse2 = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
+            var addTSLAResponse2 = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
             Assert.Equal(HttpStatusCode.BadRequest, addTSLAResponse2.StatusCode);
         }
 
@@ -126,14 +118,14 @@ namespace FomoAPIIntegrationTests.Scenarios
         public async Task Should_ReturnBadRequest_WhenAddNonExistingSymbolToPortfolio()
         {
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
             Assert.True(portfolio.Id > 0);
 
             // Add symbols to Portfolio
-            var addInvalidSymbolResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = -999 }.ToJsonPayload());
+            var addInvalidSymbolResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = -999 }.ToJsonPayload());
 
             Assert.Equal(HttpStatusCode.BadRequest, addInvalidSymbolResponse.StatusCode); 
         }
@@ -142,7 +134,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         public async Task Should_DeletePortfolioWithSymbols()
         {
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -153,18 +145,18 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to Portfolio
-            var addJPMResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
             addJPMResponse.EnsureSuccessStatusCode();
 
             // Verify Portfolio exists
-            var getPortfolioResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             getPortfolioResponse.EnsureSuccessStatusCode();
 
             // Delete and check it no longer exists
-            var deletePortfolioResponse = await _client.DeleteAsync(PortfolioPath(portfolio.Id));
+            var deletePortfolioResponse = await _client.DeleteAsync(ApiPath.PortfolioPath(portfolio.Id));
             deletePortfolioResponse.EnsureSuccessStatusCode();
 
-            var getPortfolioAfterDeleteResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioAfterDeleteResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             Assert.Equal(HttpStatusCode.NotFound, getPortfolioAfterDeleteResponse.StatusCode);
         }
 
@@ -172,7 +164,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         public async Task Should_DeleteSymbolFromPortfolio()
         {
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -184,19 +176,19 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add symbols to Portfolio
-            var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
+            var addTSLAResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
             addTSLAResponse.EnsureSuccessStatusCode();
 
-            var addJPMResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
             addJPMResponse.EnsureSuccessStatusCode();
 
             // Delete JPM
             var jpmPortfolioSymbol = await addJPMResponse.Content.ReadAsAsync<PortfolioSymbol>();
-            var deleteJPMResponse = await _client.DeleteAsync(PortfolioSymbolsPath(portfolio.Id, jpmPortfolioSymbol.Id));
+            var deleteJPMResponse = await _client.DeleteAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id, jpmPortfolioSymbol.Id));
             deleteJPMResponse.EnsureSuccessStatusCode();
 
             // Check only one symbol left on Portfolio
-            var getPortfolioResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             getPortfolioResponse.EnsureSuccessStatusCode();
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
 
@@ -208,7 +200,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         public async Task Should_RenamePortfolio()
         {
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), new { name = string.Empty }.ToJsonPayload());
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -219,11 +211,11 @@ namespace FomoAPIIntegrationTests.Scenarios
             var newName = "newname!";
             var renamePayload = new { name = newName }.ToJsonPayload();
 
-            var renameResponse = await _client.PatchAsync(PortfolioPath(portfolio.Id) + "/rename", renamePayload);
+            var renameResponse = await _client.PatchAsync(ApiPath.PortfolioPath(portfolio.Id) + "/rename", renamePayload);
             renameResponse.EnsureSuccessStatusCode();
 
             // Grab Portfolio and verify renamed
-            var getPortfolioResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             getPortfolioResponse.EnsureSuccessStatusCode();
 
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -238,7 +230,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             var payload = new { name = "" }.ToJsonPayload();
 
             // Create Portfolio
-            var createPortfolioResponse = await _client.PostAsync(PortfolioPath(), payload);
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.PortfolioPath(), payload);
             createPortfolioResponse.EnsureSuccessStatusCode();
 
             var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
@@ -252,19 +244,19 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO msftSymbol = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // Add symbols to Portfolio
-            var addTSLAResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
+            var addTSLAResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = tslaSymbol.SymbolId }.ToJsonPayload());
             addTSLAResponse.EnsureSuccessStatusCode();
             var tslaPortfolioSymbol = await addTSLAResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
-            var addJPMResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
             addJPMResponse.EnsureSuccessStatusCode();
             var jpmPortfolioSymbol = await addJPMResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
-            var addFBResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = fbSymbol.SymbolId }.ToJsonPayload());
+            var addFBResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = fbSymbol.SymbolId }.ToJsonPayload());
             addFBResponse.EnsureSuccessStatusCode();
             var fbPortfolioSymbol = await addFBResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
-            var addMSFTResponse = await _client.PostAsync(PortfolioSymbolsPath(portfolio.Id), new { SymbolId = msftSymbol.SymbolId }.ToJsonPayload());
+            var addMSFTResponse = await _client.PostAsync(ApiPath.PortfolioSymbolsPath(portfolio.Id), new { SymbolId = msftSymbol.SymbolId }.ToJsonPayload());
             addMSFTResponse.EnsureSuccessStatusCode();
             var msftPortfolioSymbol = await addMSFTResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
@@ -287,11 +279,11 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             }.ToJsonPayload();
 
-            var reorderTSLAResponse = await _client.PatchAsync(PortfolioSymbolsReorderPath(portfolio.Id), newOrder);
+            var reorderTSLAResponse = await _client.PatchAsync(ApiPath.PortfolioSymbolsReorderPath(portfolio.Id), newOrder);
 
             reorderTSLAResponse.EnsureSuccessStatusCode();
 
-            var getPortfolioResponse = await _client.GetAsync(PortfolioPath(portfolio.Id));
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.PortfolioPath(portfolio.Id));
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
 
             Assert.Equal(portfolio.Id, fetchedPortfolio.Id);
@@ -309,9 +301,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         private async Task<SymbolSearchResultDTO> FetchSymbol(string ticker, ExchangeType exchange)
         {
-            await Task.Delay(100); // To prevent hammering stock client
-
-            var response = await _client.GetAsync(SymbolSearchPath(ticker, 1));
+            var response = await _client.GetAsync(ApiPath.SymbolSearchPath(ticker, 1));
             response.EnsureSuccessStatusCode();
             var searchResults = await response.Content.ReadAsAsync<IEnumerable<SymbolSearchResultDTO>>();
 

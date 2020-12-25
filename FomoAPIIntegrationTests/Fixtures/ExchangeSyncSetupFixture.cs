@@ -2,7 +2,7 @@
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using FomoAPI.Infrastructure.Exchanges;
 using FomoAPI.Infrastructure.Repositories;
-using FomoAPIIntegrationTests.Infrastructure.Exchanges;
+using FomoAPIIntegrationTests.Scenarios;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

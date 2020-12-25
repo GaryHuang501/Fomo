@@ -1,5 +1,6 @@
 ﻿using FomoAPI.Application.DTOs;
 using FomoAPI.Application.EventBuses;
+using FomoAPI.Domain.Stocks.Queries;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.Services
@@ -15,6 +16,13 @@ namespace FomoAPI.Application.Services
         /// <param name="ticker">Ticker for the stock.</param>
         /// <returns>The stock data <see cref="StockSingleQuoteDataDTO"/>.</returns>
         Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId);
+
+        /// <summary>
+        /// Saves the single quote query result or updates it if it already exists.
+        /// </summary>
+        /// <param name="query"><see cref="SingleQuoteQuery"/> to upsert data for.</param>
+        /// <param name="queryResult"><see cref="SingleQuoteQueryResult"/> stock data results to save.</param>
+        public Task UpsertSingleQuoteData(SingleQuoteQuery query, SingleQuoteQueryResult queryResult);
 
         /// <summary>
         /// Adds a subscriber to the subscription of stock query to queued up and executed.

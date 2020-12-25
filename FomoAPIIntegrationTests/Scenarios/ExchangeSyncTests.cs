@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
+namespace FomoAPIIntegrationTests.Scenarios
 {
     public class ExchangeSyncTests : IAsyncLifetime
     {

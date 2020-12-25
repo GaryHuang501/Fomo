@@ -23,7 +23,7 @@ namespace FomoAPI.Application.EventBuses
         /// Set the max queries that can be run per threshold.
         /// </summary>
         /// <param name="maxQueryPerInterval">Max Query Threshold</param>
-        void SetMaxQueryPerIntervalThreshold(int maxQueryPerInterval);
+        Task SetMaxQueryPerIntervalThreshold(int maxQueryPerInterval);
 
         /// <summary>
         /// Resets to a starting state

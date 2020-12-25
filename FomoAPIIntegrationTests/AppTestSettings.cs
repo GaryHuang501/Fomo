@@ -37,6 +37,11 @@ namespace FomoAPIIntegrationTests
             get { return _testAppSettingsConfig.GetSection("LiveAlphaVantage").Get<AlphaVantageOptions>(); }
         }
 
+        public EventBusOptions EventBusOptions
+        {
+            get { return _testAppSettingsConfig.GetSection("EventBus").Get<EventBusOptions>(); }
+        }
+
         public string FomoApiURL
         {
             get

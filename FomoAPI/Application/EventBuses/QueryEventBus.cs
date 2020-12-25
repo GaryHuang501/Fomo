@@ -34,20 +34,23 @@ namespace FomoAPI.Application.EventBuses
         private int _intervalNumQueriesLeft;
 
         public QueryEventBus(QueryQueue queryQueue,
-                             IQueryContextFactory queryqueryContextRegistry,
+                             IQueryContextFactory queryContextFactory,
                              IQueuePriorityRule queuePriorityRule,
                              ILogger<QueryEventBus> logger)
         {
             _queryQueue = queryQueue;
-            _queryContextFactory = queryqueryContextRegistry;
+            _queryContextFactory = queryContextFactory;
             _logger = logger;
             _queryEnqueueLock = new SemaphoreSlim(1);
             _queuePriorityRule = queuePriorityRule;
         }
 
-        public void SetMaxQueryPerIntervalThreshold(int maxQueryPerIntervalThreshold)
+        public async Task SetMaxQueryPerIntervalThreshold(int maxQueryPerIntervalThreshold)
         {
+            await _queryEnqueueLock.WaitAsync();
+
             _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
+            _queryEnqueueLock.Release();
         }
 
         /// <summary>
@@ -57,6 +60,7 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         public async Task Reset()
         {
+            // Should wait until items are dequeued so they are not lost.
             await _queryEnqueueLock.WaitAsync();
 
             int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();
@@ -76,9 +80,10 @@ namespace FomoAPI.Application.EventBuses
         {
             _logger.LogTrace("Fetching query priority list");
 
-            // Query is removed from queue but the query will not be enqueued again until 
-            // it is queries are cleared during the next refresh interval. This prevents a race condition
+            // Query is removed from queue but the query cannot be enqueued again until 
+            // the queue is cleared on the next refresh interval. This prevents a race condition
             // from happening where query would be execute mulitple times.
+
             await _queryEnqueueLock.WaitAsync();
             await EnqueueNextQueries();
             var queriesToExecute = _queryQueue.Dequeue(_maxQueryPerIntervalThreshold);
@@ -93,6 +98,7 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// Enqueue next prioritized queries to run.
         /// </summary>
+        /// <remarks>Queue size should not exceed <see cref="_intervalNumQueriesLeft"/></remarks>
         private async Task EnqueueNextQueries()
         {
             if (_intervalNumQueriesLeft <= 0)

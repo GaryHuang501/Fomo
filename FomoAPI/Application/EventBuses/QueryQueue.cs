@@ -38,16 +38,19 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         private readonly Dictionary<StockQuery, StatusInfo> _queryStatus;
 
-        private readonly Dictionary<int, int> _numQueriesExecutedAtMinute;
+        private readonly Dictionary<int, int> _numQueriesExecutedInterval;
 
         private readonly object _lock;
+
+        private Func<int> GetIntervalKey;
 
         public QueryQueue()
         {
             _queue = new Queue<StockQuery>();
             _queryStatus = new Dictionary<StockQuery, StatusInfo>();
-            _numQueriesExecutedAtMinute = new Dictionary<int, int>();
+            _numQueriesExecutedInterval = new Dictionary<int, int>();
             _lock = new object();
+            GetIntervalKey = DefaultTimeIntervalKey;
         }
 
         public bool IsEmpty()
@@ -96,23 +99,33 @@ namespace FomoAPI.Application.EventBuses
         }
 
         /// <summary>
-        /// Get the number of queries ran for the current minute interval.
+        /// Get the number of queries ran for the current interval.
         /// </summary>
-        /// <returns><see cref="int"/> Count of queries that have been executed and are executing at the current minute interval.</returns>
+        /// <returns><see cref="int"/> Count of queries that have been executed and are executing at the current interval.</returns>
+        /// <remarks>This prevents executing too many queries on a interval.</remarks>
         public int GetCurrentIntervalQueriesRanCount()
         {
             lock(_lock){
 
-                int currentMinute = DateTime.UtcNow.Minute;
+                int currentInterval = GetIntervalKey();
                 int numExecuted = 0;
 
-                if (_numQueriesExecutedAtMinute.ContainsKey(currentMinute))
+                if (_numQueriesExecutedInterval.ContainsKey(currentInterval))
                 {
-                    numExecuted = _numQueriesExecutedAtMinute[currentMinute];
+                    numExecuted = _numQueriesExecutedInterval[currentInterval];
                 }
 
                 return numExecuted + _queryStatus.Count(q => q.Value.Status == QueryStatus.Executing);
             }
+        }
+
+        /// <summary>
+        ///  Set a custom function to return the interval key
+        /// </summary>
+        /// <param name="intervalKey">Function that returns IntervalKey</param>
+        public void SetIntervalKey(Func<int> intervalKey)
+        {
+            GetIntervalKey = intervalKey;
         }
 
         /// <summary>
@@ -127,17 +140,17 @@ namespace FomoAPI.Application.EventBuses
                 {
                     _queryStatus[query] = new StatusInfo(QueryStatus.Executed);
 
-                    int currentMinute = DateTime.UtcNow.Minute;
+                    int currentInterval = GetIntervalKey();
 
-                    bool minuteExists = _numQueriesExecutedAtMinute.ContainsKey(currentMinute);
+                    bool intervalExists = _numQueriesExecutedInterval.ContainsKey(currentInterval);
 
-                    if (!minuteExists)
+                    if (!intervalExists)
                     {
-                        _numQueriesExecutedAtMinute.Add(currentMinute, 1);
+                        _numQueriesExecutedInterval.Add(currentInterval, 1);
                     }
                     else
                     {
-                        _numQueriesExecutedAtMinute[currentMinute]++;
+                        _numQueriesExecutedInterval[currentInterval]++;
                     }
                 }
             }
@@ -150,7 +163,7 @@ namespace FomoAPI.Application.EventBuses
         {
             lock (_lock)
             {
-                _numQueriesExecutedAtMinute.Clear();
+                _numQueriesExecutedInterval.Clear();
                 _queryStatus.Clear();
                 _queue.Clear();
             }
@@ -179,6 +192,11 @@ namespace FomoAPI.Application.EventBuses
 
                 return false;
             }
+        }
+
+        private int DefaultTimeIntervalKey()
+        {
+            return DateTime.UtcNow.Minute;
         }
     }
 }

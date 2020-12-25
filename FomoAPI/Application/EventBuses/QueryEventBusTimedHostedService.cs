@@ -73,7 +73,7 @@ namespace FomoAPI.Application.EventBuses
 
             try
             {
-                _queryEventBus.SetMaxQueryPerIntervalThreshold(_eventBusOptions.MaxQueriesPerInterval);
+                await _queryEventBus.SetMaxQueryPerIntervalThreshold(_eventBusOptions.MaxQueriesPerInterval);
                 await _queryEventBus.Reset();
             }
             catch (Exception ex)

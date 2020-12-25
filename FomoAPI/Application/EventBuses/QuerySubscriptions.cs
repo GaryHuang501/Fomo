@@ -54,6 +54,18 @@ namespace FomoAPI.Application.EventBuses
             _pendingQueriesMap.TryRemove(query, out SubscriptionInfo subscriptionInfo);
         }
 
+        public long GetSubscriberCount(StockQuery query)
+        {
+            if(_pendingQueriesMap.TryGetValue(query, out SubscriptionInfo subscription))
+            {
+                return subscription.SubscriberCount;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         /// <summary>
         /// Get all the <see cref="SubscriptionInfo"/> 
         /// </summary>

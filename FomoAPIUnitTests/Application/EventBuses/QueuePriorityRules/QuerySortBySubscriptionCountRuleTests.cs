@@ -23,7 +23,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             _mockContext = new Mock<IQueryContext>();
 
             // Always return as stale query result
-            _mockContext.Setup(c => c.GetQueryResult(It.IsAny<int>())).Returns(Task.FromResult<StockQueryResult>(null));
+            _mockContext.Setup(c => c.GetCachedQueryResult(It.IsAny<int>())).Returns(Task.FromResult<StockQueryResult>(null));
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             query1.SetMockQueryContext(_mockContext);
             query2.SetMockQueryContext(_mockContext);
 
-            _mockContext.Setup(c => c.GetQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", null)));
+            _mockContext.Setup(c => c.GetCachedQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", null)));
 
             var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 

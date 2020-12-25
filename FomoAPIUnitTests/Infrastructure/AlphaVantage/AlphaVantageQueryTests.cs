@@ -17,7 +17,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             var parameters = query.GetParameters();
 
             Assert.Equal(symbol, parameters["symbol"]);
-            Assert.Equal("csv", parameters["datatype"]);
+            Assert.Equal("json", parameters["datatype"]);
             Assert.Equal("GLOBAL_QUOTE", parameters["function"]);
         }
 
@@ -31,12 +31,12 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         }
 
         [Fact]
-        public void DataType_ShouldReturnCsvType()
+        public void DataType_ShouldReturnJSONType()
         {
             string symbol = "TSLA";
             var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
 
-            Assert.Equal(QueryDataType.Csv, query.DataType);
+            Assert.Equal(QueryDataType.Json, query.DataType);
         }
 
         [Fact]

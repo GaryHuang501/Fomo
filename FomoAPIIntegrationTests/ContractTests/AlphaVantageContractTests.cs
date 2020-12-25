@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace FomoAPIIntegrationTests.Infrastructure.AlphaVantage
+namespace FomoAPIIntegrationTests.ContractTests
 {
     public class AlphaVantageContractTests: IDisposable
     {

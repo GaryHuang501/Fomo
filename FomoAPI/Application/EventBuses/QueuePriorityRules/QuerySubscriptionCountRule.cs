@@ -64,7 +64,7 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
             {
                 IQueryContext queryContext = info.Query.CreateContext(_contextFactory);
 
-                StockQueryResult queryResult = await queryContext.GetQueryResult(info.Query.SymbolId);
+                StockQueryResult queryResult = await queryContext.GetCachedQueryResult(info.Query.SymbolId);
 
                 bool queryNeedsRefresh = queryResult == null || info.Query.FunctionType.IsExpired(queryResult.CreateDateUtc, DateTime.UtcNow);
 

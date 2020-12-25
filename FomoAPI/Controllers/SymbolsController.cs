@@ -50,7 +50,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpGet("singleQuoteData")]
-        public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteDatas([FromQuery] int[] symbolIds)
+        public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteData([FromQuery] int[] symbolIds)
         {
             List<StockSingleQuoteDataDTO> dataset = new List<StockSingleQuoteDataDTO>();
 

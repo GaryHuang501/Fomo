@@ -6,7 +6,7 @@ using Moq;
 using System;
 using System.IO;
 
-namespace FomoAPIIntegrationTests.Infrastructure.Exchanges
+namespace FomoAPIIntegrationTests.Fixtures
 {
     /// <summary>
     /// Client to download and cache symbol data from nasdaq to disk.
