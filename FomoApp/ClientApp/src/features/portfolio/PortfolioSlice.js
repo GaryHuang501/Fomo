@@ -1,21 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import config from '../../app/Config.json'
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const fetchPortfolioIds = createAsyncThunk('portfolio/fetchPortfoliIds', async (thunkApi) => {
-    const response = await axios.get(`${config.apiUrl}/portfolios`);
+    const response = await axios.get(`${apiUrl}/portfolios`);
 
     return response.data;
 });
 
 export const fetchPortfolio = createAsyncThunk('portfolio/fetchPortfolio', async (id, thunkApi) => {
-    const response = await axios.get(`${config.apiUrl}/portfolios/${id}`);
+    const response = await axios.get(`${apiUrl}/portfolios/${id}`);
 
     return response.data;
 });
 
 export const addPortfolioStock = createAsyncThunk('portfolio/addPortfolioStock', async (payload, thunkApi) => {
-    const response = await axios.post(`${config.apiUrl}/portfolios/${payload.portfolioId}/portfolioSymbols`, {symbolId: payload.symbolId});
+    const response = await axios.post(`${apiUrl}/portfolios/${payload.portfolioId}/portfolioSymbols`, {symbolId: payload.symbolId});
 
     return response.data;
 });

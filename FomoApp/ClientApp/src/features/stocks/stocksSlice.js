@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import config from '../../app/Config.json'
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const fetchStockSingleQuote = createAsyncThunk('stocks/fetchStockSingleQuote', async (symbolId, thunkApi) => {
-    const response = await axios.get(`${config.apiUrl}/stocks/singlequote/${symbolId}`);
+    const response = await axios.get(`${apiUrl}/stocks/singlequote/${symbolId}`);
 
     return response.data;
 });

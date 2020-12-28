@@ -48,10 +48,6 @@ export const StockSearchBar = function () {
     dispatch(addPortfolioStock({symbolId: symbolId, portfolioId: selectedPortfolioId}));
   }
 
-  function isSearchKeywordsSet(){
-    return searchKeywords && searchKeywords.length > 0;
-  }
-
   // Create the JSX for the search results drop down to render.
   function createSearchResultsBox(){
     let resultBox = null;
@@ -71,10 +67,10 @@ export const StockSearchBar = function () {
     if(hasMatches){
       resultBox = <div id='stock-search-results'>{potentialMatches}</div>
     }
-    else if(stockSearchStatus  == 'loading'){
+    else if(stockSearchStatus  === 'loading'){
       resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "Searching..."}} /></div>
     }
-    else if(searchKeywords.trim().length > 0 && stockSearchStatus  == 'succeeded'){
+    else if(searchKeywords.trim().length > 0 && stockSearchStatus  === 'succeeded'){
       resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "No results found."}} /></div>
     }
     

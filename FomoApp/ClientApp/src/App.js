@@ -6,6 +6,7 @@ import {
   Redirect,
 } from 'react-router-dom'
 import { axiosSetup } from './app/AxiosSetup';
+import { firebaseSetup } from './app/FireBaseSetup';
 import { NavHeader } from './app/NavHeader';
 import { PortfolioPage } from './features/portfolio/PortfolioPage';
 import { LeaderBoardPage } from './features/leaderboard/LeaderBoardPage';
@@ -22,10 +23,22 @@ function App() {
   const isAuthenticated = useSelector(selectAuthenticatedState);
 
   useEffect(() => {
-    axiosSetup(dispatch);
+    
+    function setupHttpClient(){
+      axiosSetup(dispatch);
+    }
+  
+    function setupNotifications(){
+      firebaseSetup();
+    }
+
+    setupNotifications();
+    setupHttpClient();
     dispatch(checkLogin());
     setSetupFinished(true);
   }, [dispatch]);
+
+
 
   return (
      <Router>

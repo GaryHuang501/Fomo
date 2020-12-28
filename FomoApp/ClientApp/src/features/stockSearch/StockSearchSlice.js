@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import config from '../../app/Config.json'
+
+const apiUrl = process.env.REACT_APP_API_URL;
+const searchLimit = process.env.REACT_APP_STOCK_SEARCH_RESULTS_LIMIT;
 
 export const searchStocks = createAsyncThunk('stockSearch/fetchStocks', async (keywords, thunkApi) => {
         const { stockSearch } = thunkApi.getState();
@@ -9,7 +11,7 @@ export const searchStocks = createAsyncThunk('stockSearch/fetchStocks', async (k
             return stockSearch.stocks[keywords];
         }
 
-        const response = await axios.get(`${config.apiUrl}/symbols/?keywords=${keywords}&limit=${config.stockSearchResultsLimit}`)
+        const response = await axios.get(`${apiUrl}/symbols/?keywords=${keywords}&limit=${searchLimit}`)
         return response.data;
 }, {
     condition: (keywords) => {
@@ -23,7 +25,8 @@ export const stockSearchSlice = createSlice({
   name: 'stockSearch',
   initialState: {
       stocks:{      
-      }
+      },
+      status: 'idle'
   },
   reducers: {
   },

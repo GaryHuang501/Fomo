@@ -1,6 +1,7 @@
 ﻿{
   "Authentication": {
     "Google": {
+      // Test credentials only allows access through local address. Replaced in production.
       "ClientId": "889322570796-msaguv1cibfealr9r8h15f8ip36p7tj2.apps.googleusercontent.com",
       "ClientSecret": "dFWFw1MGE6hfnLjyLWd3cgun"
     }

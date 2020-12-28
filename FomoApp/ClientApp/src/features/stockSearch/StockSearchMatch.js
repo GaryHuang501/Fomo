@@ -2,7 +2,7 @@ import React from 'react';
 import './StockSearchMatch.css';
 
 export const StockSearchMatch = function (props) {
-  console.log(props);
+  
   function clickCallback(){
     if(props.onClick){
       props.onClick(props.match.symbolId)
