@@ -33,7 +33,7 @@ namespace FomoAPI.Application.EventBuses
         {
             const int initialNumOfSubscribers = 1;
 
-            _pendingQueriesMap.AddOrUpdate(query, new SubscriptionInfo(query, initialNumOfSubscribers), (key, oldValue) => new SubscriptionInfo(key, oldValue.SubscriberCount + 1));
+            _pendingQueriesMap.AddOrUpdate(query, new SubscriptionInfo(query, initialNumOfSubscribers), (key, oldValue) => new SubscriptionInfo(query, oldValue.SubscriberCount + 1));
         }
 
         /// <summary>
