@@ -73,16 +73,17 @@
     <Build Include="SingleQuoteData.sql" />
     <Build Include="Symbol.sql" />
     <Build Include="Exchange.sql" />
-    <Build Include="PriceAlert.sql" />
     <Build Include="TableTypes\PortfolioSymbolSortOrderType.sql" />
     <Build Include="TableTypes\UpdateSymbolType.sql" />
     <Build Include="ExchangeSyncHistory.sql" />
     <Build Include="ExchangeSyncSetting.sql" />
     <Build Include="Stored Procedures\UpdateSymbols.sql" />
     <Build Include="Stored Procedures\DelistSymbols.sql" />
+    <Build Include="Settings.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DataSetup\Exchanges.sql" />
     <Build Include="TableTypes\IntIdType.sql" />
+    <None Include="DataSetup\Settings.sql" />
   </ItemGroup>
 </Project>

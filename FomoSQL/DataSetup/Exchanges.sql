@@ -1,4 +1,8 @@
-﻿INSERT INTO Exchange (ID, Name) VALUES
+﻿/*
+	Data to setup initial exchange and exchange sync state.
+*/
+
+INSERT INTO Exchange (ID, Name) VALUES
 (1, 'NASDAQ'),
 (2, 'NYSE'),
 (3, 'NYSE ARCA'),
