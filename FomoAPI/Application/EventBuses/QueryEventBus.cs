@@ -49,8 +49,14 @@ namespace FomoAPI.Application.EventBuses
         {
             await _queryEnqueueLock.WaitAsync();
 
-            _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
-            _queryEnqueueLock.Release();
+            try
+            {
+                _maxQueryPerIntervalThreshold = maxQueryPerIntervalThreshold;
+            }
+            finally
+            {
+                _queryEnqueueLock.Release();
+            }
         }
 
         /// <summary>
@@ -62,13 +68,18 @@ namespace FomoAPI.Application.EventBuses
         {
             // Should wait until items are dequeued so they are not lost.
             await _queryEnqueueLock.WaitAsync();
+            try
+            {
+                int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();
 
-            int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();
+                _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold - queriesRanCurrentInterval;
 
-            _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold - queriesRanCurrentInterval;
-
-            _queryQueue.ClearAll();
-            _queryEnqueueLock.Release();
+                _queryQueue.ClearAll();
+            }
+            finally
+            {
+                _queryEnqueueLock.Release();
+            }
         }
 
         /// <summary>
@@ -85,9 +96,19 @@ namespace FomoAPI.Application.EventBuses
             // from happening where query would be execute mulitple times.
 
             await _queryEnqueueLock.WaitAsync();
-            await EnqueueNextQueries();
-            var queriesToExecute = _queryQueue.Dequeue(_maxQueryPerIntervalThreshold);
-            _queryEnqueueLock.Release();
+
+            IList<StockQuery> queriesToExecute;
+
+            try
+            {
+                await EnqueueNextQueries();
+                queriesToExecute = _queryQueue.Dequeue(_maxQueryPerIntervalThreshold);
+            }
+            finally
+            {
+                _queryEnqueueLock.Release();
+            }
+
 
             _logger.LogInformation("{queryCount} queries pended up", queriesToExecute.Count());
 
@@ -153,14 +174,14 @@ namespace FomoAPI.Application.EventBuses
         {
             await queryContext.SaveQueryResultToStore();
 
-            _logger.LogTrace("Saving query results for {symbol}", query.SymbolId);
+            _logger.LogTrace("Saved query results for {symbol}", query.SymbolId);
         }
 
         private async Task ExecuteQueryResultTriggers(IQueryContext queryContext)
         {
             await queryContext.ExecuteResultTriggers();
 
-            _logger.LogTrace("Executing Query Result Triggers");
+            _logger.LogTrace("ExecutedQuery Result Triggers");
         }
     }
 }

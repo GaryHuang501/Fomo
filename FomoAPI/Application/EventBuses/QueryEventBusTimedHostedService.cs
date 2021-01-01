@@ -78,7 +78,7 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refreshing event bus state state" );
+                _logger.LogCritical(ex, "Error refreshing event bus state state" );
             }
         }
 
@@ -92,7 +92,7 @@ namespace FomoAPI.Application.EventBuses
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error executing queries");
+                _logger.LogCritical(ex, "Error executing queries");
             }
         }
 
