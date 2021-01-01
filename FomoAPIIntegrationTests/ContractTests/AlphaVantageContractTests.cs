@@ -1,9 +1,8 @@
-﻿using FomoAPI.Application.ConfigurationOptions;
-using FomoAPI.Domain.Stocks;
+﻿using FomoAPI.Domain.Stocks;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
-using FomoAPI.Infrastructure.Enums;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -25,8 +24,8 @@ namespace FomoAPIIntegrationTests.ContractTests
         public AlphaVantageContractTests()
         {
             _mockAlphaVantageOptionsAccessor = new Mock<IOptionsMonitor<AlphaVantageOptions>>();
-            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppTestSettings.Instance.LiveAlphaVantageOptions);
-            _mockHttpFactory = new MockHttpClientFactory(AppTestSettings.Instance.LiveAlphaVantageOptions.Url);
+            _mockAlphaVantageOptionsAccessor.Setup(x => x.CurrentValue).Returns(AppTestSettings.Instance.AlphaVantageLiveOptions);
+            _mockHttpFactory = new MockHttpClientFactory(AppTestSettings.Instance.AlphaVantageLiveOptions.Url);
             _parserFactory = new AlphaVantageParserFactory();
             _mockLogger = new Mock<ILogger<AlphaVantageClient>>();
         }

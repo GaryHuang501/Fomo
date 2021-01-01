@@ -3,8 +3,11 @@ using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
+using FomoAPI.Infrastructure.Clients;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Clients.Firebase;
 using FomoAPI.Infrastructure.Repositories;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +19,8 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<FirebaseAuthFactory>().As<IHostedService>().SingleInstance();
+            builder.RegisterType<FirebaseAuthFactory>().As<IClientAuthFactory>().SingleInstance();
             builder.RegisterType<StockSearchCache>().SingleInstance();
             builder.RegisterType<SingleQuoteCache>().SingleInstance();
 
@@ -24,7 +29,9 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerDependency();
+            builder.RegisterType<FireBaseDBClient>().As<INotificationClient>().InstancePerLifetimeScope();
             builder.RegisterType<StockDataService>().As<IStockDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<StockNotificationCenter>().As<IStockNotificationCenter>().InstancePerLifetimeScope();
             builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
         }
     }

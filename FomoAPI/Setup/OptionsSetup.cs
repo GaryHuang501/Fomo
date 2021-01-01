@@ -15,12 +15,20 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("AlphaVantage"))
                     .ValidateDataAnnotations();
 
+            services.AddOptions<DbOptions>()
+                    .Bind(config.GetSection("Database"))
+                    .ValidateDataAnnotations();
+
             services.AddOptions<EventBusOptions>()
                     .Bind(config.GetSection("EventBus"))
                     .ValidateDataAnnotations();
 
             services.AddOptions<ExchangeSyncOptions>()
                     .Bind(config.GetSection("ExchangeSync"))
+                    .ValidateDataAnnotations();
+
+            services.AddOptions<FirebaseOptions>()
+                    .Bind(config.GetSection("FireBase"))
                     .ValidateDataAnnotations();
 
             services.AddOptions<CacheOptions>("SingleQuoteCache")
@@ -31,9 +39,6 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("StockSearchCache"))
                     .ValidateDataAnnotations();
 
-            services.AddOptions<DbOptions>()
-                    .Bind(config.GetSection("Database"))
-                    .ValidateDataAnnotations();
         }
     }
 }

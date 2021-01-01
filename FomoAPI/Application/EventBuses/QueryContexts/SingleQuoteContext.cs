@@ -1,21 +1,16 @@
 ﻿using FomoAPI.Application.Stores;
-using FomoAPI.Application.EventBuses.Triggers;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Repositories;
-using System;
-using Microsoft.Data.SqlClient;
-using FomoAPI.Infrastructure.Stocks;
 using FomoAPI.Application.Services;
 using Microsoft.Extensions.Logging;
 
 namespace FomoAPI.Application.EventBuses.QueryContexts
 {
     /// <summary>
-    /// Context to control where the single quote query results will be fetched from, saved, and any post triggers
+    /// Context to route single quote data to the correct dependencies to process the data.
     /// </summary>
     public class SingleQuoteContext : IQueryContext
     {
@@ -26,7 +21,7 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         private readonly IStockClient _stockClient;
 
         private readonly IStockDataService _stockDataService;
-
+        private readonly IStockNotificationCenter _notificationCenter;
         private readonly ILogger<SingleQuoteContext> _logger;
 
         private SingleQuoteQuery _query;
@@ -38,6 +33,7 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
             SingleQuoteCache queryResultCache,
             ISymbolRepository symbolRepository,
             IStockDataService stockDataService,
+            IStockNotificationCenter notificationCenter,
             SingleQuoteQuery query, 
             ILogger<SingleQuoteContext> logger)
         {
@@ -45,6 +41,7 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
             _queryResultCache = queryResultCache;
             _symbolRepository = symbolRepository;
             _stockDataService = stockDataService;
+            _notificationCenter = notificationCenter;
             _query = query;
             _logger = logger;
         }
@@ -76,6 +73,14 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         public Task ExecuteResultTriggers()
         {
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Notifies clients that the single quote data has changed.
+        /// </summary>
+        public async Task NotifyChangesClients()
+        {
+            await _notificationCenter.NotifySingleQuoteChanges(new int[] { _query.SymbolId });
         }
     }
 }

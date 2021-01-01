@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
@@ -32,9 +33,9 @@ namespace FomoAPIIntegrationTests
             get { return _testAppSettingsConfig.GetSection("AlphaVantage").Get<AlphaVantageOptions>(); }
         }
 
-        public AlphaVantageOptions LiveAlphaVantageOptions
+        public AlphaVantageOptions AlphaVantageLiveOptions
         {
-            get { return _testAppSettingsConfig.GetSection("LiveAlphaVantage").Get<AlphaVantageOptions>(); }
+            get { return _testAppSettingsConfig.GetSection("AlphaVantageLive").Get<AlphaVantageOptions>(); }
         }
 
         public EventBusOptions EventBusOptions

@@ -32,11 +32,11 @@ namespace FomoAPI
         {
             services.AddControllers();
             services.AddCustomDBContexts(Configuration)
+                    .AddCustomOptions(Configuration)
                     .AddCustomAuthentications(Configuration)
                     .AddCustomCORS(DevelopmentCorsPolicyName)
                     .AddCustomAntiForgery()
-                    .AddCustomHttpClients(Configuration)
-                    .AddCustomOptions(Configuration);
+                    .AddCustomHttpClients(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                     .AddApplicationPart(typeof(Startup).Assembly);
@@ -152,10 +152,9 @@ namespace FomoAPI
 
         public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration config)
         {
-            services.AddHttpClient("AlphaVantage", c =>
-                    {
-                        c.BaseAddress = new Uri(config["AlphaVantage:Url"]);
-                    });
+            services.AddHttpClient(config["AlphaVantage:ClientName"], c => { });
+            services.AddHttpClient("Firebase:ClientName", c => { });
+
             return services;
         }
 

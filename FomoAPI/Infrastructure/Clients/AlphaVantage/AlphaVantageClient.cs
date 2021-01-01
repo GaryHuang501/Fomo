@@ -13,6 +13,7 @@ using System.Linq;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {

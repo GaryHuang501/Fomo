@@ -8,16 +8,17 @@ using FomoAPI.Application.EventBuses.QueryContexts;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
 {
-    public class QuerySortBySubscriptionCountRuleTests
+    public class QueryGetPrioritizedQueriesBySubscriptionCountRuleTests
     {
         private readonly Mock<IQueryContextFactory> _mockContextFactory;
 
         private readonly Mock<IQueryContext> _mockContext;
 
-        public QuerySortBySubscriptionCountRuleTests()
+        public QueryGetPrioritizedQueriesBySubscriptionCountRuleTests()
         {
             _mockContextFactory = new Mock<IQueryContextFactory>();
             _mockContext = new Mock<IQueryContext>();
@@ -27,7 +28,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
         }
 
         [Fact]
-        public async Task Sort_ShouldSortSubscriptionsBySubscriberCountDescending()
+        public async Task GetPrioritizedQueries_ShouldGetPrioritizedQueriesSubscriptionsBySubscriberCountDescending()
         {
             var querySubscriptions = new QuerySubscriptions();
 
@@ -57,7 +58,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
         }
 
         [Fact]
-        public async Task Sort_ShouldIgnoreSubscriptionsWithNoSubscribers()
+        public async Task GetPrioritizedQueries_ShouldIgnoreSubscriptionsWithNoSubscribers()
         {
             var querySubscriptions = new QuerySubscriptions();
 
@@ -81,7 +82,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
         }
 
         [Fact]
-        public async Task Sort_ShouldOnlyIncludeSubscriptionsWithStaleData()
+        public async Task GetPrioritizedQueries_ShouldOnlyIncludeSubscriptionsWithStaleData_Null()
         {
             var querySubscriptions = new QuerySubscriptions();
 

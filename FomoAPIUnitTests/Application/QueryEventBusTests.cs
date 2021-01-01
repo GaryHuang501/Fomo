@@ -19,6 +19,8 @@ namespace FomoAPIUnitTests.Application
         private readonly QuerySubscriptions _querySubscriptions;
 
         private readonly QueryQueue _queryQueue;
+
+        private readonly Mock<IQueryContextFactory> _mockContextFactory;
         private class TestQuery : StockQuery
         {
             public Mock<IQueryContext> MockQueryContext { get; private set; }
@@ -27,14 +29,14 @@ namespace FomoAPIUnitTests.Application
                 : base (symbolId, QueryFunctionType.SingleQuote)
             {
                 MockQueryContext = new Mock<IQueryContext>();
+
+                // Setting it to null will tell QuerySubscription that this query is not in the cache
+                // So it will say this query needs to be updated/fetched.
+                MockQueryContext.Setup(c => c.GetCachedQueryResult(SymbolId)).Returns(Task.FromResult<StockQueryResult>(null));
             }
 
             public override IQueryContext CreateContext(IQueryContextFactory contextFactory)
             {             
-                // Setting it to null will tell QuerySubscription that this query is not in the cache
-                // So it will say this query needs to be updated/fetched.
-                MockQueryContext.Setup(c => c.GetCachedQueryResult(SymbolId)).Returns(Task.FromResult<StockQueryResult>(null));
-
                 return MockQueryContext.Object;
             }
         }
@@ -48,17 +50,17 @@ namespace FomoAPIUnitTests.Application
             // Will allow same queries to be queued again after a  millisecond
             _queryQueue.SetIntervalKey(() => DateTime.UtcNow.Millisecond);
 
-            var mockContextFactory = new Mock<IQueryContextFactory>();
+            _mockContextFactory = new Mock<IQueryContextFactory>();
 
             var priorityRule = new QuerySubscriptionCountRule(
-                    contextFactory: mockContextFactory.Object,
+                    contextFactory: _mockContextFactory.Object,
                     _querySubscriptions,
                     (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object
                 );
 
             _queryEventBus = new QueryEventBus(
                     queryQueue: _queryQueue,
-                    queryContextFactory: mockContextFactory.Object,
+                    queryContextFactory: _mockContextFactory.Object,
                     queuePriorityRule: priorityRule,
                     logger: (new Mock<ILogger<QueryEventBus>>()).Object
                 );
@@ -358,6 +360,83 @@ namespace FomoAPIUnitTests.Application
             query6.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
 
             Assert.Equal(0, _querySubscriptions.Count);
+        }
+
+
+        [Fact]
+        public async Task Should_BeAbleToExecuteNextQueryBatch_WhenErrorEnqueing_MultipleBatches()
+        {
+            await _queryEventBus.SetMaxQueryPerIntervalThreshold(100);
+            await _queryEventBus.Reset();
+
+            var query1 = new TestQuery(1);
+            var query2 = new TestQuery(2);
+            var query3 = new TestQuery(3);
+            var query4 = new TestQuery(4);
+            var query5 = new TestQuery(5); 
+            var query6 = new TestQuery(6);
+
+            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(query2);
+            query2.MockQueryContext.Setup(c => c.GetCachedQueryResult(query2.SymbolId)).Throws(new Exception("Force exception"));
+
+            try
+            {
+                await _queryEventBus.ExecutePendingQueries();
+            }
+            catch(Exception)
+            {
+            }
+
+            query2.MockQueryContext.Setup(c => c.GetCachedQueryResult(query2.SymbolId)).Returns(Task.FromResult<StockQueryResult>(null));
+            await _queryEventBus.ExecutePendingQueries();
+
+            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(query4);
+
+            await _queryEventBus.ExecutePendingQueries();
+
+            _querySubscriptions.AddSubscriber(query5);
+            _querySubscriptions.AddSubscriber(query6);
+
+
+            await _queryEventBus.ExecutePendingQueries();
+
+            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query5.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query6.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Should_ContinueToExecuteQueries_WhenErrorExecuting_MultipleQueries()
+        {
+            await _queryEventBus.SetMaxQueryPerIntervalThreshold(5);
+            await _queryEventBus.Reset();
+
+            var query1 = new TestQuery(1);
+            var query2 = new TestQuery(2);
+            var query3 = new TestQuery(3);
+            var query4 = new TestQuery(4);
+            var query5 = new TestQuery(5);
+
+            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(query4);
+            _querySubscriptions.AddSubscriber(query5);
+
+            query2.MockQueryContext.Setup(c => c.SaveQueryResultToStore()).Throws(new Exception("Force exception"));
+
+            await _queryEventBus.ExecutePendingQueries();
+
+            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            query5.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
         }
 
         private async Task WaitNextInterval()

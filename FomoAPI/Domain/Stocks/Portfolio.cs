@@ -22,7 +22,7 @@ namespace FomoAPI.Domain.Stocks
 
         public DateTime DateCreated { get; private set; }
 
-        public IEnumerable<PortfolioSymbol> Symbols { get; private set; }
+        public IEnumerable<PortfolioSymbol> PortfolioSymbols { get; private set; }
 
         [JsonConstructor]
         [ExplicitConstructor]
@@ -31,14 +31,14 @@ namespace FomoAPI.Domain.Stocks
         {
         }
 
-        public Portfolio(int id, Guid userId, string name, DateTime dateModified, DateTime dateCreated, IEnumerable<PortfolioSymbol> symbols)
+        public Portfolio(int id, Guid userId, string name, DateTime dateModified, DateTime dateCreated, IEnumerable<PortfolioSymbol> portfolioSymbols)
         {
             Id = id;
             UserId = userId;
             Name = name;
             DateModified = dateModified;
             DateCreated = dateCreated;
-            Symbols = symbols;
+            PortfolioSymbols = portfolioSymbols;
         }
     }
 }

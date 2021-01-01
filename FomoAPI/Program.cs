@@ -17,15 +17,20 @@ namespace FomoAPI
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-
             return Host.CreateDefaultBuilder(args)
                     .ConfigureAppConfiguration((hostingContext, config) =>
                     {
                         var env = hostingContext.HostingEnvironment;
                         config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                              .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                              .AddJsonFile("authentication.json", optional: true, reloadOnChange: true);
+                        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                              .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true)
+                              .AddJsonFile("authentication.json", optional: false, reloadOnChange: true)
+                              .AddJsonFile("firebase.json", optional: false, reloadOnChange: true);
+
+                        if (hostingContext.HostingEnvironment.IsDevelopment())
+                        {
+                            config.AddUserSecrets<Program>();
+                        }
 
                         config.AddEnvironmentVariables();
                     })

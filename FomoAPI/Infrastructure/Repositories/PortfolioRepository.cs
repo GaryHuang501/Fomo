@@ -297,7 +297,7 @@ namespace FomoAPI.Infrastructure.Repositories
                             name: portfolio.Name,
                             dateModified: portfolio.DateModified,
                             dateCreated: portfolio.DateCreated,
-                            symbols: portfolioSymbolsResultSet);
+                            portfolioSymbols: portfolioSymbolsResultSet);
                     }
                 }
             }

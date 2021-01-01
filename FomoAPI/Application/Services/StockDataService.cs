@@ -111,7 +111,6 @@ namespace FomoAPI.Application.Services
             _singleQuoteCache.Upsert(query.SymbolId, queryResult);
         }
 
-
         public void AddSubscriberToSingleQuote(int symbolId)
         {
             var query = new SingleQuoteQuery(symbolId);

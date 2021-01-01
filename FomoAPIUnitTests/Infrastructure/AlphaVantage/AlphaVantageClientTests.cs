@@ -2,6 +2,7 @@
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

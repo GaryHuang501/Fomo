@@ -1,13 +1,12 @@
 ﻿using FomoAPI.Application.EventBuses.Triggers;
 using FomoAPI.Domain.Stocks.Queries;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses.QueryContexts
 {
     /// <summary>
-    /// Provides context for a given query type, routing the functionality to correct associated classes.
+    /// Provides context for a given query type, routing the functionality to correct the dependencies to
+    /// process the query data.
     /// </summary>
     public interface IQueryContext
     {
@@ -28,5 +27,10 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         /// </summary>
         /// <returns>The <see cref="StockQueryResult"/>. Returns Null if it doesn't exist in the cache.</returns>
         Task<StockQueryResult> GetCachedQueryResult(int symbolId);
+
+        /// <summary>
+        /// Sends notifications to listening clients that stock data has changed.
+        /// </summary>
+        Task NotifyChangesClients();
     }
 }

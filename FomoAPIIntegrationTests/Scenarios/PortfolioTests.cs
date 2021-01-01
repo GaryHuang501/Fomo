@@ -77,10 +77,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
 
             Assert.Equal(portfolio.Id, fetchedPortfolio.Id);
-            Assert.Equal(2, fetchedPortfolio.Symbols.Count());
+            Assert.Equal(2, fetchedPortfolio.PortfolioSymbols.Count());
 
-            var tsla = fetchedPortfolio.Symbols.Single(s => s.Ticker == "TSLA");
-            var jpm = fetchedPortfolio.Symbols.Single(s => s.Ticker == "JPM");
+            var tsla = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "TSLA");
+            var jpm = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "JPM");
 
             Assert.Equal("NASDAQ", tsla.ExchangeName);
             Assert.False(string.IsNullOrWhiteSpace(tsla.FullName));
@@ -192,8 +192,8 @@ namespace FomoAPIIntegrationTests.Scenarios
             getPortfolioResponse.EnsureSuccessStatusCode();
             var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
 
-            Assert.Single(fetchedPortfolio.Symbols);
-            Assert.Equal("TSLA", fetchedPortfolio.Symbols.First().Ticker);
+            Assert.Single(fetchedPortfolio.PortfolioSymbols);
+            Assert.Equal("TSLA", fetchedPortfolio.PortfolioSymbols.First().Ticker);
         }
 
         [Fact]
@@ -288,10 +288,10 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             Assert.Equal(portfolio.Id, fetchedPortfolio.Id);
 
-            var tsla = fetchedPortfolio.Symbols.Single(s => s.Ticker == "TSLA");
-            var jpm = fetchedPortfolio.Symbols.Single(s => s.Ticker == "JPM");
-            var fb = fetchedPortfolio.Symbols.Single(s => s.Ticker == "FB");
-            var msft = fetchedPortfolio.Symbols.Single(s => s.Ticker == "MSFT");
+            var tsla = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "TSLA");
+            var jpm = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "JPM");
+            var fb = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "FB");
+            var msft = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "MSFT");
 
             Assert.Equal(1, fb.SortOrder);
             Assert.Equal(2, tsla.SortOrder);
