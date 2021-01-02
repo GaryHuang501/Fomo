@@ -1,20 +1,18 @@
-import React from 'react';
 import './Portfolio.css';
+
 import { PortfolioStock } from './PortfolioStock';
-import { useSelector } from 'react-redux'
+import React from 'react';
 import { selectPortfolio } from './PortfolioSlice';
+import { useSelector } from 'react-redux'
 
 export const Portfolio = function () {
   const portfolio = useSelector(selectPortfolio);
 
   const portfolioStocks = [];
 
-  if(portfolio.symbols && Array.isArray(portfolio.symbols))
-  {
-    for(const symbol of portfolio.symbols){
-        const stock = <PortfolioStock key={symbol.symbolId} symbol={symbol}></PortfolioStock>
-        portfolioStocks.push(stock);
-    }
+  for(const symbol of portfolio.portfolioSymbols){
+    const stock = <PortfolioStock key={symbol.symbolId} symbol={symbol}></PortfolioStock>
+    portfolioStocks.push(stock);
   }
   
   return (

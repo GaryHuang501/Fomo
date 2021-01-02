@@ -66,7 +66,7 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
 
                 StockQueryResult queryResult = await queryContext.GetCachedQueryResult(info.Query.SymbolId);
 
-                bool queryNeedsRefresh = queryResult == null || info.Query.FunctionType.IsExpired(queryResult.CreateDateUtc, DateTime.UtcNow);
+                bool queryNeedsRefresh = queryResult == null || info.Query.FunctionType.IsExpired(queryResult.Data.LastUpdated, DateTime.UtcNow);
 
                 if (queryNeedsRefresh)
                 {

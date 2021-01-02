@@ -1,5 +1,6 @@
 ﻿using FomoAPI.Infrastructure.Clients;
 using FomoAPI.Infrastructure.Clients.Firebase;
+using FomoAPI.Infrastructure.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace FomoAPI.Application.Services
         {
             foreach(var id in symbolIdsChanged)
             {
-                await _client.NotifyUpsert($"singleQuoteData/{id}", new FirebaseSingleQuoteEntry(DateTime.UtcNow));
+                var notification = new SingleQuoteNotification($"singleQuoteData/{id}", DateTime.UtcNow);
+                await _client.NotifyChanges(notification);
             }
         }
     }

@@ -8,15 +8,15 @@ namespace FomoAPI.Domain.Stocks.Queries
 
         public StockData Data { get; private set; }
 
-        public DateTime CreateDateUtc { get; private set; }
+        public DateTime LastUpdated { get; private set; }
 
         public string ErrorMessage { get; private set; }
 
-        protected StockQueryResult(string symbol, StockData data)
+        protected StockQueryResult(string symbol, StockData data, DateTime lastUpdated)
         {
             Symbol = symbol;
             Data = data;
-            CreateDateUtc = DateTime.UtcNow;
+            LastUpdated = lastUpdated;
         }
 
         protected StockQueryResult(string errorMessage)

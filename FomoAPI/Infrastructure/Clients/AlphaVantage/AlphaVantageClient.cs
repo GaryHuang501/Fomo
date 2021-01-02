@@ -14,6 +14,7 @@ using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
 using FomoAPI.Infrastructure.ConfigurationOptions;
+using FomoAPI.Infrastructure.Stocks;
 
 namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 {

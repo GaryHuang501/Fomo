@@ -3,7 +3,7 @@ using FomoAPI.Domain.Stocks.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Stocks
 {
     /// <summary>
     /// Client to query stock data from a third party provider.

@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -68,7 +69,8 @@ export const selectPortfolioIds = state => state.portfolio.ids;
 export const selectSelectedPortfolioId = state => state.portfolio.selectedPortfolioId;
 
 export const selectPortfolio = function(state){  
-    return state.portfolio.portfolios[state.portfolio.selectedPortfolioId] ?? {symbol:[]};
+    const portfolio = state.portfolio.portfolios[state.portfolio.selectedPortfolioId];
+    return portfolio ? portfolio : { portfolioSymbols: [] };
 }
 
 export default portfolioSlice.reducer;

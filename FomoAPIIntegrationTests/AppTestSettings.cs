@@ -1,4 +1,5 @@
-﻿using FomoAPI.Application.ConfigurationOptions;
+﻿using FomoAPI;
+using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -16,6 +17,7 @@ namespace FomoAPIIntegrationTests
         public static AppTestSettings Instance { get { return _instance.Value; } }
 
         private readonly IConfiguration _launchSettingsConfig;
+        private readonly IConfiguration _firebaseSettingsConfig;
         private readonly IConfiguration _testAppSettingsConfig;
 
         public Guid TestUserId
@@ -43,6 +45,11 @@ namespace FomoAPIIntegrationTests
             get { return _testAppSettingsConfig.GetSection("EventBus").Get<EventBusOptions>(); }
         }
 
+        public FireBaseOptions FireBaseOptions
+        {
+            get { return _firebaseSettingsConfig.GetSection("FireBase").Get<FireBaseOptions>(); }
+        }
+
         public string FomoApiURL
         {
             get
@@ -65,6 +72,7 @@ namespace FomoAPIIntegrationTests
         {
             _testAppSettingsConfig = CreateConfiguration("appsettings.Test.json");
             _launchSettingsConfig = CreateConfiguration("launchSettings.json");
+            _firebaseSettingsConfig = CreateConfiguration("firebase.json");
         }
 
         private IConfiguration CreateConfiguration(string fileName)
@@ -72,6 +80,7 @@ namespace FomoAPIIntegrationTests
             return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile(fileName, optional: true, reloadOnChange: true)
+            .AddUserSecrets<AppTestSettings>()
             .Build();
         }
     }

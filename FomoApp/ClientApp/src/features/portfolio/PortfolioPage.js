@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
-import { StockSearchBar } from '../stockSearch/StockSearchBar';
-import { Portfolio } from './Portfolio';
-import { ChatBox } from '../chatbox/ChatBox';
 import './PortfolioPage.css';
+
+import React, { useEffect } from 'react';
+import { fetchPortfolio, fetchPortfolioIds, selectPortfolioIds, selectSelectedPortfolioId, setSelectedPortfolioId } from './PortfolioSlice';
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchPortfolioIds, fetchPortfolio, setSelectedPortfolioId, selectPortfolioIds, selectSelectedPortfolioId } from './PortfolioSlice';
+
+import { ChatBox } from '../chatbox/ChatBox';
+import { Portfolio } from './Portfolio';
+import { PortfolioListener } from './PortfolioListener';
+import { StockSearchBar } from '../stockSearch/StockSearchBar';
 
 export const PortfolioPage = function() {
 
@@ -35,7 +38,8 @@ export const PortfolioPage = function() {
             <StockSearchBar></StockSearchBar>
         </section>
         <section id='portfolio-container'>
-            <Portfolio></Portfolio>
+          <PortfolioListener></PortfolioListener>
+          <Portfolio></Portfolio>
         </section>
         <section id='portfolio-chatbox-container'>
             <h3 id='portfolio-chatbox-header'>Gary's Portfolio</h3>

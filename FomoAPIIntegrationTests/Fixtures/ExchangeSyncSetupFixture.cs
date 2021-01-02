@@ -25,6 +25,7 @@ namespace FomoAPIIntegrationTests.Fixtures
         private readonly SqlConnection _connection;
 
         private string _connectionString = AppTestSettings.Instance.TestDBConnectionString;
+
         public ExchangeSyncSetupFixture()
         {
             _connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString);

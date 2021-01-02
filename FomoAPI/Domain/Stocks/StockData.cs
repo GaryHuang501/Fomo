@@ -7,5 +7,6 @@ namespace FomoAPI.Domain.Stocks
 {
     public abstract class StockData
     {
+        public DateTime LastUpdated { get; protected set; }
     }
 }

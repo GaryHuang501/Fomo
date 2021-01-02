@@ -31,7 +31,6 @@ namespace FomoAPIIntegrationTests.Fixtures
         {
             var builder = base.CreateHostBuilder();
 
-
             builder.ConfigureWebHost(webBuilder =>
                     {
                         webBuilder

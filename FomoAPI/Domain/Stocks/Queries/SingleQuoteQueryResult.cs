@@ -9,7 +9,7 @@ namespace FomoAPI.Domain.Stocks.Queries
     {
         public new StockSingleQuoteData Data { get; private set; }
 
-        public SingleQuoteQueryResult(string symbol, StockSingleQuoteData data) : base(symbol, data)
+        public SingleQuoteQueryResult(string symbol, StockSingleQuoteData data) : base(symbol, data, data.LastUpdated)
         {
             Data = data;
         }

@@ -143,6 +143,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
 
             Assert.False(queryResult.HasError);
             Assert.Equal("MSFT", queryResult.Data.Symbol);
+            Assert.Equal(singleQuoteData.LastUpdated, queryResult.Data.LastUpdated);
         }
     }
 }

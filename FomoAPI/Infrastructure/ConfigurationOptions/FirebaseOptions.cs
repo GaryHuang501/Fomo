@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FomoAPI.Infrastructure.ConfigurationOptions
 {
-    public class FirebaseOptions
+    public class FireBaseOptions
     {
         public string ApiKey { get; set; }
 

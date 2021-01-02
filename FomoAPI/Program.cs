@@ -31,6 +31,11 @@ namespace FomoAPI
                         {
                             config.AddUserSecrets<Program>();
                         }
+                        else if(hostingContext.HostingEnvironment.EnvironmentName == "Test")
+                        {
+                            const string testSecretsId = "22803d79-afbc-493c-a3f7-f05a6c451f7c";
+                            config.AddUserSecrets(testSecretsId);
+                        }
 
                         config.AddEnvironmentVariables();
                     })

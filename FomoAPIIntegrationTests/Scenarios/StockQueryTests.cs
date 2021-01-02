@@ -128,7 +128,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             AssertSingleQuote(dataDto, searchResult.SymbolId);
 
             // Next update the LastUpdated date of the single quote data entry in the database.
-            // however hen this single quote data is fetched it the date should not match since
+            // however when this single quote data is fetched it the date should not match since
             // the database is updated but not cache, which is where it will be fetched from.
             var modifiedDate = new DateTime(2000, 1, 1); ;
             await _dbFixture.Connection.ExecuteAsync($"UPDATE SingleQuoteData SET LastUpdated = '{modifiedDate}'");
@@ -156,6 +156,56 @@ namespace FomoAPIIntegrationTests.Scenarios
             var secondCachedDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
             var secondCachedDto = secondCachedDtos[0];
             Assert.Equal(dbDto.LastUpdated, secondCachedDto.LastUpdated);
+        }
+
+        [Fact]
+        public async Task GetSingleQuoteData_ShouldUpdateQueryResults_WhenResultsFromDBStale()
+        {
+            // Trigger the query so it is saved into the database.
+            SymbolSearchResultDTO searchResult = await SearchSymbol("TSLA", ExchangeType.NASDAQ);
+            List<StockSingleQuoteDataDTO> dataDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
+            Assert.Single(dataDtos);
+
+            var dataDto = dataDtos[0];
+
+            Assert.Equal(searchResult.SymbolId, dataDto.SymbolId);
+            Assert.Null(dataDto.SingleQuoteData);
+
+            var startTime = DateTime.UtcNow;
+
+            // Wait for query to execute and until there is data
+            while (dataDto.SingleQuoteData == null)
+            {
+                await CheckTimeOut(startTime);
+
+                List<StockSingleQuoteDataDTO> newData = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
+                dataDto = newData[0];
+            }
+
+            AssertSingleQuote(dataDto, searchResult.SymbolId);
+
+            // Make the data stale
+            var modifiedDate = new DateTime(2000, 1, 1); ;
+            await _dbFixture.Connection.ExecuteAsync($"UPDATE SingleQuoteData SET LastUpdated = '{modifiedDate}'");
+
+            //reset the server so it will update the cache with the stale value.
+            // System should detect the stale data and trigger an update.
+            await RestartServer();
+
+            var dbDataDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
+            var dbDataDto = dbDataDtos[0];
+
+            // Wait for query to execute and until there is data
+            while (dbDataDto.LastUpdated <= modifiedDate)
+            {
+                await CheckTimeOut(startTime);
+
+                List<StockSingleQuoteDataDTO> newData = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
+                dbDataDto = newData[0];
+            }
+
+            Assert.Equal(searchResult.SymbolId, dbDataDto.SymbolId);
+            Assert.True(dbDataDto.LastUpdated > DateTime.UtcNow.AddMinutes(-5));
         }
 
         [Fact]
@@ -258,7 +308,6 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             await _dbFixture.Connection.ExecuteAsync("DELETE FROM SingleQuoteData");
         }
-
 
         private async Task CheckTimeOut(DateTime startTime)
         {

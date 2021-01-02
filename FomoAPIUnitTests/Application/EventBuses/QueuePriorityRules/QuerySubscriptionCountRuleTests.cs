@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
 using System;
+using FomoAPI.Domain.Stocks;
 
 namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
 {
@@ -95,7 +96,21 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             query1.SetMockQueryContext(_mockContext);
             query2.SetMockQueryContext(_mockContext);
 
-            _mockContext.Setup(c => c.GetCachedQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", null)));
+            var stockData = new StockSingleQuoteData(
+                    symbol: "MSFT",
+                    high: 1,
+                    low: 2,
+                    open: 3,
+                    previousClose: 4,
+                    volume: 5,
+                    change: 6,
+                    price: 7,
+                    changePercent: 0.9m,
+                    lastUpdated: DateTime.UtcNow,
+                    lastTradingDay: DateTime.UtcNow
+                );
+
+            _mockContext.Setup(c => c.GetCachedQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", stockData)));
 
             var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 

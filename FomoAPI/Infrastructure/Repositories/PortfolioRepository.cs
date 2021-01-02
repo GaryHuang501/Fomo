@@ -126,14 +126,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <returns>Task</returns>
         public async Task DeletePortfolio(int portfolioId)
         {
-            var sql = @"DELETE PriceAlert FROM PriceAlert
-                        INNER JOIN 
-                            PortfolioSymbol
-                        ON  
-                            PortfolioSymbol.Id = PriceAlert.PortfolioSymbolId
-                        WHERE
-                            PortfolioSymbol.PortfolioId = @portfolioId;
-
+            var sql = @"
                         DELETE FROM PortfolioSymbol
                         WHERE
                             PortfolioSymbol.PortfolioId = @portfolioId;

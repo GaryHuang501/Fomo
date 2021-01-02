@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -16,18 +17,11 @@ export const stocksSlice = createSlice({
         }
     },
     reducers: {
+        updateSingleQuote: (state, action) => {
+            state.singleQuote[action.payload.symbolId] = action.payload;
+        }
     },
     extraReducers: {
-        [fetchStockSingleQuote.pending]: (state, action) => {
-            state.status = 'loading';
-        },
-        [fetchStockSingleQuote.fulfilled]: (state, action) => {
-            state.status = 'succeeded';
-            state.portfolios[action.meta.arg] = action.payload;
-        },
-        [fetchStockSingleQuote.rejected]: (state, action) => {
-            state.status = 'failed';
-        }
     }
 });
 

@@ -6,6 +6,7 @@ using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Application.Services;
 using Microsoft.Extensions.Logging;
+using FomoAPI.Infrastructure.Stocks;
 
 namespace FomoAPI.Application.EventBuses.QueryContexts
 {
@@ -80,6 +81,11 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         /// </summary>
         public async Task NotifyChangesClients()
         {
+            if (_queryResult.HasError)
+            {
+                return;
+            }
+
             await _notificationCenter.NotifySingleQuoteChanges(new int[] { _query.SymbolId });
         }
     }

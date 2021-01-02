@@ -28,10 +28,7 @@ namespace FomoAPI.Domain.Stocks
 
         public string Symbol { get; private set; }
 
-        public DateTime LastUpdated { get; private set; }
-
         public DateTime LastTradingDay { get; private set; }
-
 
         [JsonConstructor]
         [ExplicitConstructor]

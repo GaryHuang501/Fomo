@@ -5,6 +5,7 @@ using FomoAPI.Application.EventBuses.QueuePriorityRules;
 using FomoAPI.Application.Stores;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Stocks;
 using Microsoft.Extensions.Hosting;
 
 namespace FomoAPI.AutoFacModules

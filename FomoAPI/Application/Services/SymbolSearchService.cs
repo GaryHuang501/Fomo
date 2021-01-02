@@ -3,6 +3,7 @@ using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Repositories;
+using FomoAPI.Infrastructure.Stocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

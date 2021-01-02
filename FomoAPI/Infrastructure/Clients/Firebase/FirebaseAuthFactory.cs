@@ -17,14 +17,13 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
     /// </summary>
     public class FirebaseAuthFactory : IClientAuthFactory, IHostedService, IDisposable
     {
-        private readonly FirebaseOptions _firebaseOptions;
+        private readonly FireBaseOptions _firebaseOptions;
         private readonly ILogger<FirebaseAuthFactory> _logger;
         private string _authToken;
         private DateTime _lastRenewTime;
         private Timer _renewTokenTimer;
 
-
-        public FirebaseAuthFactory(IOptionsMonitor<FirebaseOptions> firebaseOptionsMonitor, ILogger<FirebaseAuthFactory> logger)
+        public FirebaseAuthFactory(IOptionsMonitor<FireBaseOptions> firebaseOptionsMonitor, ILogger<FirebaseAuthFactory> logger)
         {
             _firebaseOptions = firebaseOptionsMonitor.CurrentValue;
             _logger = logger;
@@ -42,7 +41,10 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
 
         public void Dispose()
         {
-            _renewTokenTimer.Dispose();
+            if (_renewTokenTimer != null)
+            {
+                _renewTokenTimer.Dispose();
+            }
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

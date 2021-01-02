@@ -27,7 +27,7 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("ExchangeSync"))
                     .ValidateDataAnnotations();
 
-            services.AddOptions<FirebaseOptions>()
+            services.AddOptions<FireBaseOptions>()
                     .Bind(config.GetSection("FireBase"))
                     .ValidateDataAnnotations();
 

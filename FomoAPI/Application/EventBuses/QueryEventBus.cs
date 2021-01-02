@@ -160,6 +160,7 @@ namespace FomoAPI.Application.EventBuses
                 _logger.LogTrace("Query for symbolId {symbol} cleared from queue", query.SymbolId);
 
                 await ExecuteQueryResultTriggers(queryContext);
+                await NotifyClients(queryContext, query);
 
                 _logger.LogTrace("Finished processing symbol query {SymbolId}", query.SymbolId);
 
@@ -182,6 +183,11 @@ namespace FomoAPI.Application.EventBuses
             await queryContext.ExecuteResultTriggers();
 
             _logger.LogTrace("ExecutedQuery Result Triggers");
+        }
+        private async Task NotifyClients(IQueryContext queryContext, StockQuery query)
+        {
+            await queryContext.NotifyChangesClients();
+            _logger.LogTrace("Notified Clients changes for {symbolId}", query.SymbolId);
         }
     }
 }

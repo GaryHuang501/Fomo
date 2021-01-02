@@ -95,7 +95,26 @@ namespace FomoAPIUnitTests.Application
             query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
             query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
 
+
             Assert.Equal(0, _querySubscriptions.Count);
+        }
+
+        [Fact]
+        public async Task Should_NotifyUpdatedQueries()
+        {
+            var query1 = new TestQuery(1);
+            var query2 = new TestQuery(2);
+            var query3 = new TestQuery(3);
+
+            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(query3);
+
+            await _queryEventBus.ExecutePendingQueries();
+
+            query1.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
+            query2.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
+            query3.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
         }
 
         [Fact]
