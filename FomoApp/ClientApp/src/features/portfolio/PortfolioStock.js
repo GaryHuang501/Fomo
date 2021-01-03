@@ -1,15 +1,16 @@
-import React from 'react';
 import './PortfolioStock.css';
-import { useSelector } from 'react-redux'
+
+import React from 'react';
 import { selectStockData } from '../stocks/stocksSlice';
+import { useSelector } from 'react-redux'
 
 export const PortfolioStock = (props) => {
 
-    const stockData = useSelector(state => selectStockData(state, props.symbol));
+    const stockData = useSelector(state => selectStockData(state, props.portfolioSymbol));
 
     return (
         <tr className="portfolio-row portfolio-stock">
-            <td className="portfolio-column portfolio-row-name">{props.symbol.ticker}</td>
+            <td className="portfolio-column portfolio-row-name">{props.portfolioSymbol.ticker}</td>
             <td className="portfolio-column portoflio-stock-market-price">{stockData.marketPrice}</td>
             <td className="portfolio-column portfolio-row-average-price">{stockData.averagePrice}</td>
             <td className="portfolio-column portfolio-row-change">{stockData.change}</td>

@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import './App.css';
+
+import React, { useEffect, useState } from 'react';
 import {
+  Redirect,
+  Route,
   BrowserRouter as Router,
   Switch,
-  Route,
-  Redirect,
 } from 'react-router-dom'
-import { axiosSetup } from './app/AxiosSetup';
-import { firebaseSetup } from './app/FireBaseSetup';
+import { checkLogin, selectAuthenticatedState } from './features/login/LoginSlice';
+import { useDispatch, useSelector } from 'react-redux'
+
+import { LeaderBoardPage } from './features/leaderboard/LeaderBoardPage';
+import { LoginModal } from './features/login/LoginModal';
+import { MembersPage } from './features/members/MembersPage';
 import { NavHeader } from './app/NavHeader';
 import { PortfolioPage } from './features/portfolio/PortfolioPage';
-import { LeaderBoardPage } from './features/leaderboard/LeaderBoardPage';
-import { MembersPage } from './features/members/MembersPage';
-import { LoginModal } from './features/login/LoginModal';
-import { useSelector, useDispatch } from 'react-redux'
-import './App.css';
-import { checkLogin, selectAuthenticatedState } from './features/login/LoginSlice';
-
+import { axiosSetup } from './app/AxiosSetup';
+import { firebaseSetup } from './app/FireBaseSetup';
 
 function App() {
 
@@ -38,8 +39,6 @@ function App() {
     dispatch(checkLogin());
     setSetupFinished(true);
   }, [dispatch]);
-
-
 
   return (
      <Router>

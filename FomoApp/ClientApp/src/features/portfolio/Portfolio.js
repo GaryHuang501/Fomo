@@ -10,8 +10,8 @@ export const Portfolio = function () {
 
   const portfolioStocks = [];
 
-  for(const symbol of portfolio.portfolioSymbols){
-    const stock = <PortfolioStock key={symbol.symbolId} symbol={symbol}></PortfolioStock>
+  for(const portfolioSymbol of portfolio.portfolioSymbols){
+    const stock = <PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}></PortfolioStock>
     portfolioStocks.push(stock);
   }
   
