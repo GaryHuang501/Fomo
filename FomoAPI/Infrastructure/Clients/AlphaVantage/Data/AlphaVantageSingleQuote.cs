@@ -9,10 +9,11 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Data
         [JsonProperty("Global Quote")]
         public GlobalQuote Data { get; set; }
 
-        public StockSingleQuoteData ToDomain()
+        public SingleQuoteData ToDomain(int symbolId)
         {
-            return new StockSingleQuoteData(
-                    symbol: Data.Symbol,
+            return new SingleQuoteData(
+                    symbolId: symbolId,
+                    ticker: Data.Symbol,
                     high: Data.High,
                     low: Data.Low,
                     open: Data.Open,

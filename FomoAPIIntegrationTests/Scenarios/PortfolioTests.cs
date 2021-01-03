@@ -307,7 +307,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             var result = searchResults.Single();
 
-            Assert.Equal(ticker, result.Symbol);
+            Assert.Equal(ticker, result.Ticker);
 
             return searchResults.Single();
         }

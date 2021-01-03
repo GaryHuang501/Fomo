@@ -45,7 +45,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             string symbol = "JPM";
             var query = new AlphaVantageQuery(QueryFunctionType.SingleQuote, symbol);
 
-            Assert.Equal(symbol, query.Symbol);
+            Assert.Equal(symbol, query.Ticker);
             Assert.NotEqual(new DateTime(), query.CreateDate);
         }
 

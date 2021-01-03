@@ -43,11 +43,11 @@ namespace FomoAPI.Application.Services
             // Also our internal Symbol DB identity is what is used to add the symbol the portfolio.
             var newDtos = new List<SymbolSearchResultDTO>();
             IEnumerable<SymbolSearchResult> newSearchResults = await _client.GetSearchedTickers(keywords);
-            IEnumerable<Symbol> symbols = await _symbolRepository.GetSymbols(newSearchResults.Select(r => r.Symbol));
+            IEnumerable<Symbol> symbols = await _symbolRepository.GetSymbols(newSearchResults.Select(r => r.Ticker));
 
             foreach (var result in newSearchResults)
             {
-                Symbol matchingSymbol = symbols.FirstOrDefault(s => s.Ticker == result.Symbol);
+                Symbol matchingSymbol = symbols.FirstOrDefault(s => s.Ticker == result.Ticker);
 
                 if (matchingSymbol != null)
                 {

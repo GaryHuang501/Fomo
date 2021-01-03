@@ -7,9 +7,9 @@ namespace FomoAPI.Domain.Stocks.Queries
 {
     public class SingleQuoteQueryResult : StockQueryResult
     {
-        public new StockSingleQuoteData Data { get; private set; }
+        public new SingleQuoteData Data { get; private set; }
 
-        public SingleQuoteQueryResult(string symbol, StockSingleQuoteData data) : base(symbol, data, data.LastUpdated)
+        public SingleQuoteQueryResult(string ticker, SingleQuoteData data) : base(ticker, data, data.LastUpdated)
         {
             Data = data;
         }

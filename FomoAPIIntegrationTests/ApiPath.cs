@@ -30,7 +30,7 @@ namespace FomoAPIIntegrationTests
                 builder.Append($"&symbolIds={symbolIds[i]}");
             }
 
-            return $"api/Symbols/singleQuoteData?{builder.ToString()}";
+            return $"api/SingleQuoteData?{builder.ToString()}";
         }
 
     }

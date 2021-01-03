@@ -49,7 +49,7 @@ namespace FomoAPI.Application.Services
         public async Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId)
         {
             SingleQuoteQueryResult queryResult;
-            StockSingleQuoteData data;
+            SingleQuoteData data;
 
             if (_singleQuoteCache.TryGet(symbolId, out queryResult))
             {
@@ -61,7 +61,7 @@ namespace FomoAPI.Application.Services
 
             if(data != null)
             {
-                _singleQuoteCache.Add(symbolId, new SingleQuoteQueryResult(data.Symbol, data));
+                _singleQuoteCache.Add(symbolId, new SingleQuoteQueryResult(data.Ticker, data));
                 return new StockSingleQuoteDataDTO(symbolId, data);
             }
 

@@ -148,22 +148,34 @@ namespace FomoAPI.Application.EventBuses
 
         private async Task ExecuteQuery(StockQuery query)
         {
+            IQueryContext queryContext = null;
+
             try
             {
                 _logger.LogTrace("Executing query for symbolId {symbol}", query.SymbolId);
 
-                var queryContext = query.CreateContext(_queryContextFactory);
+                queryContext = query.CreateContext(_queryContextFactory);
 
                 await SaveQueryResult(queryContext, query);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error executing and saving query for symbol: {SymbolId}", query.SymbolId);
+                return;
+            }
+            finally
+            {
                 _queryQueue.MarkAsExecuted(query);
+            }
 
-                _logger.LogTrace("Query for symbolId {symbol} cleared from queue", query.SymbolId);
+            try
+            {
+            _logger.LogTrace("Query for symbolId {symbol} cleared from queue", query.SymbolId);
 
                 await ExecuteQueryResultTriggers(queryContext);
                 await NotifyClients(queryContext, query);
 
                 _logger.LogTrace("Finished processing symbol query {SymbolId}", query.SymbolId);
-
             }
             catch (Exception ex)
             {

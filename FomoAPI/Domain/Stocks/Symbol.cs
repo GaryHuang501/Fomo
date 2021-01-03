@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace FomoAPI.Domain.Stocks
 {
     /// <summary>
-    /// Represents the info on a stock.
+    /// Represents a stock's info
     /// </summary>
     public class Symbol : IEntity
     {

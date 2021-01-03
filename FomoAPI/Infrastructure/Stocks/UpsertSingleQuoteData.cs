@@ -24,15 +24,13 @@ namespace FomoAPI.Infrastructure.Stocks
 
         public long Volume { get; private set; }
 
-        public string Symbol { get; private set; }
-
         public DateTime LastUpdated { get; private set; }
 
         public DateTime LastTradingDay { get; private set; }
 
         public int SymbolId { get; private set; }
 
-        public UpsertSingleQuoteData(int symbolId, StockSingleQuoteData data)
+        public UpsertSingleQuoteData(int symbolId, SingleQuoteData data)
         {
             SymbolId = symbolId;
             High = data.High;
@@ -43,7 +41,6 @@ namespace FomoAPI.Infrastructure.Stocks
             PreviousClose = data.PreviousClose;
             Change = data.Change;
             ChangePercent = data.ChangePercent;
-            Symbol = data.Symbol;
             LastUpdated = data.LastUpdated;
             LastTradingDay = data.LastTradingDay;
         }

@@ -22,7 +22,7 @@ namespace FomoAPI.Application.Services
         {
             foreach(var id in symbolIdsChanged)
             {
-                var notification = new SingleQuoteNotification($"singleQuoteData/{id}", DateTime.UtcNow);
+                var notification = new SingleQuoteNotification(id, DateTime.UtcNow);
                 await _client.NotifyChanges(notification);
             }
         }

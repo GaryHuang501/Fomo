@@ -1,6 +1,6 @@
 ﻿{
   "FireBase": {
-    "ApiKey": "AIzaSyCzJHVz07AKuCzELVARPlkNQ0zQHPawrF8",
+    "ApiKey": "AIzaSyCzJHVz07AKuCzELVARPlkNQ0zQHPawrF8", // Public API Key
     "AuthEnabled": false,
     "ClientName": "FireBase",
     "DatabaseUrl": "https://fomo-189110-default-rtdb.firebaseio.com",

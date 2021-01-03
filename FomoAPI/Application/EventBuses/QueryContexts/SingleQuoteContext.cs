@@ -53,7 +53,7 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         public async Task SaveQueryResultToStore()
         {
             Symbol symbol = await _symbolRepository.GetSymbol(_query.SymbolId);
-            _queryResult = await _stockClient.GetSingleQuoteData(symbol.Ticker, symbol.ExchangeName);
+            _queryResult = await _stockClient.GetSingleQuoteData(_query, symbol.Ticker, symbol.ExchangeName);
             await _stockDataService.UpsertSingleQuoteData(_query, _queryResult);
         }
 

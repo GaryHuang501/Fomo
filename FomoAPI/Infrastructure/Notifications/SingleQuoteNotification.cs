@@ -4,13 +4,15 @@ namespace FomoAPI.Infrastructure.Notifications
 {
     public class SingleQuoteNotification : INotification
     {
+        public const string Name = "SingleQuoteData";
+
         public DateTime LastUpdated { get; private set; }
        
         public string Key { get; private set; }
 
-        public SingleQuoteNotification(string key, DateTime lastUpdated)
+        public SingleQuoteNotification(int symbolId, DateTime lastUpdated)
         {
-            Key = key;
+            Key = $"{Name}/{symbolId}";
             LastUpdated = lastUpdated;
         }
     }

@@ -16,13 +16,13 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Get the single quote data for given symbol Id.
         /// </summary>
         /// <param name="symbolId">SymbolId for single quote data to retrieve.</param>
-        /// <returns><see cref="StockSingleQuoteData"/></returns>
-        Task<StockSingleQuoteData> GetSingleQuoteData(int symbolId);
+        /// <returns><see cref="SingleQuoteData"/></returns>
+        Task<SingleQuoteData> GetSingleQuoteData(int symbolId);
 
         /// <summary>
         /// Upsert single quote data to database.
         /// </summary>
-        /// <param name="singleQuoteData"><see cref="StockSingleQuoteData"/> to save.</param>
+        /// <param name="singleQuoteData"><see cref="SingleQuoteData"/> to save.</param>
         /// <returns>Whether or not the data was saved.</returns>
         Task<bool> UpsertSingleQuoteData(UpsertSingleQuoteData singleQuoteData);
     }

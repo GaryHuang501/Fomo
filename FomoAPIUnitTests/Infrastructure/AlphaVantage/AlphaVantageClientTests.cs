@@ -1,8 +1,11 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Domain.Stocks;
+using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using FomoAPI.Infrastructure.ConfigurationOptions;
+using FomoAPI.Infrastructure.Enums;
+using FomoAPIUnitTests.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -21,13 +24,13 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
     {
         private Mock<IHttpClientFactory> _mockHttpFactory;
         private Mock<IAlphaVantageDataParserFactory> _mockParserFactory;
-        private Mock<IAlphaVantageDataParser<StockSingleQuoteData>>_singleQuoteDataCsvParser;
+        private Mock<IAlphaVantageDataParser<SingleQuoteData>>_singleQuoteDataCsvParser;
         private readonly Mock<ILogger<AlphaVantageClient>> _mockLogger;
         private readonly Mock<IOptionsMonitor<AlphaVantageOptions>> _mockAlphaVantageOptionsAccessor;
 
         public AlphaVantageClientTests()
         {
-            _singleQuoteDataCsvParser = new Mock<IAlphaVantageDataParser<StockSingleQuoteData>>();
+            _singleQuoteDataCsvParser = new Mock<IAlphaVantageDataParser<SingleQuoteData>>();
 
             _mockParserFactory = new Mock<IAlphaVantageDataParserFactory>();
             _mockParserFactory.Setup(x => x.GetSingleQuoteDataParser()).Returns(_singleQuoteDataCsvParser.Object);
@@ -71,11 +74,12 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         [Fact]
         public async Task GetSingleQuoteData_ShouldReturnQueryResultWithError_WhenParsingError()
         {
+            var query = new SingleQuoteQuery(-1);
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
             SetupMockHttpClient("", HttpStatusCode.OK);
-            _singleQuoteDataCsvParser.Setup(x => x.ParseJson(It.IsAny<string>())).Throws(new Exception());
+            _singleQuoteDataCsvParser.Setup(x => x.ParseJson(It.IsAny<int>(), It.IsAny<string>())).Throws(new Exception());
 
-            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
+            var queryResult = await client.GetSingleQuoteData(query, "MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
             Assert.NotNull(queryResult.ErrorMessage);
@@ -101,7 +105,8 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             var httpClient = new HttpClient(handlerMock.Object);
             _mockHttpFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
+            var query = new SingleQuoteQuery(-1);
+            var queryResult = await client.GetSingleQuoteData(query, "MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
             Assert.NotNull(queryResult.ErrorMessage);
@@ -113,7 +118,8 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
             SetupMockHttpClient("", HttpStatusCode.Unauthorized);
 
-            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
+            var query = new SingleQuoteQuery(-1);
+            var queryResult = await client.GetSingleQuoteData(query, "MSFT", "NASDAQ");
 
             Assert.True(queryResult.HasError);
         }
@@ -121,8 +127,9 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
         [Fact]
         public async Task GetSingleQuoteData_ShouldReturnSingleQuoteQueryResultWithoutError_WhenSuccessful()
         {
-            var singleQuoteData = new StockSingleQuoteData(
-                    symbol: "MSFT",
+            var singleQuoteData = new SingleQuoteData(
+                    symbolId: 1,
+                    ticker: "MSFT",
                     high: 1,
                     low: 2,
                     open: 3,
@@ -137,12 +144,13 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
 
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);
             SetupMockHttpClient("mockData", HttpStatusCode.OK);
-            _singleQuoteDataCsvParser.Setup(x => x.ParseJson(It.IsAny<string>())).Returns(singleQuoteData);
+            _singleQuoteDataCsvParser.Setup(x => x.ParseJson(-1, It.IsAny<string>())).Returns(singleQuoteData);
 
-            var queryResult = await client.GetSingleQuoteData("MSFT", "NASDAQ");
+            var query = new SingleQuoteQuery(-1);
+            var queryResult = await client.GetSingleQuoteData(query, "MSFT", "NASDAQ");
 
             Assert.False(queryResult.HasError);
-            Assert.Equal("MSFT", queryResult.Data.Symbol);
+            Assert.Equal("MSFT", queryResult.Data.Ticker);
             Assert.Equal(singleQuoteData.LastUpdated, queryResult.Data.LastUpdated);
         }
     }

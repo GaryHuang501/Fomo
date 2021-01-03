@@ -22,7 +22,7 @@ namespace FomoAPIUnitTests.Application
     {
         private readonly SingleQuoteCache _cache;
         private readonly StockDataService _service;
-        private readonly StockSingleQuoteData _singleQuoteData;
+        private readonly SingleQuoteData _singleQuoteData;
 
         private Mock<IStockDataRepository> _stockDataRepository;
 
@@ -44,8 +44,9 @@ namespace FomoAPIUnitTests.Application
                                             new QuerySubscriptions(),
                                             new Mock<ILogger<StockDataService>>().Object);
 
-            _singleQuoteData = new StockSingleQuoteData(
-                    symbol: "MSFT",
+            _singleQuoteData = new SingleQuoteData(
+                    symbolId: 1,
+                    ticker: "MSFT",
                     high: 1,
                     low: 2,
                     open: 3,
@@ -110,7 +111,7 @@ namespace FomoAPIUnitTests.Application
 
             StockSingleQuoteDataDTO data = await _service.GetSingleQuoteData(query.SymbolId);
 
-            Assert.Equal(queryResult.Data, data.SingleQuoteData);
+            Assert.Equal(queryResult.Data, data.Data);
             _stockDataRepository.Verify(s => s.GetSingleQuoteData(It.IsAny<int>()), Times.Never);
         }
 
@@ -124,7 +125,7 @@ namespace FomoAPIUnitTests.Application
 
             StockSingleQuoteDataDTO data = await _service.GetSingleQuoteData(query.SymbolId);
 
-            Assert.Equal(queryResult.Data, data.SingleQuoteData);
+            Assert.Equal(queryResult.Data, data.Data);
             _stockDataRepository.Verify(s => s.GetSingleQuoteData(It.IsAny<int>()), Times.Once);
             _cache.TryGet(query.SymbolId, out SingleQuoteQueryResult cachedResult);
 
@@ -134,11 +135,11 @@ namespace FomoAPIUnitTests.Application
         [Fact]
         public async Task GetSingleQuoteData_ShouldReturnEmptyDataSet_WhenNotInDBOrCache()
         {
-            _stockDataRepository.Setup(s => s.GetSingleQuoteData(It.IsAny<int>())).Returns(Task.FromResult<StockSingleQuoteData>(null));
+            _stockDataRepository.Setup(s => s.GetSingleQuoteData(It.IsAny<int>())).Returns(Task.FromResult<SingleQuoteData>(null));
 
             StockSingleQuoteDataDTO data = await _service.GetSingleQuoteData(1);
 
-            Assert.Null(data.SingleQuoteData);
+            Assert.Null(data.Data);
             Assert.Null(data.LastUpdated);
 
         }

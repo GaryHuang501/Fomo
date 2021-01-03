@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FomoAPI.Domain.Stocks.Queries
 {
     /// <summary>
-    /// Query to fetch <see cref="StockSingleQuoteData"/>for a stock.
+    /// Query to fetch <see cref="SingleQuoteData"/>for a stock.
     /// </summary>
     public class SingleQuoteQuery : StockQuery
     {

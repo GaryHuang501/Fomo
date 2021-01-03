@@ -12,6 +12,8 @@ namespace FomoAPI.Application.EventBuses
     /// </summary>
     /// <remarks>
     /// Queue will not enqueue queries that have been on the queue before until it has been cleared.
+    /// 
+    /// Dequeue
     /// </remarks>
     public class QueryQueue
     {
@@ -29,12 +31,12 @@ namespace FomoAPI.Application.EventBuses
         }
 
         /// <summary>
-        /// The queue of queries to keep track of the next pneding queries to execute
+        /// The queue of queries to keep track of the next pending queries to execute
         /// </summary>
         private readonly Queue<StockQuery> _queue;
 
         /// <summary>
-        /// Hashset to keep track what queries are pending queue. 
+        /// Keep track the current status of queries <see cref="QueryStatus"/>
         /// </summary>
         private readonly Dictionary<StockQuery, StatusInfo> _queryStatus;
 
@@ -76,9 +78,11 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// Dequeue <see cref="StockQuery"/> items from queue equal to the given count.
         /// Dequeued queries are marked as executing.
-        /// If count exceeds the set's size, the set will return all items
+        /// 
+        /// If count exceeds the set's size, the set will return all items.
+        /// Dequeued items cannot be enqueued again while it is in executing state.
         /// </summary>
-        /// <returns>The dequeued <see cref="Stockquery"/></returns>
+        /// <returns>The dequeued <see cref="StockQuery"/></returns>
         /// <remarks>IList is used to avoid deferred natured of IEnumreable potential causing race conditions.</remarks>
         public IList<StockQuery> Dequeue(int count)
         {

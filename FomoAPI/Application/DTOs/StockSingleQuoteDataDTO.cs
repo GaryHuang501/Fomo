@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace FomoAPI.Application.DTOs
 {
     /// <summary>
-    /// DTO for <see cref="StockSingleQuoteData"/> to client
+    /// DTO for <see cref="Domain.Stocks.SingleQuoteData"/> to client
     /// </summary>
     public class StockSingleQuoteDataDTO
     {
         public int SymbolId { get; private set; }
 
-        public StockSingleQuoteData SingleQuoteData { get; private set; }
+        public SingleQuoteData Data { get; private set; }
 
         public DateTime? LastUpdated { get; set; }
 
@@ -23,10 +23,10 @@ namespace FomoAPI.Application.DTOs
         /// </summary>
         /// <param name="symbolId">SymbolId of Stock</param>
         /// <param name="singleQuoteData">The <see cref="SingleQuoteData"/></param>
-        public StockSingleQuoteDataDTO(int symbolId, StockSingleQuoteData singleQuoteData)
+        public StockSingleQuoteDataDTO(int symbolId, SingleQuoteData singleQuoteData)
         {
             SymbolId = symbolId > 0 ? symbolId : throw new ArgumentException(nameof(symbolId), "must be greater than 0");
-            SingleQuoteData = singleQuoteData ?? throw new NullReferenceException(nameof(singleQuoteData));
+            Data = singleQuoteData ?? throw new NullReferenceException(nameof(singleQuoteData));
             LastUpdated = singleQuoteData.LastUpdated;
         }
 
@@ -37,15 +37,15 @@ namespace FomoAPI.Application.DTOs
         public StockSingleQuoteDataDTO(int symbolId)
         {
             SymbolId = symbolId > 0 ? symbolId : throw new ArgumentException(nameof(symbolId), "must be greater than 0");
-            SingleQuoteData = null;
+            Data = null;
             LastUpdated = null;
         }
 
         [JsonConstructor]
-        public StockSingleQuoteDataDTO(int symbolId, StockSingleQuoteData singleQuoteData, DateTime? lastUpdated)
+        public StockSingleQuoteDataDTO(int symbolId, SingleQuoteData data, DateTime? lastUpdated)
         {
             SymbolId = symbolId;
-            SingleQuoteData = singleQuoteData;
+            Data = data;
             LastUpdated = lastUpdated;
         }
 

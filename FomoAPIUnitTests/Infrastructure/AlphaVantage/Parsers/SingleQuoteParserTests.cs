@@ -18,9 +18,9 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
             var parser = new SingleQuoteParser();
-            var singleQuoteData = parser.ParseCsv(reader);
+            var singleQuoteData = parser.ParseCsv(-1, reader);
 
-            Assert.Equal("MSFT", singleQuoteData.Symbol);
+            Assert.Equal("MSFT", singleQuoteData.Ticker);
             Assert.Equal(134.8800m, singleQuoteData.Open);
             Assert.Equal(139.1000m, singleQuoteData.High);
             Assert.Equal(136.2800m, singleQuoteData.Low);
@@ -41,7 +41,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             var reader = new StreamReader(stream);
             var parser = new SingleQuoteParser();
 
-            Assert.Throws<ArgumentException>(() => parser.ParseCsv(reader));
+            Assert.Throws<ArgumentException>(() => parser.ParseCsv(-1, reader));
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             var reader = new StreamReader(stream);
             var parser = new SingleQuoteParser();
 
-            Assert.Throws<ArgumentException>(() => parser.ParseCsv(reader));
+            Assert.Throws<ArgumentException>(() => parser.ParseCsv(-1, reader));
         }
 
         [Theory]
@@ -77,7 +77,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvData));
             var reader = new StreamReader(stream);
             var parser = new SingleQuoteParser();
-            Assert.Throws<KeyNotFoundException>(() => parser.ParseCsv(reader));
+            Assert.Throws<KeyNotFoundException>(() => parser.ParseCsv(-1, reader));
         }
 
     }

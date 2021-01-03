@@ -33,10 +33,11 @@ namespace FomoAPIIntegrationTests.ContractTests
         [Fact]
         public async Task GetSingleQuote_ShouldReturnSingleQuoteStockData()
         {
-            var stockSymbol = "MSFT";
+            var query = new SingleQuoteQuery(-1);
+            var ticker = "MSFT";
             var alphaVantageClient = new AlphaVantageClient(_mockHttpFactory, _mockAlphaVantageOptionsAccessor.Object, _parserFactory, _mockLogger.Object);
 
-            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(stockSymbol, "NASDAQ");
+            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(query, ticker, "NASDAQ");
 
             Assert.False(singleQuoteResult.HasError);
 
@@ -48,16 +49,17 @@ namespace FomoAPIIntegrationTests.ContractTests
             Assert.True(singleQuoteResult.Data.PreviousClose >= 0);
             Assert.True(singleQuoteResult.Data.LastUpdated > new DateTime());
             Assert.True(singleQuoteResult.Data.LastTradingDay > new DateTime());
-            Assert.Equal(stockSymbol, singleQuoteResult.Data.Symbol);
+            Assert.Equal(ticker, singleQuoteResult.Data.Ticker);
         }
 
         [Fact]
         public async Task GetSingleQuote_ShouldReturnErrorWhenUnknownSymbol()
         {
-            var stockSymbol = "AB1234567890";
+            var query = new SingleQuoteQuery(-1);
+            var ticker = "AB1234567890";
             var alphaVantageClient = new AlphaVantageClient(_mockHttpFactory, _mockAlphaVantageOptionsAccessor.Object, _parserFactory, _mockLogger.Object);
 
-            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(stockSymbol, "NYSE");
+            SingleQuoteQueryResult singleQuoteResult = await alphaVantageClient.GetSingleQuoteData(query, ticker, "NYSE");
 
             Assert.True(singleQuoteResult.HasError);
             Assert.False(string.IsNullOrEmpty(singleQuoteResult.ErrorMessage));
@@ -73,7 +75,7 @@ namespace FomoAPIIntegrationTests.ContractTests
 
             Assert.True(searchResults.Count() > 1);
 
-            Assert.Equal(stockSymbol, searchResults.First().Symbol);
+            Assert.Equal(stockSymbol, searchResults.First().Ticker);
 
             SymbolSearchResult msftSymbol = searchResults.First();
 

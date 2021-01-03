@@ -58,14 +58,14 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
             _logger.LogTrace("Executing query http request url: {url}", urlWithQueryString);
 
-            return content.BestMatches.Select(m => new SymbolSearchResult(symbol: m.Symbol, fullName: m.Name, m.MatchScore));
+            return content.BestMatches.Select(m => new SymbolSearchResult(ticker: m.Symbol, fullName: m.Name, m.MatchScore));
         }
 
-        public async Task<SingleQuoteQueryResult> GetSingleQuoteData(string ticker, string exchangeName)
+        public async Task<SingleQuoteQueryResult> GetSingleQuoteData(StockQuery query, string ticker, string exchangeName)
         {
             var alphaVantageQuery = new AlphaVantageQuery(QueryFunctionType.SingleQuote, ticker);
 
-            var alphaVantageQueryResult = await GetQueryData<StockSingleQuoteData>(alphaVantageQuery, _parserFactory.GetSingleQuoteDataParser());
+            var alphaVantageQueryResult = await GetQueryData<SingleQuoteData>(query.SymbolId, alphaVantageQuery, _parserFactory.GetSingleQuoteDataParser());
 
             if(alphaVantageQueryResult.HasError)
             {
@@ -81,7 +81,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
         /// </summary>
         /// <param name="query">Query object used to generate the request</param>
         /// <returns></returns>
-        private async Task<AlphaVantageQueryResult<TData>> GetQueryData<TData>(AlphaVantageQuery query, IAlphaVantageDataParser<TData> parser)
+        private async Task<AlphaVantageQueryResult<TData>> GetQueryData<TData>(int symbolId, AlphaVantageQuery query, IAlphaVantageDataParser<TData> parser)
             where TData : StockData  
         {
             AlphaVantageQueryResult<TData> queryResult;
@@ -106,7 +106,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                     try
                     {
                         json = await response.Content.ReadAsStringAsync();
-                        data = parser.ParseJson(json);
+                        data = parser.ParseJson(symbolId, json);
                         queryResult = new AlphaVantageQueryResult<TData>(data);
                     }
                     catch(Exception) when (json.Contains("Error Message"))
@@ -114,12 +114,12 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                         var errorJson = await response.Content.ReadAsStringAsync();
                         var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
                         queryResult = new AlphaVantageQueryResult<TData>(error: errorObject.ErrorMessage);
-                        _logger.LogError("Alphavantage Error for query: {error}", query.Symbol, errorObject.ErrorMessage);
+                        _logger.LogError("Alphavantage Error for query: {error}", query.Ticker, errorObject.ErrorMessage);
                     }
                     catch(Exception ex)
                     {
                         queryResult = new AlphaVantageQueryResult<TData>(error: $"Exception: {ex.Message}");
-                        _logger.LogError(ex, "Failed to parse alphavantage data for query {query}", query.Symbol);
+                        _logger.LogError(ex, "Failed to parse alphavantage data for query {query}", query.Ticker);
                     }
                 }
                 else

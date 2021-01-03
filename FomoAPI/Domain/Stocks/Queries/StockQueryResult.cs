@@ -4,7 +4,7 @@ namespace FomoAPI.Domain.Stocks.Queries
 {
     public abstract class StockQueryResult
     {
-        public string Symbol { get; private set; }
+        public string Ticker { get; private set; }
 
         public StockData Data { get; private set; }
 
@@ -12,9 +12,9 @@ namespace FomoAPI.Domain.Stocks.Queries
 
         public string ErrorMessage { get; private set; }
 
-        protected StockQueryResult(string symbol, StockData data, DateTime lastUpdated)
+        protected StockQueryResult(string ticker, StockData data, DateTime lastUpdated)
         {
-            Symbol = symbol;
+            Ticker = ticker;
             Data = data;
             LastUpdated = lastUpdated;
         }

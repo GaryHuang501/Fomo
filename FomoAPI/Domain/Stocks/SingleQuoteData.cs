@@ -8,7 +8,7 @@ namespace FomoAPI.Domain.Stocks
     /// <summary>
     /// Latest stock data for a given stock.
     /// </summary>
-    public class StockSingleQuoteData : StockData, IEntity
+    public class SingleQuoteData : StockData, IEntity
     {
         public decimal High { get; private set; }
 
@@ -26,14 +26,17 @@ namespace FomoAPI.Domain.Stocks
 
         public long Volume { get; private set; }
 
-        public string Symbol { get; private set; }
+        public string Ticker { get; private set; }
+
+        public int SymbolId { get; private set; }
 
         public DateTime LastTradingDay { get; private set; }
 
         [JsonConstructor]
         [ExplicitConstructor]
-        public StockSingleQuoteData(
-            string symbol,
+        public SingleQuoteData(
+            int symbolId,
+            string ticker,
             decimal high,
             decimal low,
             decimal open,
@@ -45,7 +48,8 @@ namespace FomoAPI.Domain.Stocks
             DateTime lastUpdated, 
             DateTime lastTradingDay)
         {
-            Symbol = symbol;
+            SymbolId = symbolId;
+            Ticker = ticker;
             High = high;
             Low = low;
             Open = open;

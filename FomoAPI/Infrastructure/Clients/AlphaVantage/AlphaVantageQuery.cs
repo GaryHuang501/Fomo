@@ -16,16 +16,16 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
     {
         public QueryFunctionType FunctionType { get; }
 
-        public string Symbol { get; }
+        public string Ticker { get; }
 
         public DateTime CreateDate { get; }
 
-        public AlphaVantageQuery(QueryFunctionType functionType, string symbol)
+        public AlphaVantageQuery(QueryFunctionType functionType, string ticker)
         {
-            if (string.IsNullOrEmpty(symbol)) throw new ArgumentNullException(nameof(symbol));
+            if (string.IsNullOrEmpty(ticker)) throw new ArgumentNullException(nameof(ticker));
 
             FunctionType = functionType;
-            Symbol = symbol;
+            Ticker = ticker;
             CreateDate = DateTime.UtcNow;
         }
 
@@ -36,7 +36,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             return new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
             {
                 { AlphaVantageQueryKeys.Function, FunctionType.Name },
-                { AlphaVantageQueryKeys.Symbol, Symbol },
+                { AlphaVantageQueryKeys.Symbol, Ticker },
                 { AlphaVantageQueryKeys.DataType, DataType.Name }
             });
         }

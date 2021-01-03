@@ -24,16 +24,17 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Get Single quote data from database.
         /// </summary>
         /// <param name="symbolId">SymbolId of stock data to retrieve.</param>
-        /// <returns><see cref="StockSingleQuoteData"/></returns>
+        /// <returns><see cref="SingleQuoteData"/></returns>
         /// <remarks>
         /// Is not thread safe if same items are inserted at the same time. 
         /// But that's fine since the stock data is unlikely to be different if it's that close in time.
         /// This is more performant than adding locks.
         /// </remarks>
-        public async Task<StockSingleQuoteData> GetSingleQuoteData(int symbolId)
+        public async Task<SingleQuoteData> GetSingleQuoteData(int symbolId)
         {
             var sql = @"SELECT
                             SymbolId,
+                            Symbol.Ticker,
                             Price,
                             High,
                             Low,
@@ -46,11 +47,15 @@ namespace FomoAPI.Infrastructure.Repositories
                             LastTradingDay
                         FROM
                             SingleQuoteData
+                        INNER JOIN
+                            Symbol
+                        ON
+                            Symbol.Id = SingleQuoteData.SymbolId
                         WHERE
                             SymbolId = @SymbolId";
 
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QuerySingleOrDefaultAsync<StockSingleQuoteData>(sql, new { SymbolId = symbolId });
+            return await connection.QuerySingleOrDefaultAsync<SingleQuoteData>(sql, new { SymbolId = symbolId });
         }
 
         public async Task<bool> UpsertSingleQuoteData(UpsertSingleQuoteData data)

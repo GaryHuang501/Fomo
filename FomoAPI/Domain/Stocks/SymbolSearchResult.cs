@@ -8,16 +8,16 @@ namespace FomoAPI.Domain.Stocks
 {
     public class SymbolSearchResult
     {
-        public string Symbol { get; private set; }
+        public string Ticker { get; private set; }
 
         public string FullName { get; private set; }
 
         public decimal Match { get; private set; }
 
         [JsonConstructor]
-        public SymbolSearchResult(string symbol, string fullName, decimal match)
+        public SymbolSearchResult(string ticker, string fullName, decimal match)
         {
-            Symbol = symbol;
+            Ticker = ticker;
             FullName = fullName;
             Match = match;
         }

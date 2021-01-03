@@ -96,8 +96,9 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             query1.SetMockQueryContext(_mockContext);
             query2.SetMockQueryContext(_mockContext);
 
-            var stockData = new StockSingleQuoteData(
-                    symbol: "MSFT",
+            var stockData = new SingleQuoteData(
+                    symbolId: 1,
+                    ticker: "MSFT",
                     high: 1,
                     low: 2,
                     open: 3,

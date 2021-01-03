@@ -8,7 +8,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 {
     public class AlphaVantageParserFactory: IAlphaVantageDataParserFactory
     {
-        public IAlphaVantageDataParser<StockSingleQuoteData> GetSingleQuoteDataParser()
+        public IAlphaVantageDataParser<SingleQuoteData> GetSingleQuoteDataParser()
         {
             return new SingleQuoteParser();
         }

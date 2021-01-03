@@ -13,9 +13,11 @@ namespace FomoAPI.Infrastructure.Stocks
         /// <summary>
         /// Get the single quote data from the third party api.
         /// </summary>
-        /// <param name="symbol">Symbol for the query be executed.</param>
-        /// <returns><see cref="StockSingleQuoteData"/></returns>
-        Task<SingleQuoteQueryResult> GetSingleQuoteData(string ticker, string exchangeName);
+        /// <param name="query"></param>
+        /// <param name="ticker"></param>
+        /// <param name="exchangeName"></param>
+        /// <returns><see cref="SingleQuoteData"/></returns>
+        Task<SingleQuoteQueryResult> GetSingleQuoteData(StockQuery query, string ticker, string exchangeName);
 
         /// <summary>
         /// Gets the top ticker search results for a given keyword from the client

@@ -2,6 +2,7 @@
 using FomoAPI.Application.DTOs;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPIIntegrationTests.Fixtures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,11 +87,11 @@ namespace FomoAPIIntegrationTests.Scenarios
             var dataDto = dataDtos[0];
 
             Assert.Equal(searchResult.SymbolId, dataDto.SymbolId);
-            Assert.Null(dataDto.SingleQuoteData);
+            Assert.Null(dataDto.Data);
 
             var startTime = DateTime.UtcNow;
 
-            while (dataDto.SingleQuoteData == null)
+            while (dataDto.Data == null)
             {
                 await CheckTimeOut(startTime);
 
@@ -112,12 +113,12 @@ namespace FomoAPIIntegrationTests.Scenarios
             var dataDto = dataDtos[0];
 
             Assert.Equal(searchResult.SymbolId, dataDto.SymbolId);
-            Assert.Null(dataDto.SingleQuoteData);
+            Assert.Null(dataDto.Data);
 
             var startTime = DateTime.UtcNow;
 
             // Wait for query to execute and until there is data
-            while (dataDto.SingleQuoteData == null)
+            while (dataDto.Data == null)
             {
                 await CheckTimeOut(startTime);
 
@@ -169,12 +170,12 @@ namespace FomoAPIIntegrationTests.Scenarios
             var dataDto = dataDtos[0];
 
             Assert.Equal(searchResult.SymbolId, dataDto.SymbolId);
-            Assert.Null(dataDto.SingleQuoteData);
+            Assert.Null(dataDto.Data);
 
             var startTime = DateTime.UtcNow;
 
             // Wait for query to execute and until there is data
-            while (dataDto.SingleQuoteData == null)
+            while (dataDto.Data == null)
             {
                 await CheckTimeOut(startTime);
 
@@ -226,12 +227,12 @@ namespace FomoAPIIntegrationTests.Scenarios
             List<StockSingleQuoteDataDTO> dataDtos = await GetSingleQuoteData(symbolIdsToGet);
             Assert.Equal(3, dataDtos.Count());
 
-            Assert.All(dataDtos, d => Assert.Null(d.SingleQuoteData));
+            Assert.All(dataDtos, d => Assert.Null(d.Data));
 
             var startTime = DateTime.UtcNow;
 
             // Wait for query to execute until all populated
-            while (dataDtos.Count(d => d.SingleQuoteData == null) != 0)
+            while (dataDtos.Count(d => d.Data == null) != 0)
             {
                 await CheckTimeOut(startTime);
 
@@ -271,12 +272,12 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             Assert.Equal(4, dataDtos.Count());
 
-            Assert.All(dataDtos, d => Assert.Null(d.SingleQuoteData));
+            Assert.All(dataDtos, d => Assert.Null(d.Data));
 
             var startTime = DateTime.UtcNow;
 
             // Wait for query to execute until all populated
-            while (dataDtos.Count(d => d.SingleQuoteData == null) != 0)
+            while (dataDtos.Count(d => d.Data == null) != 0)
             {
                 await CheckTimeOut(startTime);
 
@@ -292,15 +293,15 @@ namespace FomoAPIIntegrationTests.Scenarios
         private void AssertSingleQuote(StockSingleQuoteDataDTO dataDto, int expectedSymbolId)
         {
             Assert.Equal(expectedSymbolId, dataDto.SymbolId);
-            Assert.NotNull(dataDto.SingleQuoteData);
-            Assert.True(dataDto.SingleQuoteData.Low >= 0);
-            Assert.True(dataDto.SingleQuoteData.High >= 0);
-            Assert.True(dataDto.SingleQuoteData.Open >= 0);
-            Assert.True(dataDto.SingleQuoteData.Volume >= 0);
-            Assert.True(dataDto.SingleQuoteData.Price >= 0);
-            Assert.True(dataDto.SingleQuoteData.PreviousClose >= 0);
-            Assert.True(dataDto.SingleQuoteData.LastUpdated > new DateTime());
-            Assert.True(dataDto.SingleQuoteData.LastTradingDay > new DateTime());
+            Assert.NotNull(dataDto.Data);
+            Assert.True(dataDto.Data.Low >= 0);
+            Assert.True(dataDto.Data.High >= 0);
+            Assert.True(dataDto.Data.Open >= 0);
+            Assert.True(dataDto.Data.Volume >= 0);
+            Assert.True(dataDto.Data.Price >= 0);
+            Assert.True(dataDto.Data.PreviousClose >= 0);
+            Assert.True(dataDto.Data.LastUpdated > new DateTime());
+            Assert.True(dataDto.Data.LastTradingDay > new DateTime());
         }
 
 
@@ -313,7 +314,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             await Task.Delay(100);
 
-            if (DateTime.UtcNow > startTime.AddSeconds(50))
+            if (DateTime.UtcNow > startTime.AddSeconds(150))
             {
                 throw new TimeoutException("Valid data was never returned");
             }
@@ -332,11 +333,17 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             var response = await _client.GetAsync(ApiPath.SymbolSearchPath(ticker, 1));
             response.EnsureSuccessStatusCode();
-            var searchResults = await response.Content.ReadAsAsync<IEnumerable<SymbolSearchResultDTO>>();
+            var searchResultsJson = await response.Content.ReadAsStringAsync();
+   
+            var settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Error;
+            settings.NullValueHandling = NullValueHandling.Include;
+
+            var searchResults = JsonConvert.DeserializeObject<IEnumerable<SymbolSearchResultDTO>>(searchResultsJson, settings);
 
             var result = searchResults.Single();
 
-            Assert.Equal(ticker, result.Symbol);
+            Assert.Equal(ticker, result.Ticker);
 
             return searchResults.Single();
         }

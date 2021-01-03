@@ -26,7 +26,7 @@ namespace FomoAPI.Application.DTOs
 
         public int SymbolId { get; set; }
 
-        public string Symbol { get; set; }
+        public string Ticker { get; set; }
 
         public SymbolSearchResultDTO(SymbolSearchResult searchResult, Symbol symbol)
         {
@@ -35,12 +35,12 @@ namespace FomoAPI.Application.DTOs
             ExchangeName = symbol.ExchangeName;
             FullName = searchResult.FullName;
             Match = searchResult.Match;
-            Symbol = searchResult.Symbol;
+            Ticker = searchResult.Ticker;
             SymbolId = symbol.Id;
         }
 
         [JsonConstructor]
-        public SymbolSearchResultDTO(bool delisted, int exchangeId, string exchangeName, string fullName, decimal match, int symbolId, string symbol)
+        public SymbolSearchResultDTO(bool delisted, int exchangeId, string exchangeName, string fullName, decimal match, int symbolId, string ticker)
         {
             Delisted = delisted;
             ExchangeId = exchangeId;
@@ -48,7 +48,7 @@ namespace FomoAPI.Application.DTOs
             FullName = fullName;
             Match = match;
             SymbolId = symbolId;
-            Symbol = symbol;
+            Ticker = ticker;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
     /// <summary>
     /// Parser class used in AlphaVantage to map CSV query response data to StockSingleQuoteData.
     /// </summary>
-    public class SingleQuoteParser : IAlphaVantageDataParser<StockSingleQuoteData>
+    public class SingleQuoteParser : IAlphaVantageDataParser<SingleQuoteData>
     {
         private readonly JsonSerializerSettings _settings;
 
@@ -21,10 +21,10 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
             _settings.NullValueHandling = NullValueHandling.Include;
         }
 
-        public StockSingleQuoteData ParseJson(string json)
+        public SingleQuoteData ParseJson(int symbolId, string json)
         {
             var data =  JsonConvert.DeserializeObject<AlphaVantageSingleQuote>(json, _settings);
-            return data.ToDomain();
+            return data.ToDomain(symbolId);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
         /// </summary>
         /// <param name="reader">Reader holding the response data</param>
         /// <returns></returns>
-        public StockSingleQuoteData ParseCsv(StreamReader reader)
+        public SingleQuoteData ParseCsv(int symbolId, StreamReader reader)
         {
             string headerLine = reader.ReadLine();
 
@@ -67,10 +67,10 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
 
             var mappedData = MapData(columnHeaderValueMap);
 
-            return mappedData;
+            return mappedData.ToDomain(symbolId);
         }
 
-        private StockSingleQuoteData MapData(Dictionary<string, string> columnHeaderValueMap)
+        private AlphaVantageSingleQuote MapData(Dictionary<string, string> columnHeaderValueMap)
         {
             string symbol = columnHeaderValueMap[nameof(symbol)];
             decimal high = decimal.Parse(columnHeaderValueMap[nameof(high)]);
@@ -83,19 +83,22 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
             decimal price = decimal.Parse(columnHeaderValueMap[nameof(price)]);
             DateTime latestDay = DateTime.Parse(columnHeaderValueMap[nameof(latestDay)]);
 
-            return new StockSingleQuoteData(
-                    symbol: symbol,
-                    high: high,
-                    low: low,
-                    open: open,
-                    previousClose: previousClose,
-                    volume: volume,
-                    change: change,
-                    price: price,
-                    changePercent: decimal.Parse(changePercent.Trim().Replace("%", string.Empty)),
-                    lastTradingDay: latestDay,
-                    lastUpdated: DateTime.UtcNow
-                );
+            var globalQuote = new GlobalQuote
+            {
+                Symbol = symbol,
+                High = high,
+                Low = low,
+                Open = open,
+                PreviousClose = previousClose,
+                Volume = volume,
+                Change = change,
+                Price = price,
+                ChangePercent = changePercent,
+                LastTradingDay = latestDay,
+                LastUpdated = DateTime.UtcNow
+            };
+
+            return new AlphaVantageSingleQuote { Data = globalQuote };
         }
     }
 }
