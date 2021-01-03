@@ -31,7 +31,8 @@ export const portfolioSlice = createSlice({
 
         },
         fetchIdStatus: "idle",
-        fetchPortfolioStatus: "idle"
+        fetchPortfolioStatus: "idle",
+        addPortfolioSymbolStatus: "idle"
     },
     reducers: {
         setSelectedPortfolioId: (state, action) => {
@@ -58,8 +59,19 @@ export const portfolioSlice = createSlice({
         },
         [fetchPortfolio.rejected]: (state, action) => {
             state.fetchPortfolioStatus = 'failed';
-        }
-    }
+        },
+        [addPortfolioStock.pending]: (state, action) => {
+            state.addPortfolioSymbolStatus = 'loading';
+        },
+        [addPortfolioStock.fulfilled]: (state, action) => {
+            state.addPortfolioSymbolStatus = 'succeeded';
+            state.portfolios[state.selectedPortfolioId].portfolioSymbols.push(action.payload);
+
+        },
+        [addPortfolioStock.rejected]: (state, action) => {
+            state.addPortfolioSymbolStatus = 'rejected';
+        },
+    } 
 });
 
 export const { setSelectedPortfolioId } = portfolioSlice.actions;

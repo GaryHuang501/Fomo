@@ -94,7 +94,7 @@ namespace FomoAPI.Controllers
         [HttpPost("{id}/portfolioSymbols")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
+        public async Task<ActionResult<PortfolioSymbol>> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
         {          
            var portfolioSymbol = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.SymbolId);
 

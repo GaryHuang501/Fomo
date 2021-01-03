@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/fontawesome-free-5.14.0-web/css/fontawesome.min.css';
 import '../../assets/fontawesome-free-5.14.0-web/css/solid.min.css';
-import { DebounceInput } from 'react-debounce-input';
-import { useDispatch, useSelector} from 'react-redux'
 import './StockSearchBar.css';
-import { StockSearchMatch } from './StockSearchMatch'
-import { searchStocks, selectStockSearchResults, selectStockSearchStatus } from './StockSearchSlice'
+
+import React, { useEffect, useRef, useState } from 'react';
 import { addPortfolioStock, selectSelectedPortfolioId } from '../portfolio/PortfolioSlice'
+import { searchStocks, selectStockSearchResults, selectStockSearchStatus } from './StockSearchSlice'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { DebounceInput } from 'react-debounce-input';
+import { StockSearchMatch } from './StockSearchMatch'
 
 export const StockSearchBar = function () {
 
@@ -55,7 +57,7 @@ export const StockSearchBar = function () {
 
     for (const result of stockSearchResults) {
       const match = <StockSearchMatch 
-                      key={result.symbol} 
+                      key={result.symbolId} 
                       match={result}
                       onClick={onClickStockMatch}/>;
 
@@ -68,10 +70,10 @@ export const StockSearchBar = function () {
       resultBox = <div id='stock-search-results'>{potentialMatches}</div>
     }
     else if(stockSearchStatus  === 'loading'){
-      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "Searching..."}} /></div>
+      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ ticker: null, fullName: "Searching..."}} /></div>
     }
     else if(searchKeywords.trim().length > 0 && stockSearchStatus  === 'succeeded'){
-      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ symbol: null, fullName: "No results found."}} /></div>
+      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ ticker: null, fullName: "No results found."}} /></div>
     }
     
     return resultBox;
