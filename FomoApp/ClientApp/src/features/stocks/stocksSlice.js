@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-export const fetchStockSingleQuotes = createAsyncThunk('fetchStockSingleQuote/', async (symbolIds, thunkApi) => {
+export const fetchStockSingleQuoteDatas = createAsyncThunk('fetchStockSingleQuoteDatas/', async (symbolIds, thunkApi) => {
 
     let idQuery = "";
 
@@ -18,8 +18,8 @@ export const fetchStockSingleQuotes = createAsyncThunk('fetchStockSingleQuote/',
         idQuery += `symbolIds=${id}`
     }
 
-    console.log(`${apiUrl}/SingleQuoteData?${idQuery}`);
-    const response = await axios.get(`${apiUrl}/SingleQuoteData?${idQuery}`);
+    console.log(`${apiUrl}/singleQuoteData?${idQuery}`);
+    const response = await axios.get(`${apiUrl}/singleQuoteData?${idQuery}`);
 
     return response.data;
 });
@@ -27,30 +27,59 @@ export const fetchStockSingleQuotes = createAsyncThunk('fetchStockSingleQuote/',
 export const stocksSlice = createSlice({
     name: 'stocks',
     initialState: {
-        singleQuote:{      
+        singleQuoteData:{      
         }
     },
     reducers: {
     },
     extraReducers: {
-        [fetchStockSingleQuotes.fulfilled]: (state, action) => {
+        [fetchStockSingleQuoteDatas.fulfilled]: (state, action) => {
             console.log(action);
-            return;
-            for(const newSingleQuote of action.payload){
-                const current = state.singleQuote[action.payload.symbolId];
+            for(const newSingleQuoteData of action.payload){
 
-                if(!current && ( Date.parse(newSingleQuote.Data.lastUpdated) > Date.parse(current.lastUpdated)) ){
-                    state.singleQuote[current.symbolId] = newSingleQuote.data;
+                const current = state.singleQuoteData[action.payload.symbolId];
+                
+                const noCurrentDataExists = !current;
+                const isStaleData = noCurrentDataExists || Date.parse(newSingleQuoteData.lastUpdated) > Date.parse(current.lastUpdated);
+
+                if(isStaleData){ 
+                    
+                    const noDataOnServerYet = newSingleQuoteData.data === null;
+
+                    if (noDataOnServerYet){
+                        state.singleQuoteData[newSingleQuoteData.symbolId] = null
+                    }
+                    else{
+                        state.singleQuoteData[newSingleQuoteData.symbolId] = newSingleQuoteData.data;
+                    }
                 } 
             }
         },
     }
 });
 
+export const selectStocksLastUpdatedDates = function(state){
+
+    const dates = {};
+
+    for(const symbolId in state.singleQuoteData){
+
+        if(state.singleQuoteData == null){
+            dates[symbolId] = new Date("2000-01-01");
+        }
+        else
+        {
+            dates[symbolId] = state.singleQuoteData[symbolId].lastUpdated;
+        }
+    }
+
+    return dates;
+}
+
 
 export const selectStockData = function(state, portfolioSymbol){
-    if(portfolioSymbol.symbolId in state.stocks.singleQuote){
-        return state.stocks.singleQuote[portfolioSymbol.symbolId];
+    if(portfolioSymbol.symbolId in state.stocks.singleQuoteData){
+        return state.stocks.singleQuoteData[portfolioSymbol.symbolId];
     }
     else{
         return {

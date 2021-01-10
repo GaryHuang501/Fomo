@@ -11,11 +11,12 @@ export const PortfolioStock = (props) => {
     return (
         <tr className="portfolio-row portfolio-stock">
             <td className="portfolio-column portfolio-row-name">{props.portfolioSymbol.ticker}</td>
-            <td className="portfolio-column portoflio-stock-market-price">{stockData.marketPrice}</td>
-            <td className="portfolio-column portfolio-row-average-price">{stockData.averagePrice}</td>
-            <td className="portfolio-column portfolio-row-change">{stockData.change}</td>
-            <td className="portfolio-column portoflio-stock-bull-icon">{stockData.bull}</td>
-            <td className="portfolio-column portfolio-row-bear-icon">{stockData.bear}</td>
+            <td className="portfolio-column portoflio-stock-market-price">{stockData.price}</td>
+            <td className="portfolio-column portfolio-row-change">{Number.isFinite(stockData.changePercent) ? stockData.changePercent.toFixed(2): "--"}%</td>
+            <td className="portfolio-column portfolio-row-average-price">{stockData.averagePrice ?? "--"}</td>
+            <td className="portfolio-column portfolio-row-return">{stockData.return ?? "--"}</td>
+            <td className="portfolio-column portoflio-stock-bull-icon">{stockData.bull ?? 0}</td>
+            <td className="portfolio-column portfolio-row-bear-icon">{stockData.bear ?? 0}</td>
             <td className="portfolio-column portfolio-row-options">
                 <span className="portfolio-row-options-field">Up</span>
                 <span className="portfolio-row-options-field">Down</span>
