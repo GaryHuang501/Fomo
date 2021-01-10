@@ -14,9 +14,13 @@ namespace FomoAPI.Application.DTOs
     {
         public int SymbolId { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="SingleQuoteData"/>.
+        /// Null means no data exists.
+        /// </summary>
         public SingleQuoteData Data { get; private set; }
 
-        public DateTime? LastUpdated { get; set; }
+        public DateTime? LastUpdated { get; private set; }
 
         /// <summary>
         /// Instantiate instance of <see cref="StockSingleQuoteDataDTO"/> with data.

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Application.EventBuses
 {
+    /// <summary>
+    /// Info about the subscription to a query.
+    /// </summary>
     public class SubscriptionInfo
     {
         public StockQuery Query { get; private set; }
