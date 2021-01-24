@@ -2,8 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL;
-
 export const fetchStockSingleQuoteDatas = createAsyncThunk('fetchStockSingleQuoteDatas/', async (symbolIds, thunkApi) => {
 
     let idQuery = "";
@@ -17,11 +15,10 @@ export const fetchStockSingleQuoteDatas = createAsyncThunk('fetchStockSingleQuot
 
         idQuery += `symbolIds=${id}`
     }
-
-    console.log(`${apiUrl}/singleQuoteData?${idQuery}`);
-    const response = await axios.get(`${apiUrl}/singleQuoteData?${idQuery}`);
-
+    
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/singleQuoteData?${idQuery}`);
     return response.data;
+
 });
 
 export const stocksSlice = createSlice({
@@ -34,7 +31,6 @@ export const stocksSlice = createSlice({
     },
     extraReducers: {
         [fetchStockSingleQuoteDatas.fulfilled]: (state, action) => {
-            console.log(action);
             for(const newSingleQuoteData of action.payload){
 
                 const current = state.singleQuoteData[action.payload.symbolId];
@@ -62,14 +58,14 @@ export const selectStocksLastUpdatedDates = function(state){
 
     const dates = {};
 
-    for(const symbolId in state.singleQuoteData){
+    for(const symbolId in state.stocks.singleQuoteData){
 
-        if(state.singleQuoteData == null){
+        if(state.stocks.singleQuoteData == null){
             dates[symbolId] = new Date("2000-01-01");
         }
         else
         {
-            dates[symbolId] = state.singleQuoteData[symbolId].lastUpdated;
+            dates[symbolId] = state.stocks.singleQuoteData[symbolId].lastUpdated;
         }
     }
 
@@ -78,6 +74,7 @@ export const selectStocksLastUpdatedDates = function(state){
 
 
 export const selectStockData = function(state, portfolioSymbol){
+
     if(portfolioSymbol.symbolId in state.stocks.singleQuoteData){
         return state.stocks.singleQuoteData[portfolioSymbol.symbolId];
     }
@@ -85,11 +82,10 @@ export const selectStockData = function(state, portfolioSymbol){
         return {
             symbolId: portfolioSymbol.symbolId,
             ticker:  portfolioSymbol.ticker,
-            marketPrice: "Pending",
+            price: "Pending",
             averagePrice: "--",
             change: "--",
-            bull: "--",
-            bear: "--"
+            votes: 0
         }
     }
 }

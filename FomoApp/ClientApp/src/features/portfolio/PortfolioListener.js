@@ -14,7 +14,6 @@ import { singleQuoteDataPath } from '../../app/FireBasePaths';
  */
 export const PortfolioListener = function(){
 
-
     const portfolio = useSelector(selectPortfolio);
     const stockLastUpdatedDates = useSelector(selectStocksLastUpdatedDates, shallowEqual);
 
@@ -35,7 +34,6 @@ export const PortfolioListener = function(){
                 portfolioSymbolsToUpdate.push(portfolioSymbol);
             }
         }
-
 
         function addListenersPortfolioSymbol(){
             for(const portfolioSymbol of portfolio.portfolioSymbols){        

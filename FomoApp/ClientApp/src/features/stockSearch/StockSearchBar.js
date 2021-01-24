@@ -83,9 +83,9 @@ export const StockSearchBar = function () {
 
   return (
     <div id='stock-search-bar' ref={thisStockSearchBarRef}>
-      <form id='stock-search-bar-form' onSubmit={onSubmit}>
+      <form id='stock-search-bar-form' onSubmit={onSubmit} role='search'>
         <i className="fas fa-search-plus search-icon "></i>
-        <DebounceInput minLength={1} debounceTimeout={500} type="search" placeholder='Search for US stocks...' onChange={onKeywordChange} value={searchKeywords}></DebounceInput>
+        <DebounceInput role='searchbox' minLength={1} debounceTimeout={500} type="search" placeholder='Search for US stocks...' onChange={onKeywordChange} value={searchKeywords}></DebounceInput>
       </form>
       {searchResultsBox}
     </div>

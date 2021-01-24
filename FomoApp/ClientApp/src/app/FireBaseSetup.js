@@ -1,7 +1,8 @@
-import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
 import 'firebase/analytics';
+
+import firebase from 'firebase/app';
 
 export const firebaseSetup = function(){
     var firebaseConfig = {

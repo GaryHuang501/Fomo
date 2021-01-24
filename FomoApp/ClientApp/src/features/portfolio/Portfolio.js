@@ -18,15 +18,14 @@ export const Portfolio = function () {
   return (
     <table id="portfolio">
       <thead>
-        <tr className="portfolio-row portfolio-header">
-            <th className="portfolio-column portfolio-header-column">Symbol</th>
-            <th className="portfolio-column portfolio-header-column">MKT $</th>
-            <th className="portfolio-column portfolio-header-column">Change</th>
-            <th className="portfolio-column portfolio-header-column">Avg $</th>
-            <th className="portfolio-column portfolio-header-column">ROI</th>
-            <th className="portfolio-column portfolio-header-column">Bull</th>
-            <th className="portfolio-column portfolio-header-column">Bear</th>
-            <th className="portfolio-column portfolio-header-column portfolio-row-options-header">         
+        <tr className="portfolio-row portfolio-header" role="row">
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">Symbol</th>
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">MKT $</th>
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">Change</th>
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">Avg $</th>
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">ROI</th>
+            <th className="portfolio-column portfolio-header-column" role="columnHeader">Votes</th>
+            <th className="portfolio-column portfolio-header-column portfolio-row-options-header" role="columnHeader">         
                 <span>Up</span>
                 <span>Down</span>
                 <span>Edit</span>
@@ -36,7 +35,7 @@ export const Portfolio = function () {
         </tr>
       </thead>
       <tbody>
-        <tr className="portfolio-row-spacing">
+        <tr className="portfolio-row-spacing" role="row">
         </tr>
         {portfolioStocks}
       </tbody>
