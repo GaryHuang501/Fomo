@@ -5,7 +5,7 @@ import { fetchStockSingleQuoteDatas, selectStocksLastUpdatedDates } from './../s
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 
 import firebase from 'firebase/app';
-import { selectPortfolio } from './PortfolioSlice';
+import { selectSelectedPortfolio } from './PortfolioSlice';
 import { singleQuoteDataPath } from '../../app/FireBasePaths';
 
 /**
@@ -14,7 +14,7 @@ import { singleQuoteDataPath } from '../../app/FireBasePaths';
  */
 export const PortfolioListener = function(){
 
-    const portfolio = useSelector(selectPortfolio);
+    const portfolio = useSelector(selectSelectedPortfolio);
     const stockLastUpdatedDates = useSelector(selectStocksLastUpdatedDates, shallowEqual);
 
     const dispatch = useDispatch();

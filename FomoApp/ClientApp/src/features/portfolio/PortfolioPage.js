@@ -13,7 +13,6 @@ export const PortfolioPage = function() {
 
   const dispatch = useDispatch();
   const portfolioIds = useSelector(selectPortfolioIds);
-  const selectedPortfolioId = useSelector(selectSelectedPortfolioId);
 
   useEffect(() => {
     dispatch(fetchPortfolioIds());
@@ -25,12 +24,6 @@ export const PortfolioPage = function() {
       dispatch(setSelectedPortfolioId(portfolioIds[0]));
     }
   }, [portfolioIds, dispatch]);
-
-  useEffect(() => {
-    if(selectedPortfolioId > 0){
-      dispatch(fetchPortfolio(selectedPortfolioId))
-    }
-  }, [selectedPortfolioId, dispatch]);
 
   return (
     <main id="portfolio-page">

@@ -1,13 +1,22 @@
 import './Portfolio.css';
 
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
+
 import { PortfolioStock } from './PortfolioStock';
-import React from 'react';
-import { selectPortfolio } from './PortfolioSlice';
-import { useSelector } from 'react-redux'
+import { selectSelectedPortfolio } from './PortfolioSlice';
 
 export const Portfolio = function () {
-  const portfolio = useSelector(selectPortfolio);
-
+ const portfolio = useSelector(selectSelectedPortfolio);
+ const dispatch = useDispatch();
+ 
+  useEffect(() => {
+    // Render when portfolio Id is fetched from portfolio page.
+    if(portfolio.Id > 0){
+      dispatch(fetchPortfolio(portfolio.Id));
+    }
+  }, [portfolio.Id, dispatch]);
+  
   const portfolioStocks = [];
 
   for(const portfolioSymbol of portfolio.portfolioSymbols){

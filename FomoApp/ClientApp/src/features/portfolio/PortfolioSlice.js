@@ -80,9 +80,9 @@ export const selectPortfolioIds = state => state.portfolio.ids;
 
 export const selectSelectedPortfolioId = state => state.portfolio.selectedPortfolioId;
 
-export const selectPortfolio = function(state){  
+export const selectSelectedPortfolio = function(state){  
     const portfolio = state.portfolio.portfolios[state.portfolio.selectedPortfolioId];
-    return portfolio ? portfolio : { portfolioSymbols: [] };
+    return portfolio ? portfolio : { Id: -1, portfolioSymbols: [] };
 }
 
 export default portfolioSlice.reducer;
