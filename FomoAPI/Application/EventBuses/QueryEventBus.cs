@@ -33,6 +33,8 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         private int _intervalNumQueriesLeft;
 
+        public int QueriesExecutedInterval { get; private set; }
+
         public QueryEventBus(QueryQueue queryQueue,
                              IQueryContextFactory queryContextFactory,
                              IQueuePriorityRule queuePriorityRule,
@@ -73,7 +75,7 @@ namespace FomoAPI.Application.EventBuses
                 int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();
 
                 _intervalNumQueriesLeft = _maxQueryPerIntervalThreshold - queriesRanCurrentInterval;
-
+                QueriesExecutedInterval = 0;
                 _queryQueue.ClearAll();
             }
             finally
@@ -136,6 +138,7 @@ namespace FomoAPI.Application.EventBuses
                 if (success)
                 {
                     _intervalNumQueriesLeft--;
+                    QueriesExecutedInterval++;
                     _queuePriorityRule.ResetPriority(query);
                 }
 

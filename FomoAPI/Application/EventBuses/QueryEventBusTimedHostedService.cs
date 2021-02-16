@@ -70,6 +70,7 @@ namespace FomoAPI.Application.EventBuses
         {
             _logger.LogInformation("Resetting Event Bus state");
             _logger.LogInformation($"Max queries to run per interval is {_eventBusOptions.MaxQueriesPerInterval}");
+            _logger.LogInformation($"Queries ran last interval: {queryEventBus.QueriesExecutedInterval}");
 
             try
             {

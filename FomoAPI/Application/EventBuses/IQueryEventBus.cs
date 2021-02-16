@@ -29,5 +29,10 @@ namespace FomoAPI.Application.EventBuses
         /// Resets to a starting state
         /// </summary>
         Task Reset();
+
+        /// <summary>
+        /// Gets the number of queries ran last interval.
+        /// </summary>
+        int QueriesExecutedInterval { get; }
     }
 }
