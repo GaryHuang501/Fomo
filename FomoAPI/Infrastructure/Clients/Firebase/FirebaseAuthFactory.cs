@@ -1,4 +1,6 @@
-﻿using FomoAPI.Infrastructure.ConfigurationOptions;
+﻿using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,21 +24,42 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
         private string _authToken;
         private DateTime _lastRenewTime;
         private Timer _renewTokenTimer;
+        private SemaphoreSlim _semaphore;
+        private GoogleCredential _googleCreds;
+        private FirebaseApp _firebaseApp;
+
 
         public FirebaseAuthFactory(IOptionsMonitor<FireBaseOptions> firebaseOptionsMonitor, ILogger<FirebaseAuthFactory> logger)
         {
             _firebaseOptions = firebaseOptionsMonitor.CurrentValue;
             _logger = logger;
+            _semaphore = new SemaphoreSlim(1);
         }
 
-        public async Task<string> CreateAuthToken()
+        /// <summary>
+        /// Creates a server access token if it has not been created yet.
+        /// Otherwise it will reuse the token.
+        /// </summary>
+        /// <returns>The token string.</returns>
+        public async Task<string> CreateServerAccessToken()
         {
             if (_authToken == null)
             {
-                await RenewToken();
+                await RenewServerAccessToken();
             }
 
             return _authToken;
+        }
+
+        /// <summary>
+        /// Creates a custom token to be returned to client to log into firebase api.
+        /// </summary>
+        /// <returns>The token string</returns>
+        public async Task<string> CreateClientToken(string userId)
+        {
+            string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
+
+            return customToken;
         }
 
         public void Dispose()
@@ -45,25 +68,35 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
             {
                 _renewTokenTimer.Dispose();
             }
+
+            _firebaseApp.Delete();
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var renewTimeSpan = TimeSpan.FromMinutes(_firebaseOptions.TokenRenewalMinutes);
 
+            _googleCreds = GoogleCredential.FromJson(_firebaseOptions.ServiceAccountCredentials);
+
+            _firebaseApp = FirebaseApp.Create(new AppOptions()
+            {
+                Credential = _googleCreds
+            });
+
             if (!_firebaseOptions.AuthEnabled)
             {
                 return;
             }
 
-            await RenewToken();
+            await RenewServerAccessToken();
 
             _renewTokenTimer = new Timer(async (state) =>
             {
                 try
                 {
                     _logger.LogInformation("Renewing Firebase token. Last renewed:", _lastRenewTime.ToString());
-                    await RenewToken();
+                    _googleCreds = GoogleCredential.FromJson(_firebaseOptions.ServiceAccountCredentials);
+                    await RenewServerAccessToken();
                 }catch(Exception ex)
                 {
                     _logger.LogCritical("Error renewing firebase token", ex);
@@ -76,26 +109,27 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
             return Task.CompletedTask;
         }
 
-
-        private async Task RenewToken()
+        private async Task RenewServerAccessToken()
         {
+            bool lockAcquired = await _semaphore.WaitAsync(0);
 
-            // Authenticate a Google credential with the service account
-            GoogleCredential googleCred = GoogleCredential.FromJson(_firebaseOptions.ServiceAccountCredentials);
+            if(!lockAcquired)
+            {
+                return;
+            }
 
             // Add the required scopes to the Google credential
-            GoogleCredential scoped = googleCred.CreateScoped(
+            GoogleCredential scoped = _googleCreds.CreateScoped(
                                                                 new List<string>
                                                                 {
                                                                 "https://www.googleapis.com/auth/firebase.database",
                                                                 "https://www.googleapis.com/auth/userinfo.email"
                                                                 });
 
-            // Use the Google credential to generate an access token
-            var oidcOptions = OidcTokenOptions.FromTargetAudience("https://localhost");
-            OidcToken token = await scoped.GetOidcTokenAsync(oidcOptions);
-            _authToken = await token.GetAccessTokenAsync();
+            _authToken =  await scoped.UnderlyingCredential.GetAccessTokenForRequestAsync();
             _lastRenewTime = DateTime.UtcNow;
+
+            _semaphore.Release();
         }
     }
 }

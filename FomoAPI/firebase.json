@@ -1,10 +1,10 @@
 ﻿{
   "FireBase": {
     "ApiKey": "AIzaSyCzJHVz07AKuCzELVARPlkNQ0zQHPawrF8", // Public API Key
-    "AuthEnabled": false,
+    "AuthEnabled": true,
     "ClientName": "FireBase",
     "DatabaseUrl": "https://fomo-189110-default-rtdb.firebaseio.com",
     "ServiceAccountCredentials": "${SERVICE_ACCOUNT}$",
-    "TokenRenewalMinutes": 240
+    "TokenRenewalMinutes": 50 // Expires after an hour, so renew it earlier
   }
 }

@@ -21,8 +21,7 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<FirebaseAuthFactory>().As<IHostedService>().SingleInstance();
-            builder.RegisterType<FirebaseAuthFactory>().As<IClientAuthFactory>().SingleInstance();
+            builder.RegisterType<FirebaseAuthFactory>().As<IHostedService>().As<IClientAuthFactory>().SingleInstance();
             builder.RegisterType<StockSearchCache>().SingleInstance();
             builder.RegisterType<SingleQuoteCache>().SingleInstance();
 

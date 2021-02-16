@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using FomoApp.Exceptions;
 using System;
+using FomoAPI.Infrastructure.Clients;
 
 namespace FomoAPI.Controllers
 {
@@ -15,12 +16,15 @@ namespace FomoAPI.Controllers
     {
         private readonly SignInManager<IdentityUser<Guid>> _signInManager;
         private readonly UserManager<IdentityUser<Guid>> _userManager;
+        private readonly IClientAuthFactory _clientAuthFactory;
 
         public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
-            UserManager<IdentityUser<Guid>> userManager)
+                                  UserManager<IdentityUser<Guid>> userManager,
+                                  IClientAuthFactory clientAuthFactory)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _clientAuthFactory = clientAuthFactory;
         }
 
         /// <summary>
@@ -32,6 +36,17 @@ namespace FomoAPI.Controllers
         public IActionResult CheckLogin()
         {
             return Ok();
+        }
+
+        /// <summary>
+        /// Gets client custom token to access third party API such as firebase.
+        /// </summary>
+        /// <returns>Client Token.</returns>
+        [HttpGet("ClientCustomToken")]
+        [Authorize]
+        public async Task<ActionResult<string>> GetClientCustomToken()
+        {    
+            return await _clientAuthFactory.CreateClientToken(User.GetUserId().ToString());
         }
 
         /// <summary>

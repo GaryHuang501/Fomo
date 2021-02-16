@@ -9,9 +9,15 @@ namespace FomoAPI.Infrastructure.Clients
     public interface IClientAuthFactory
     {
         /// <summary>
-        /// Create the authentication token
+        /// Create the access auth token so server can communicate with API.
         /// </summary>
         /// <returns>The token string</returns>
-        Task<string> CreateAuthToken();
+        Task<string> CreateServerAccessToken();
+
+        /// <summary>
+        /// Creates a token for client to login to comunicate with API
+        /// </summary>
+        /// <returns>The token string</returns>
+        Task<string> CreateClientToken(string userId);
     }
 }

@@ -81,7 +81,7 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
                 return uri;
             }
 
-            string authToken = await _authFactory.CreateAuthToken();
+            string authToken = await _authFactory.CreateServerAccessToken();
             return $"{uri}?access_token={authToken}";
         }
     }
