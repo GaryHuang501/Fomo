@@ -1,12 +1,12 @@
 import './PortfolioPage.css';
 
 import React, { useEffect } from 'react';
-import { fetchPortfolio, fetchPortfolioIds, selectPortfolioIds, selectSelectedPortfolioId, setSelectedPortfolioId } from './PortfolioSlice';
+import { fetchPortfolio, fetchPortfolioIds, selectPortfolioIds, setSelectedPortfolioId } from './PortfolioSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
 import { ChatBox } from '../chatbox/ChatBox';
 import { Portfolio } from './Portfolio';
-import { PortfolioListener } from './PortfolioListener';
+import PortfolioListener from './PortfolioListener';
 import { StockSearchBar } from '../stockSearch/StockSearchBar';
 
 export const PortfolioPage = function() {
@@ -22,13 +22,14 @@ export const PortfolioPage = function() {
     // Currently only support one portfolio per user
     if(portfolioIds.length > 0){
       dispatch(setSelectedPortfolioId(portfolioIds[0]));
+      dispatch(fetchPortfolio(portfolioIds[0]));
     }
   }, [portfolioIds, dispatch]);
 
   return (
     <main id="portfolio-page">
         <section id='portfolio-stock-search-container'>
-            <StockSearchBar></StockSearchBar>
+          <StockSearchBar></StockSearchBar>
         </section>
         <section id='portfolio-container'>
           <PortfolioListener></PortfolioListener>

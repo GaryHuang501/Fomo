@@ -11,7 +11,7 @@ export const StockSearchMatch = function (props) {
   }
 
   return (
-    <div className='stock-search-match' onClick={clickCallback} role='option'>
+    <div className='stock-search-match' onClick={clickCallback} role='option'  aria-selected='false'>
         <span className='stock-search-match-symbol'>{props.match.ticker}</span>
         <span className='stock-search-match-fullname' title={props.match.fullName}>{props.match.fullName}</span>
     </div>

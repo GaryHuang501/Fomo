@@ -8,6 +8,12 @@ export const authenticate = createAsyncThunk('login/authenticate', async () => {
     await axios.get(`${apiUrl}/accounts/authenticate`);
 });
 
+export const getClientCustomToken = createAsyncThunk('login/firebase-authenticate', async () => {
+  const response = await axios.get(`${apiUrl}/accounts/ClientCustomToken`);
+  return response.data;
+
+});
+
 export const checkLogin = createAsyncThunk('login/checkLogin', async () => {
     await axios.get(`${apiUrl}/accounts/checklogin`)
 });
@@ -15,7 +21,9 @@ export const checkLogin = createAsyncThunk('login/checkLogin', async () => {
 export const loginSlice = createSlice({
   name: 'login',
   initialState: {
-    isAuthenticated: true
+    isAuthenticated: true, // Will get set to false whenever a request is rejected
+    isFirebaseAuthenticated: false,
+    customClientToken: null
   },
   reducers: {
       setAuthenticated: state => {
@@ -23,6 +31,9 @@ export const loginSlice = createSlice({
       },
       setUnauthenticated: state => {
           state.isAuthenticated = false;
+      },
+      setFireBaseAuthenticated: state => {
+          state.isFirebaseAuthenticated = true;
       }
   },
   extraReducers: {
@@ -47,12 +58,28 @@ export const loginSlice = createSlice({
     [checkLogin.rejected]: (state, action) => {
         state.status = 'failed'
         state.isAuthenticated = false;
+    },
+    [getClientCustomToken.pending]: (state, action) => {
+      state.status = 'loading'
+    },
+    [getClientCustomToken.fulfilled]: (state, action) => {
+        state.status = 'succeeded'
+        state.customClientToken = action.payload;
+    },
+    [getClientCustomToken.rejected]: (state, action) => {
+        state.status = 'failed'
+        state.isFirebaseAuthenticated = false;
     }
   }
 });
 
-export const { setAuthenticated, setUnauthenticated } = loginSlice.actions;
+export const { setAuthenticated, setUnauthenticated, setFireBaseAuthenticated } = loginSlice.actions;
 
 export const selectAuthenticatedState = state => state.login.isAuthenticated;
+
+export const selectClientCustomToken = state => state.login.customClientToken;
+
+export const selectFirebaseAuthenticatedState = state => state.login.isFirebaseAuthenticated;
+
 
 export default loginSlice.reducer;

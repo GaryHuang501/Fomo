@@ -2,10 +2,10 @@ import 'firebase/auth';
 import 'firebase/database';
 import 'firebase/analytics';
 
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
-import { PortfolioListener } from './PortfolioListener';
+import PortfolioListener from './PortfolioListener';
 import { PortfolioStock } from './PortfolioStock';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -84,7 +84,7 @@ afterEach(() => {
     mock.restore();
 });
 
-it("Should fetch stock data for single symbol in portfoio", async () => {
+it("Should fetch stock data for single symbol in portfoio immediately when no data in store and notification not newer", async () => {
 
     const portfolioSymbol = { id: 1, symbolId: 1, ticker: "VOO" };
 
@@ -143,11 +143,12 @@ it("Should fetch stock data for single symbol in portfoio", async () => {
 
     await Promise.resolve();
 
-    expect(spy).not.toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledTimes(1);
     
+    // Notification should do nothing since notification isn't newer
     for(const ref of firebaseRefs)
     {
-        ref.invokeCallBack(new Snapshot(null));
+        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
     }
     
     jest.advanceTimersByTime(20000);
@@ -159,6 +160,89 @@ it("Should fetch stock data for single symbol in portfoio", async () => {
     await waitFor(() => {
         expect(screen.getByText(singleQuoteData.data.ticker)).toBeInTheDocument();
         expect(screen.getByText(singleQuoteData.data.price.toString())).toBeInTheDocument();
+    });
+});
+
+it("Should not fetch stock data immediately if data has been fetched before and no new notifications.", async () => {
+
+    const portfolioSymbol = { id: 1, symbolId: 1, ticker: "VOO" };
+
+    const initialPortfolio = {
+        ids: [1],
+        selectedPortfolioId: 1,
+        portfolios: {
+            1: {
+                id: 1,
+                portfolioSymbols: [portfolioSymbol]
+            }
+        }
+    };
+
+    const initialStockData = {
+        singleQuoteData: {
+            1: {
+                lastUpdated: '2020-01-01',
+                symbolId: portfolioSymbol.symbolId,
+                ticker: portfolioSymbol.ticker
+            }
+        }
+    };
+
+    const initialState = {
+        portfolio: initialPortfolio,
+        stocks: initialStockData
+    };
+
+    const singleQuoteData = {
+        symbolId: 1,
+        lastUpdated: '2020-01-01',
+        data:
+            {
+                symbolId: portfolioSymbol.symbolId,
+                ticker: portfolioSymbol.ticker,
+                price: 12.15,
+                averagePrice: 12.50,
+                changePercent: 12.50,
+                votes: 5,
+                return: 1,
+                lastUpdated: '2020-01-01'
+            }
+    };
+
+    const mock = new MockAdapter(axios);
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`)
+        .reply(200, [singleQuoteData]);
+
+    const spy = jest.spyOn(axios, 'get');
+
+    act(() => {
+        render(<div>
+                    <PortfolioListener />
+                    <table>
+                        <tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}/></tbody>
+                    </table>
+                </div>,         
+            { initialState });
+    });
+
+    await Promise.resolve();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    
+    // Notification should do nothing since notification isn't newer
+    for(const ref of firebaseRefs)
+    {
+        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
+    }
+    
+    jest.advanceTimersByTime(20000);
+
+    await Promise.resolve();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    
+    await waitFor(() => {
+        expect(screen.getByText(singleQuoteData.data.ticker)).toBeInTheDocument();
     });
 });
 
@@ -241,11 +325,11 @@ it("Should fetch stock data for multiple symbol in portfoio", async () => {
 
     await Promise.resolve();
 
-    expect(spy).not.toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledTimes(1);
     
     for(const ref of firebaseRefs)
     {
-        ref.invokeCallBack(new Snapshot(null));
+        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
     }
 
     jest.advanceTimersByTime(20000);

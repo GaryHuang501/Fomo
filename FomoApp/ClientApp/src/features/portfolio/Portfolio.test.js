@@ -16,7 +16,7 @@ it("renders table headers only when no portfolios stocks added", () => {
     render(<Portfolio/>);
   });
 
-  const headers = screen.getAllByRole("columnHeader");
+  const headers = screen.getAllByRole("columnheader");
 
   expect(headers.length).toEqual(7);
   expect(headers[0].innerHTML).toEqual('Symbol');
@@ -58,7 +58,7 @@ it("renders single portfolio stock", () => {
       render(<Portfolio/>, { initialState: initialState });
     });
 
-    const headers = screen.getAllByRole("columnHeader");
+    const headers = screen.getAllByRole("columnheader");
 
     expect(headers.length).toEqual(7);
     expect(headers[0].innerHTML).toEqual('Symbol');
@@ -102,5 +102,3 @@ it("renders single portfolio stock", () => {
     expect(screen.queryByRole('cell', {name: 'VOO'})).toBeInTheDocument(); 
     expect(screen.queryByRole('cell', {name: 'AMD'})).toBeInTheDocument(); 
   });
-
-

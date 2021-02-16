@@ -26,6 +26,31 @@ it("renders with the portfolio symbol with no data", () => {
   expect(columns[5].innerHTML).toBe("0");
 });
 
+it("renders with the portfolio symbol with null data", () => {
+  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc'};
+
+  const initialState = {
+      stocks: {
+        singleQuoteData:
+        {
+          1: null
+        }
+      }
+  };
+
+  act(() => {
+    render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}/></tbody></table>, { initialState });
+  });
+
+  const columns = screen.queryAllByRole('cell');
+  expect(columns[0].innerHTML).toBe(portfolioSymbol.ticker);
+  expect(columns[1].innerHTML).toBe("Pending");
+  expect(columns[2].innerHTML).toBe("--%");
+  expect(columns[3].innerHTML).toBe("--");
+  expect(columns[4].innerHTML).toBe("--%");
+  expect(columns[5].innerHTML).toBe("0");
+});
+
 
 it("renders with the portfolio symbol with data", () => {
   const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc'};

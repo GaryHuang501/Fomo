@@ -70,10 +70,10 @@ export const StockSearchBar = function () {
       resultBox = <div id='stock-search-results'>{potentialMatches}</div>
     }
     else if(stockSearchStatus  === 'loading'){
-      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ ticker: null, fullName: "Searching..."}} /></div>
+      resultBox = <div id='stock-search-results' role='listbox'><StockSearchMatch key={null} match={{ ticker: null, fullName: "Searching..."}} /></div>
     }
     else if(searchKeywords.trim().length > 0 && stockSearchStatus  === 'succeeded'){
-      resultBox = <div id='stock-search-results'><StockSearchMatch key={null} match={{ ticker: null, fullName: "No results found."}} /></div>
+      resultBox = <div id='stock-search-results' role='listbox'><StockSearchMatch key={null} match={{ ticker: null, fullName: "No results found."}} /></div>
     }
     
     return resultBox;

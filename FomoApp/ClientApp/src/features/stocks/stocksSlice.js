@@ -38,16 +38,8 @@ export const stocksSlice = createSlice({
                 const noCurrentDataExists = !current;
                 const isStaleData = noCurrentDataExists || Date.parse(newSingleQuoteData.lastUpdated) > Date.parse(current.lastUpdated);
 
-                if(isStaleData){ 
-                    
-                    const noDataOnServerYet = newSingleQuoteData.data === null;
-
-                    if (noDataOnServerYet){
-                        state.singleQuoteData[newSingleQuoteData.symbolId] = null
-                    }
-                    else{
-                        state.singleQuoteData[newSingleQuoteData.symbolId] = newSingleQuoteData.data;
-                    }
+                if(isStaleData){                  
+                    state.singleQuoteData[newSingleQuoteData.symbolId] = newSingleQuoteData.data;
                 } 
             }
         },
@@ -57,10 +49,11 @@ export const stocksSlice = createSlice({
 export const selectStocksLastUpdatedDates = function(state){
 
     const dates = {};
+    console.log(state.stocks.singleQuoteData);
 
     for(const symbolId in state.stocks.singleQuoteData){
 
-        if(state.stocks.singleQuoteData == null){
+        if(state.stocks.singleQuoteData == null || !state.stocks.singleQuoteData[symbolId]){
             dates[symbolId] = new Date("2000-01-01");
         }
         else
@@ -75,7 +68,8 @@ export const selectStocksLastUpdatedDates = function(state){
 
 export const selectStockData = function(state, portfolioSymbol){
 
-    if(portfolioSymbol.symbolId in state.stocks.singleQuoteData){
+    if(portfolioSymbol.symbolId in state.stocks.singleQuoteData 
+        && state.stocks.singleQuoteData[portfolioSymbol.symbolId]){
         return state.stocks.singleQuoteData[portfolioSymbol.symbolId];
     }
     else{

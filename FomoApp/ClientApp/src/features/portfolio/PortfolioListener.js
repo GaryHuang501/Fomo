@@ -1,80 +1,69 @@
 import './Portfolio.css';
 
-import React, { useEffect } from 'react';
-import { fetchStockSingleQuoteDatas, selectStocksLastUpdatedDates } from './../stocks/stocksSlice'
-import { shallowEqual, useDispatch, useSelector } from 'react-redux'
+import { fetchStockSingleQuoteDatas, selectStocksLastUpdatedDates } from './../stocks/stocksSlice';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
+import PortfolioStockListener from './PortfolioStockListener';
 import firebase from 'firebase/app';
 import { selectSelectedPortfolio } from './PortfolioSlice';
-import { singleQuoteDataPath } from '../../app/FireBasePaths';
+import { singleQuoteDataPath } from '../../app/FirebasePaths';
+import { useEffect } from 'react';
 
 /**
- * Listens to any changes to any stock data changes for the symbols in the portfolio.
- * Uses firebase realtime database to listen for any changes.
+ * Listens to any changes to any stock data changes for the symbols in the portfolio using firebase.
+ * Any stale stocks will queue up a request to fetch new data in regular intervals.
  */
-export const PortfolioListener = function(){
+export default function PortfolioListener(){
 
-    const portfolio = useSelector(selectSelectedPortfolio);
+    const portfolio = useSelector(selectSelectedPortfolio, shallowEqual);
+
+    // When a stock is stale, it'll trigger an update request and this list stockLastUpdatedDates will refresh
+    // recreating the portfolio stock listeners with the new dates and info.
     const stockLastUpdatedDates = useSelector(selectStocksLastUpdatedDates, shallowEqual);
 
     const dispatch = useDispatch();
   
     useEffect(() => {
-        let portfolioSymbolsToUpdate = [];
-        const listeners = [];
         let interval;
-
-        function checkStockNeedsRefreshing(portfolioSymbol, stockChangedNotification){
-
-            const currentLastUpdatedDate = stockLastUpdatedDates[portfolioSymbol.symbolId];
-            const noDataExists = !currentLastUpdatedDate || currentLastUpdatedDate.lastUpdated === null || !stockChangedNotification;
-            const isStaleData = noDataExists || Date.parse(stockChangedNotification.lastUpdated) > Date.parse(currentLastUpdatedDate);
-
-            if(isStaleData){
-                portfolioSymbolsToUpdate.push(portfolioSymbol);
-            }
-        }
-
-        function addListenersPortfolioSymbol(){
-            for(const portfolioSymbol of portfolio.portfolioSymbols){        
-                const stockRef = firebase.database().ref(`${singleQuoteDataPath}/${portfolioSymbol.symbolId}`);
-                listeners.push(stockRef);
-
-                // Receives notification that the data has changed.
-                // Push the symbol to be updated by interval if it the data is newer.
-                stockRef.on('value', (snapshot) => {
-                    const stockChangedNotification = snapshot.val();
-
-                    checkStockNeedsRefreshing(portfolioSymbol, stockChangedNotification);
-                });
-            }
-        }
-
+        const portfolioStockListeners = [];
+      
         function clearListeners(){
-            for(const listener of listeners){
-                listener.off('value');
+            for(const listener of portfolioStockListeners){
+                listener.clearListener();
             }
         }
 
-        // Update stock symbols in interval so the calls are batched to reduce chattiness.
-        function setIntervalUpdateSymbols(){
-            interval = setInterval(() => {
-                if(portfolioSymbolsToUpdate.length === 0){
-                    return;
+        function createListeners(){
+            for(const portfolioSymbol of portfolio.portfolioSymbols){
+                const listener = new PortfolioStockListener(portfolioSymbol, stockLastUpdatedDates[portfolioSymbol.symbolId]);
+                listener.bindListener(firebase);
+                portfolioStockListeners.push(listener);
+            }
+        }
+     
+        function checkStockUpdates(){
+            if(portfolioStockListeners.length === 0){
+                return;
+            }
+
+            const symbolIdsToUpdate = [];
+
+            for(const listener of portfolioStockListeners){
+                if(listener.isDataStale){
+                    listener.isDataStale = false; // mark as not stale since it will be queued for updates.
+                    symbolIdsToUpdate.push(listener.portfolioSymbol.symbolId);
                 }
-                
-                const symbolIds = portfolioSymbolsToUpdate.map(s => s.symbolId);
-
-                dispatch(fetchStockSingleQuoteDatas(symbolIds));
-              
-                portfolioSymbolsToUpdate = [];
-
-            }, process.env.REACT_APP_STOCK_REFRESH_RATE_MS);
+            }
+            
+            if(symbolIdsToUpdate.length > 0){
+                dispatch(fetchStockSingleQuoteDatas(symbolIdsToUpdate));             
+            }
         }
 
-        addListenersPortfolioSymbol();
-        setIntervalUpdateSymbols();
-
+        createListeners();
+        checkStockUpdates(); // trigger an immediate update to handle page load and refreshes.
+        interval = setInterval(checkStockUpdates, process.env.REACT_APP_STOCK_REFRESH_RATE_MS);
+        
         return () => { 
             clearListeners();
             clearInterval(interval);
