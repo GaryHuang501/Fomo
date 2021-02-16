@@ -84,7 +84,7 @@ namespace FomoAPI.Application.EventBuses
 
         private async Task ExecuteEventBus()
         {
-            _logger.LogInformation("Scheduling event bus queries");
+            _logger.LogTrace("Scheduling event bus queries");
 
             try
             {

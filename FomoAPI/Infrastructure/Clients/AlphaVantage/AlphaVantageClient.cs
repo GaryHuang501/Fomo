@@ -58,6 +58,11 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
             _logger.LogTrace("Executing query http request url: {url}", urlWithQueryString);
 
+            if(content.BestMatches == null)
+            {
+                return new List<SymbolSearchResult>();
+            }
+
             return content.BestMatches.Select(m => new SymbolSearchResult(ticker: m.Symbol, fullName: m.Name, m.MatchScore));
         }
 
@@ -113,25 +118,25 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                     {
                         var errorJson = await response.Content.ReadAsStringAsync();
                         var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
-                        queryResult = new AlphaVantageQueryResult<TData>(error: errorObject.ErrorMessage);
-                        _logger.LogError("Alphavantage Error for query: {error}", query.Ticker, errorObject.ErrorMessage);
+                        queryResult = new AlphaVantageQueryResult<TData>(error: errorObject);
+                        _logger.LogError("Alphavantage Error for query: {error}", query.Ticker, JsonConvert.SerializeObject(errorObject));
                     }
                     catch(Exception ex)
                     {
-                        queryResult = new AlphaVantageQueryResult<TData>(error: $"Exception: {ex.Message}");
+                        queryResult = new AlphaVantageQueryResult<TData>(errorMessage: $"Exception: {ex.Message}");
                         _logger.LogError(ex, "Failed to parse alphavantage data for query {query}", query.Ticker);
                     }
                 }
                 else
                 {
                     _logger.LogError("Failed to retrieve data from AlphaVantage: {reason}", response.ReasonPhrase);
-                    queryResult = new AlphaVantageQueryResult<TData>(error: response.ReasonPhrase);
+                    queryResult = new AlphaVantageQueryResult<TData>(errorMessage: response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error Executing query http request");
-                queryResult = new AlphaVantageQueryResult<TData>(error: ex.Message);
+                queryResult = new AlphaVantageQueryResult<TData>(errorMessage: ex.Message);
             }
 
             return queryResult;

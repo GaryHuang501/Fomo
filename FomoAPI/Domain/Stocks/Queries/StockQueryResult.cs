@@ -12,6 +12,8 @@ namespace FomoAPI.Domain.Stocks.Queries
 
         public string ErrorMessage { get; private set; }
 
+        public bool HasError { get; private set; }
+
         protected StockQueryResult(string ticker, StockData data, DateTime lastUpdated)
         {
             Ticker = ticker;
@@ -22,9 +24,7 @@ namespace FomoAPI.Domain.Stocks.Queries
         protected StockQueryResult(string errorMessage)
         {
             ErrorMessage = errorMessage;
+            HasError = true;
         }
-
-        public bool HasError => ErrorMessage != null;
-
     }
 }

@@ -110,7 +110,7 @@ namespace FomoAPI.Application.EventBuses
             }
 
 
-            _logger.LogInformation("{queryCount} queries pended up", queriesToExecute.Count());
+            _logger.LogTrace("{queryCount} queries pended up", queriesToExecute.Count());
 
             var queryTasks = queriesToExecute.Select(async q => await ExecuteQuery(q));
             await Task.WhenAll(queryTasks);

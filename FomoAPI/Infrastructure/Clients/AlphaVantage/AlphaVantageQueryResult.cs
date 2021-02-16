@@ -15,7 +15,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
         public T Data { get; private set; }
 
-        public bool HasError => ErrorMessage != null;
+        public bool HasError { get; private set; }
 
         public string ErrorMessage { get;  private set; }
 
@@ -25,9 +25,16 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             CreateDateUtc = DateTime.UtcNow;
         }
 
-        public AlphaVantageQueryResult(string error)
+        public AlphaVantageQueryResult(AlphaVantageQueryError error)
         {
-            ErrorMessage = error;
+            ErrorMessage = error.ErrorMessage ?? error.Note;
+            HasError = true;
+        }
+
+        public AlphaVantageQueryResult(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+            HasError = true;
         }
     }
 }

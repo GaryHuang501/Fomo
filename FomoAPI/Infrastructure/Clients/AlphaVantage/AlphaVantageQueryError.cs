@@ -14,9 +14,13 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
         [JsonProperty("Error Message", Required = Required.Always)]
         public string ErrorMessage { get; private set; }
 
-        public AlphaVantageQueryError(string error)
+        [JsonProperty(Required = Required.AllowNull)]
+        public string Note { get; private set; }
+
+        public AlphaVantageQueryError(string error, string note)
         {
             ErrorMessage = error;
+            Note = note;
         }
     }
 }
