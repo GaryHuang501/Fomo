@@ -83,6 +83,11 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
                 Credential = _googleCreds
             });
 
+            var claims = new Dictionary<string, object>()
+            {
+                { "admin", true },
+            };
+
             if (!_firebaseOptions.AuthEnabled)
             {
                 return;

@@ -54,6 +54,7 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
 
             response.EnsureSuccessStatusCode();
 
+            var json = await response.Content.ReadAsStringAsync(); ;
             var content = await response.Content.ReadAsAsync<AlphaVantageSymbolSearchResponse>();
 
             _logger.LogTrace("Executing query http request url: {url}", urlWithQueryString);
@@ -90,6 +91,8 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             where TData : StockData  
         {
             AlphaVantageQueryResult<TData> queryResult;
+
+            _logger.LogWarning(symbolId.ToString());
 
             try
             {
