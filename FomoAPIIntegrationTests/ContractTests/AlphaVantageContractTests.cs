@@ -73,7 +73,7 @@ namespace FomoAPIIntegrationTests.ContractTests
 
             IEnumerable<SymbolSearchResult> searchResults = await alphaVantageClient.GetSearchedTickers(stockSymbol);
 
-            Assert.True(searchResults.Count() > 1);
+            Assert.True(searchResults.Count() > 0);
 
             Assert.Equal(stockSymbol, searchResults.First().Ticker);
 
