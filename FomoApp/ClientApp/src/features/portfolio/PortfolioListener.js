@@ -24,8 +24,11 @@ export default function PortfolioListener(){
     const dispatch = useDispatch();
   
     useEffect(() => {
-        let interval;
         const portfolioStockListeners = [];
+
+        let subscribeInterval;
+        let batchInterval;
+        let symbolIdsToUpdate = [];
       
         function clearListeners(){
             for(const listener of portfolioStockListeners){
@@ -33,40 +36,50 @@ export default function PortfolioListener(){
             }
         }
 
+        function notifyStockDataChanged(symbolId){
+            symbolIdsToUpdate.push(symbolId);
+        }
+
         function createListeners(){
             for(const portfolioSymbol of portfolio.portfolioSymbols){
                 const listener = new PortfolioStockListener(portfolioSymbol, stockLastUpdatedDates[portfolioSymbol.symbolId]);
-                listener.bindListener(firebase);
+                listener.bindListener(notifyStockDataChanged, firebase);
                 portfolioStockListeners.push(listener);
             }
         }
      
-        function checkStockUpdates(){
-            if(portfolioStockListeners.length === 0){
-                return;
-            }
+        // gets server data and subscribe to any further update
+        function subscribeStockUpdates(){
+            const symbolIds = portfolio.portfolioSymbols.map(s => s.symbolId);
 
-            const symbolIdsToUpdate = [];
+            if(symbolIds.length > 0){
+                dispatch(fetchStockSingleQuoteDatas(symbolIds));
+            }       
+        }
 
-            for(const listener of portfolioStockListeners){
-                if(listener.isDataStale){
-                    listener.isDataStale = false; // mark as not stale since it will be queued for updates.
-                    symbolIdsToUpdate.push(listener.portfolioSymbol.symbolId);
-                }
-            }
-            
+        function batchUpdateStocks(){
             if(symbolIdsToUpdate.length > 0){
-                dispatch(fetchStockSingleQuoteDatas(symbolIdsToUpdate));             
+                dispatch(fetchStockSingleQuoteDatas(symbolIdsToUpdate));
             }
+
+            symbolIdsToUpdate = [];             
         }
 
         createListeners();
-        checkStockUpdates(); // trigger an immediate update to handle page load and refreshes.
-        interval = setInterval(checkStockUpdates, process.env.REACT_APP_STOCK_REFRESH_RATE_MS);
-        
+        subscribeStockUpdates();
+
+        // This will periodically poll for any changes and notify the server that
+        // these stocks are awaiting updates. The server will prioritize stocks
+        // with the most subscriber for a set interval.
+        subscribeInterval = setInterval(subscribeStockUpdates, process.env.REACT_APP_STOCK_SUBSCRIBE_RATE_MS);
+
+        // For stocks that received a notification to update, they will be batched together for an interval.
+        batchInterval = setInterval(batchUpdateStocks, process.env.REACT_APP_STOCK_REFRESH_RATE_MS);
+
         return () => { 
             clearListeners();
-            clearInterval(interval);
+            clearInterval(subscribeInterval);
+            clearInterval(batchInterval);
         };
       }, [portfolio, stockLastUpdatedDates, dispatch]);
 

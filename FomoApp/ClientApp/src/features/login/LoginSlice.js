@@ -2,26 +2,24 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL;
-
 export const authenticate = createAsyncThunk('login/authenticate', async () => {
-    await axios.get(`${apiUrl}/accounts/authenticate`);
+    await axios.get(`${process.env.REACT_APP_API_URL}/accounts/authenticate`);
 });
 
 export const getClientCustomToken = createAsyncThunk('login/firebase-authenticate', async () => {
-  const response = await axios.get(`${apiUrl}/accounts/ClientCustomToken`);
-  return response.data;
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts/ClientCustomToken`);
+    return response.data;
 
 });
 
 export const checkLogin = createAsyncThunk('login/checkLogin', async () => {
-    await axios.get(`${apiUrl}/accounts/checklogin`)
+    await axios.get(`${process.env.REACT_APP_API_URL}/accounts/checklogin`)
 });
 
 export const loginSlice = createSlice({
   name: 'login',
   initialState: {
-    isAuthenticated: true, // Will get set to false whenever a request is rejected
+    isAuthenticated: false, 
     isFirebaseAuthenticated: false,
     customClientToken: null
   },

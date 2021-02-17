@@ -16,6 +16,7 @@ beforeEach(() => {
     
     firebase.initializeApp = jest.fn();
     firebase.analytics = jest.fn();
+    firebase.auth = jest.fn();
 
     process.env = {
         REACT_APP_API_URL: "https://test.com",
@@ -42,15 +43,18 @@ it("Should render login modal when unauthenticated request made", async () => {
     await waitFor(() => expect(screen.getByText('Please Select a Login')).toBeInTheDocument());
 });
 
-it("Should not render login modal when authenticated request made", async () => {
+it("Should not render login modal when authenticated request made passes", async () => {
     const mock = new MockAdapter(axios);
 
     mock.onGet(`${process.env.REACT_APP_API_URL}/accounts/checklogin`)
         .reply(200, {});
 
+     mock.onGet(`${process.env.REACT_APP_API_URL}/accounts/ClientCustomToken`)
+        .reply(200, "goodtoken");
+
     act(() => {
         render(<App/>);
     });
 
-    expect(screen.queryByText('Please Select a Login')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText('Please Select a Login')).not.toBeInTheDocument());
 });

@@ -49,7 +49,6 @@ export const stocksSlice = createSlice({
 export const selectStocksLastUpdatedDates = function(state){
 
     const dates = {};
-    console.log(state.stocks.singleQuoteData);
 
     for(const symbolId in state.stocks.singleQuoteData){
 

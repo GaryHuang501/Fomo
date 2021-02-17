@@ -74,6 +74,7 @@ beforeEach(() => {
 
     process.env = {
         REACT_APP_STOCK_REFRESH_RATE_MS: 10000, // make it long so test manually trigger the refresh
+        REACT_APP_STOCK_SUBSCRIBE_RATE_MS: 20000,
         REACT_APP_API_URL: "http:localhost"
     };
 });
@@ -84,7 +85,7 @@ afterEach(() => {
     mock.restore();
 });
 
-it("Should fetch stock data for single symbol in portfoio immediately when no data in store and notification not newer", async () => {
+it("Should fetch stock data for single symbol in portfoio immediately when loaded", async () => {
 
     const portfolioSymbol = { id: 1, symbolId: 1, ticker: "VOO" };
 
@@ -144,26 +145,14 @@ it("Should fetch stock data for single symbol in portfoio immediately when no da
     await Promise.resolve();
 
     expect(spy).toHaveBeenCalledTimes(1);
-    
-    // Notification should do nothing since notification isn't newer
-    for(const ref of firebaseRefs)
-    {
-        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
-    }
-    
-    jest.advanceTimersByTime(20000);
-
-    await Promise.resolve();
-
-    expect(spy).toHaveBeenCalledTimes(1);
-    
+        
     await waitFor(() => {
         expect(screen.getByText(singleQuoteData.data.ticker)).toBeInTheDocument();
         expect(screen.getByText(singleQuoteData.data.price.toString())).toBeInTheDocument();
     });
 });
 
-it("Should not fetch stock data immediately if data has been fetched before and no new notifications.", async () => {
+it("Should not fetch stock data on batch call when no new notification updates", async () => {
 
     const portfolioSymbol = { id: 1, symbolId: 1, ticker: "VOO" };
 
@@ -227,7 +216,7 @@ it("Should not fetch stock data immediately if data has been fetched before and 
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(0);
+    jest.clearAllMocks();
     
     // Notification should do nothing since notification isn't newer
     for(const ref of firebaseRefs)
@@ -235,7 +224,7 @@ it("Should not fetch stock data immediately if data has been fetched before and 
         ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
     }
     
-    jest.advanceTimersByTime(20000);
+    jest.advanceTimersByTime(10000);
 
     await Promise.resolve();
 
@@ -246,7 +235,7 @@ it("Should not fetch stock data immediately if data has been fetched before and 
     });
 });
 
-it("Should fetch stock data for multiple symbol in portfoio", async () => {
+it("Should fetch stock data for multiple symbol in portfoio on batch call", async () => {
 
     const portfolioSymbol1 = { id: 1, symbolId: 1, ticker: "VOO" };
     const portfolioSymbol2 = { id: 2, symbolId: 2, ticker: "VTI" };
@@ -325,7 +314,7 @@ it("Should fetch stock data for multiple symbol in portfoio", async () => {
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    jest.clearAllMocks();
     
     for(const ref of firebaseRefs)
     {
@@ -336,7 +325,6 @@ it("Should fetch stock data for multiple symbol in portfoio", async () => {
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1&symbolIds=2`);
 
     await waitFor(() => {
@@ -443,21 +431,19 @@ it("Should only update stocks if the cached stock last updated date is older tha
     });
 
     await Promise.resolve();
-
-    expect(spy).not.toHaveBeenCalled();
     
-        
+    jest.clearAllMocks();
+    
     const symbol1Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol1.symbolId);
     const symbol2Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol2.symbolId);
 
     symbol1Ref.invokeCallBack(new Snapshot({lastUpdated: '2021-01-01'}));
     symbol2Ref.invokeCallBack(new Snapshot({lastUpdated: '2019-01-01'}));
  
-    jest.advanceTimersByTime(20000);
+    jest.advanceTimersByTime(10000);
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`);
 
     await waitFor(() => {
@@ -486,7 +472,7 @@ it("Should not update stock if server data is older than cached in store", async
         }
     };
 
-    const singleQuoteData1 = {
+    const originalQuoteData = {
         symbolId: portfolioSymbol1.symbolId,
         lastUpdated: '2020-01-01',
         data:
@@ -504,7 +490,7 @@ it("Should not update stock if server data is older than cached in store", async
 
     const initialStockData = {
         singleQuoteData: {
-            [portfolioSymbol1.symbolId]: singleQuoteData1.data,
+            [portfolioSymbol1.symbolId]: originalQuoteData.data,
         }
     };
 
@@ -547,9 +533,7 @@ it("Should not update stock if server data is older than cached in store", async
     });
 
     await Promise.resolve();
-
-    expect(spy).not.toHaveBeenCalled();
-          
+       
     const symbol1Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol1.symbolId);
     symbol1Ref.invokeCallBack(new Snapshot({lastUpdated: '2021-01-01'}));
  
@@ -557,14 +541,13 @@ it("Should not update stock if server data is older than cached in store", async
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`);
 
     await waitFor(() => {
         var portfolioStock = screen.getAllByRole('row');
 
-        expect(within(portfolioStock[0]).getByText(singleQuoteData1.data.ticker)).toBeInTheDocument();
-        expect(within(portfolioStock[0]).getByText(singleQuoteData1.data.price.toString())).toBeInTheDocument();
+        expect(within(portfolioStock[0]).getByText(originalQuoteData.data.ticker)).toBeInTheDocument();
+        expect(within(portfolioStock[0]).getByText(originalQuoteData.data.price.toString())).toBeInTheDocument();
     });
 });
 

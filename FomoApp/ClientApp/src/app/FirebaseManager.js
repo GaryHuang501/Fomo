@@ -1,7 +1,7 @@
 import 'firebase/auth';
 import 'firebase/database';
 
-import {getClientCustomToken, selectClientCustomToken, selectFirebaseAuthenticatedState, setFireBaseAuthenticated} from  '../features/login/LoginSlice';
+import {getClientCustomToken, selectClientCustomToken, setFireBaseAuthenticated} from  '../features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import React from 'react';
@@ -18,16 +18,19 @@ export const FirebaseManager = function() {
     dispatch(getClientCustomToken());
   }, [dispatch]);
 
-  useEffect(async () => {
-    // sign with custom token once fetched.
-    if(clientToken){
-      try{
-        await firebase.auth().signInWithCustomToken(clientToken)
-        dispatch(setFireBaseAuthenticated());
-      }
-      catch(ex){
+  useEffect(() => {
+    async function signIn(){
+      if(clientToken){
+        try{
+          await firebase.auth().signInWithCustomToken(clientToken)
+          dispatch(setFireBaseAuthenticated());
+        }
+        catch(ex){
+        }
       }
     }
+    
+    signIn();
   }, [dispatch, clientToken]);
 
 
