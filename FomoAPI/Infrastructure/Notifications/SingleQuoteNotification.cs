@@ -5,7 +5,7 @@ namespace FomoAPI.Infrastructure.Notifications
 {
     public class SingleQuoteNotification : INotification
     {
-        public const string Name = "SingleQuoteData";
+        public const string Name = "singleQuoteData";
 
         public DateTime LastUpdated { get; private set; }
        
