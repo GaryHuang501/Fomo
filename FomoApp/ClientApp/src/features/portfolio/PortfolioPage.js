@@ -8,6 +8,7 @@ import { ChatBox } from '../chatbox/ChatBox';
 import { Portfolio } from './Portfolio';
 import PortfolioListener from './PortfolioListener';
 import { StockSearchBar } from '../stockSearch/StockSearchBar';
+import { TickerTape } from './TickerTape';
 
 export const PortfolioPage = function() {
 
@@ -30,6 +31,9 @@ export const PortfolioPage = function() {
     <main id="portfolio-page">
         <section id='portfolio-stock-search-container'>
           <StockSearchBar></StockSearchBar>
+        </section>
+        <section id='portfolio-ticker-tape-container'>
+          <TickerTape></TickerTape>
         </section>
         <section id='portfolio-container'>
           <PortfolioListener></PortfolioListener>
