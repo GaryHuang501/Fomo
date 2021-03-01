@@ -1,1 +1,1 @@
-export const singleQuoteDataPath = 'SingleQuoteData';
+export const singleQuoteDataPath = 'singleQuoteData';

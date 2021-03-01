@@ -45,9 +45,9 @@ export const TickerTape = () => {
 
   return (
     <div id='ticker-tape'>
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright"></div>
+      <div className="tradingview-widget-container">
+        <div className="tradingview-widget-container__widget"></div>
+        <div className="tradingview-widget-copyright"></div>
       </div>
     </div>
   );
