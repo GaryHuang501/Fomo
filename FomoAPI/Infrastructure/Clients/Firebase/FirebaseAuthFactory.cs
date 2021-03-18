@@ -55,8 +55,9 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
         /// Creates a custom token to be returned to client to log into firebase api.
         /// </summary>
         /// <returns>The token string</returns>
-        public async Task<string> CreateClientToken(string userId)
+        public async Task<string> CreateClientToken(string userId, IReadOnlyDictionary<string, object> claims)
         {
+            await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(userId, claims);
             string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
 
             return customToken;

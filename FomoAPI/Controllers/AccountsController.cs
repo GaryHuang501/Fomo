@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using FomoApp.Exceptions;
 using System;
 using FomoAPI.Infrastructure.Clients;
+using System.Collections.Generic;
+using FomoAPI.Application.DTOs;
 
 namespace FomoAPI.Controllers
 {
@@ -28,14 +30,16 @@ namespace FomoAPI.Controllers
         }
 
         /// <summary>
-        /// Check if the user's cookies are valid.
+        /// Gets user info
         /// </summary>
         /// <returns>Returns OK if authorized</returns>
-        [HttpGet("CheckLogin")]
+        [HttpGet("")]
         [Authorize]
-        public IActionResult CheckLogin()
+        public async Task<ActionResult<UserDTO>> GetAccount()
         {
-            return Ok();
+            var user = await _userManager.GetUserAsync(User);
+
+            return Ok(new UserDTO(user.Id, user.UserName));
         }
 
         /// <summary>
@@ -45,8 +49,10 @@ namespace FomoAPI.Controllers
         [HttpGet("ClientCustomToken")]
         [Authorize]
         public async Task<ActionResult<string>> GetClientCustomToken()
-        {    
-            return await _clientAuthFactory.CreateClientToken(User.GetUserId().ToString());
+        {
+            var claims = new UserClaims(User);
+
+            return await _clientAuthFactory.CreateClientToken(claims.UserID, claims.Value);
         }
 
         /// <summary>
@@ -105,7 +111,9 @@ namespace FomoAPI.Controllers
         private async Task<IdentityUser<Guid>> RegisterUser(ExternalLoginInfo loginInfo)
         {
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-            var user = new IdentityUser<Guid> { UserName = email, Email = email };
+
+            var emailUserNamePart = email.Split('@')[0];
+            var user = new IdentityUser<Guid> { UserName = emailUserNamePart, Email = email };
 
             var result = await _userManager.CreateAsync(user);
 

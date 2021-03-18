@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Clients
@@ -18,6 +19,6 @@ namespace FomoAPI.Infrastructure.Clients
         /// Creates a token for client to login to comunicate with API
         /// </summary>
         /// <returns>The token string</returns>
-        Task<string> CreateClientToken(string userId);
+        Task<string> CreateClientToken(string userId, IReadOnlyDictionary<string, object> claims);
     }
 }
