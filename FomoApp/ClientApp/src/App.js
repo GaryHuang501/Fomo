@@ -1,13 +1,13 @@
 import './App.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Redirect,
   Route,
   BrowserRouter as Router,
   Switch,
 } from 'react-router-dom'
-import { checkLogin, selectAuthenticatedState, selectFirebaseAuthenticatedState } from './features/login/LoginSlice';
+import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState } from './features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
 import { FirebaseManager } from './app/FirebaseManager';
@@ -33,7 +33,7 @@ function App() {
   
     setupHttpClient();
     firebaseSetup();
-    dispatch(checkLogin());
+    dispatch(getAccount());
   }, [dispatch]);
 
   return (

@@ -7,12 +7,10 @@ import { useSelector } from 'react-redux'
 
 export const Portfolio = function (props) {
   const portfolio = useSelector(selectSelectedPortfolio);
-  const portfolioStocks = [];
-
-  for(const portfolioSymbol of portfolio.portfolioSymbols){
-    const stock = <PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}></PortfolioStock>
-    portfolioStocks.push(stock);
-  }
+  
+  const portfolioStocks = portfolio.portfolioSymbols.map(portfolioSymbol => {
+    return <PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}></PortfolioStock>
+  });
   
   return (
     <table id="portfolio">

@@ -9,11 +9,13 @@ import { Portfolio } from './Portfolio';
 import PortfolioListener from './PortfolioListener';
 import { StockSearchBar } from '../stockSearch/StockSearchBar';
 import { TickerTape } from './TickerTape';
+import { selectUser } from '../login/LoginSlice'
 
 export const PortfolioPage = function() {
 
   const dispatch = useDispatch();
   const portfolioIds = useSelector(selectPortfolioIds);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
     dispatch(fetchPortfolioIds());
@@ -40,7 +42,7 @@ export const PortfolioPage = function() {
           <Portfolio></Portfolio>
         </section>
         <section id='portfolio-chatbox-container'>
-            <h3 id='portfolio-chatbox-header'>Gary's Portfolio</h3>
+            <h3 id='portfolio-chatbox-header'>{ (user != null ? user.name : "") + "'s Portfolio"}</h3>
             <ChatBox></ChatBox>
         </section>
     </main>

@@ -4,7 +4,7 @@ import 'firebase/analytics';
 
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 
-import App  from '../../App';
+import App  from '../portfolio/App';
 import MockAdapter from 'axios-mock-adapter';
 import React from 'react';
 import { act } from 'react-dom/test-utils';

@@ -4,7 +4,6 @@ import 'firebase/database';
 import {getClientCustomToken, selectClientCustomToken, setFireBaseAuthenticated} from  '../features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
-import React from 'react';
 import firebase from 'firebase/app';
 import { useEffect } from 'react/cjs/react.development';
 

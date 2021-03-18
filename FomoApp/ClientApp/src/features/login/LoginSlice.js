@@ -2,18 +2,15 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 
-export const authenticate = createAsyncThunk('login/authenticate', async () => {
-    await axios.get(`${process.env.REACT_APP_API_URL}/accounts/authenticate`);
-});
-
 export const getClientCustomToken = createAsyncThunk('login/firebase-authenticate', async () => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts/ClientCustomToken`);
     return response.data;
 
 });
 
-export const checkLogin = createAsyncThunk('login/checkLogin', async () => {
-    await axios.get(`${process.env.REACT_APP_API_URL}/accounts/checklogin`)
+export const getAccount = createAsyncThunk('login/getAccount', async () => {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts`)
+    return response.data;
 });
 
 export const loginSlice = createSlice({
@@ -21,7 +18,8 @@ export const loginSlice = createSlice({
   initialState: {
     isAuthenticated: false, 
     isFirebaseAuthenticated: false,
-    customClientToken: null
+    customClientToken: null,
+    user: null
   },
   reducers: {
       setAuthenticated: state => {
@@ -35,25 +33,15 @@ export const loginSlice = createSlice({
       }
   },
   extraReducers: {
-    [authenticate.pending]: (state, action) => {
-      state.status = 'loading'
-    },
-    [authenticate.fulfilled]: (state, action) => {
-      state.status = 'succeeded'
-      state.isAuthenticated = true;
-    },
-    [authenticate.rejected]: (state, action) => {
-      state.status = 'failed'
-      state.isAuthenticated = false;
-    },
-    [checkLogin.pending]: (state, action) => {
+    [getAccount.pending]: (state, action) => {
         state.status = 'loading'
     },
-    [checkLogin.fulfilled]: (state, action) => {
+    [getAccount.fulfilled]: (state, action) => {
         state.status = 'succeeded'
         state.isAuthenticated = true;
+        state.user = action.payload;
     },
-    [checkLogin.rejected]: (state, action) => {
+    [getAccount.rejected]: (state, action) => {
         state.status = 'failed'
         state.isAuthenticated = false;
     },
@@ -79,5 +67,6 @@ export const selectClientCustomToken = state => state.login.customClientToken;
 
 export const selectFirebaseAuthenticatedState = state => state.login.isFirebaseAuthenticated;
 
+export const selectUser = state => state.login.user;
 
 export default loginSlice.reducer;

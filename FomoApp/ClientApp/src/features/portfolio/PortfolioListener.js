@@ -6,7 +6,6 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import PortfolioStockListener from './PortfolioStockListener';
 import firebase from 'firebase/app';
 import { selectSelectedPortfolio } from './PortfolioSlice';
-import { singleQuoteDataPath } from '../../app/FirebasePaths';
 import { useEffect } from 'react';
 
 /**

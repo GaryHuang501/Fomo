@@ -19,15 +19,6 @@
   grid-template-columns: repeat(16, [col-start] 1fr);
 }
 
-#portfolio-page {
-  background-color: white;
-  grid-column: col-start 1 / span 16;
-  grid-row: 2;
-  min-height: 100%;
-  display: grid;
-  grid-template-columns: repeat(16, [col-start] 1fr);
-  grid-template-rows: auto 3em 1fr;
-}
 
 .modal-backdrop{
   position: fixed;
@@ -35,4 +26,16 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+}
+
+.standard-border{
+  border: 0.1rem solid lightgrey;
+}
+
+.flex-center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 }

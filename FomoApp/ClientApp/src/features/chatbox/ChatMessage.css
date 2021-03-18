@@ -1,0 +1,31 @@
+.chat-message{
+    text-align: left;
+    margin-top: 1rem;
+    box-sizing: border-box;
+}
+
+.chat-align-left{
+    text-align: left;
+}
+
+.chat-align-right{
+    text-align: right;
+}
+
+.chat-message-info{
+    text-align: left;
+}
+
+.chat-user-info-name{
+    font-weight: bold;
+}
+
+.chat-user-info-date-created{
+    margin-left: 1rem;
+    font-size: 0.8rem;
+    color: grey;
+}
+
+.chat-message text{
+    margin-top: 1rem;
+}

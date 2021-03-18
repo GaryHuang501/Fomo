@@ -53,17 +53,9 @@ export const StockSearchBar = function () {
   // Create the JSX for the search results drop down to render.
   function createSearchResultsBox(){
     let resultBox = null;
-    const potentialMatches = [];
 
-    for (const result of stockSearchResults) {
-      const match = <StockSearchMatch 
-                      key={result.symbolId} 
-                      match={result}
-                      onClick={onClickStockMatch}/>;
-
-      potentialMatches.push(match);
-    }
-      
+    const potentialMatches = stockSearchResults.map(result => <StockSearchMatch key={result.symbolId} match={result} onClick={onClickStockMatch}/>);
+   
     const hasMatches = potentialMatches.length > 0;
   
     if(hasMatches){
