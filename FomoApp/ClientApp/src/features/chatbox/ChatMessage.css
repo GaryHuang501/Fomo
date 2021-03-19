@@ -2,6 +2,8 @@
     text-align: left;
     margin-top: 1rem;
     box-sizing: border-box;
+    white-space: pre-line;
+    width: 100%;
 }
 
 .chat-align-left{
@@ -26,6 +28,21 @@
     color: grey;
 }
 
-.chat-message text{
-    margin-top: 1rem;
+.chat-message-text{
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+}
+
+.chat-message-error-sent-icon{
+    color: red;
+    margin-left: 2rem;
+}
+
+.chat-message-sent{
+    opacity: 1;
+}
+
+.chat-message-pending{
+    opacity: 0.4;
 }

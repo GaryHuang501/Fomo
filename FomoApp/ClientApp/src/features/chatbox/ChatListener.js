@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import { useEffect } from 'react/cjs/react.development';
-import { userMessagesPath } from '../../app/FirebasePaths';
+import { userMessagesPath } from '../../app/FireBasePaths';
 
 /*
     Listens for anys new chat messages and loads the most recent chat messages

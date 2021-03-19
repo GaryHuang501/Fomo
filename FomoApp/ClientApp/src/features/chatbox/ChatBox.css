@@ -1,13 +1,19 @@
 #chatbox{
     height: 100%;
     width: 100%;
-    border: 0.1rem solid lightgrey;
-    border-radius: 1rem;
     display: flex;
     flex-direction: column;
     background-color: white;
 }
 
+#chatbox-top-filler-box{
+    border-radius: 1rem 1rem 0 0;
+    border: 0.1rem solid lightgrey;
+    border-bottom: 0;
+    height: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
 #chatbox-emoji-picker .emoji-mart-scroll{
     animation: emojiSlide 0.5s forwards;
     height: 0px;

@@ -25,7 +25,7 @@ export const ChatInputBar = function (props) {
 
   function onKeyPressed(event) {
 
-    if (!event.target.value) {
+    if (event.target.value == null) {
       return;
     }
 

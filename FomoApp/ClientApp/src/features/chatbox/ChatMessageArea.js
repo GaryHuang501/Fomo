@@ -4,6 +4,7 @@ import React, { useMemo, useRef } from 'react';
 
 import { ChatMessage } from './ChatMessage';
 import { ChatMessageDateSeparator } from './ChatMessageDateSeparator';
+import { useEffect } from 'react/cjs/react.development';
 
 /*
   Represents the area that holds the chat messages for the selected portoflio.
@@ -22,10 +23,7 @@ export const ChatMessageArea = function(props) {
 
       let currentDate = '2000-01-01';
   
-      console.log(messages);
-
       for(const message of messages){
-        console.log(message);
 
         const dateCalc = new Date(message.timeStampCreated);
         const displayDate = dateCalc.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
@@ -35,7 +33,15 @@ export const ChatMessageArea = function(props) {
           messageElements.push(<ChatMessageDateSeparator key={"sep_" + dateCalc} displayDate={displayDate}></ChatMessageDateSeparator>);
           currentDate = displayDate;
         }
-        messageElements.push(<ChatMessage key={message.id} userName={message.userName} displayTime={displayTime} text={message.text}></ChatMessage>);
+
+        const messageElem = <ChatMessage 
+                                key={message.id}
+                                userName={message.userName} 
+                                displayTime={displayTime} 
+                                text={message.text} 
+                                status={message.status}/>
+
+        messageElements.push(messageElem);
       }
     }
     else{
@@ -45,12 +51,17 @@ export const ChatMessageArea = function(props) {
   }
 
   chatMessagesElements = useMemo(() => createMessageList(props.chatMessages), [props.chatMessages]);
-  scrollBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+  useEffect(() => {
+    if(scrollBottomRef.current){
+      scrollBottomRef.current?.scrollIntoView(false);
+    }
+  }, [chatMessagesElements?.length])
 
   return (
     <div id='chat-message-area'>
       {chatMessagesElements}
-      <div ref={scrollBottomRef}></div>
+      <div id='chat-scroll-ref' ref={scrollBottomRef}></div>
     </div>
     );
 }

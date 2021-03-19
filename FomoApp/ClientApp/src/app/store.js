@@ -1,3 +1,4 @@
+import chatReducer from '../features/chatbox/ChatSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import loginReducer from '../features/login/LoginSlice';
 import portfolioReducer from '../features/portfolio/PortfolioSlice';
@@ -9,7 +10,8 @@ export const reducers = {
     login: loginReducer,
     stockSearch: stockSearchReducer,
     portfolio: portfolioReducer,
-    stocks: stocksReducer
+    stocks: stocksReducer,
+    chat: chatReducer
   },
 };
 

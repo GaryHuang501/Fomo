@@ -1,4 +1,4 @@
-import { singleQuoteDataPath } from '../../app/FirebasePaths';
+import { singleQuoteDataPath } from '../../app/FireBasePaths';
 
 /*
 Listens for any notification that a stock in a portfolio has data updates.

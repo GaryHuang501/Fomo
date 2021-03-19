@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+import ChatStatusType from './ChatStatusType';
 import firebase from 'firebase/app';
-import { userMessagesPath } from '../../app/FirebasePaths';
+import { userMessagesPath } from '../../app/FireBasePaths';
 
 export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad, thunkApi) => {
 
@@ -8,14 +10,15 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad,
 
     const newMessagePost = {
       ...messagePayLoad,
+      text: messagePayLoad.text,
       id: newMessagePostRef.key,
       timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
     };
 
-    newMessagePostRef.set(messagePayLoad
+    newMessagePostRef.set(newMessagePost
       ,(error) => {
         if (error) {
-          thunkApi.dispatch(messageError({ id: messagePayLoad.id }));
+          thunkApi.dispatch(messageError({ id: newMessagePost.id }));
         } 
     });
 
@@ -25,54 +28,57 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad,
 export const chatSlice = createSlice({
     name: 'chat',
     initialState: {
-        messagesIds: [],
+        messageIds: [],
         messages:{}
     },
     reducers: {
-        messageSent: (state, action) => {
-            const messageExists = state.messages[action.payload.id];
-
-            // Means this was a message that was sent by the current user.
-            if(messageExists){
-                action.payload.sent = true;
-            }
-
-            state.messages[action.payload.id] = action.payload;
-        },
         messageReceived: (state, action) => {
             const message = action.payload;
             const messageExists = message.id in state.messages;
+            message.status = ChatStatusType.SENT;
 
-            if(messageExists){
-                message.sent = true;
+            if(!messageExists){
+                state.messageIds.push(action.payload.id);
             }
-            else{
-                state.messages[message.id] = message;
-            }
+
+            state.messages[message.id] = message;
         },
         messageError: (state, action) => {
             const message = action.payload;
             const messageExists = message.id in state.messages;
 
             if(messageExists){
-                message.error = true;
+                message.status = ChatStatusType.ERROR;
             }
         },
         clearMessages: (state, action) => {
             state.messages = [];
+            state.messageIds = [];
         }
     },
     extraReducers: {
-        [sendMessage.success]: (state, action) => {
-            state.messagesIds.push(action.payload.id);
-            state.messages[action.payload.id] = {...action.payload, timeStampCreated: (new Date()).getTime()};
+        [sendMessage.fulfilled]: (state, action) => {
+            const message = action.payload;
+            const messageExists = message.id in state.messages;
+
+            // Possible server already saves the message and callbacked to save into store already.
+            if(messageExists) return;
+            
+            state.messageIds.push(action.payload.id);
+            state.messages[action.payload.id] = {
+                ...action.payload, 
+                timeStampCreated: (new Date()).getTime(),
+                status: ChatStatusType.PENDING
+            };
         }
     } 
 });
 
 export const { addMessage, clearMessages, messageReceived, messageError } = chatSlice.actions;
 
-export const selectMessages = state => state.chat.messageIds.map( id => state.chat.messages[id]);
+export const selectMessages = state => {
+    return state.chat.messageIds.map( id => state.chat.messages[id]);
+}
 
 export default chatSlice.reducer;
 
