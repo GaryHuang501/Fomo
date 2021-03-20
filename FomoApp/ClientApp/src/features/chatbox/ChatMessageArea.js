@@ -17,7 +17,7 @@ export const ChatMessageArea = function(props) {
   function createMessageList(messages){
     const messageElements = [];
 
-    if(messages.length > 0 ){
+    if(messages && messages.length > 0 ){
 
       messages.sort((a,b) => a- b);
 
@@ -47,6 +47,7 @@ export const ChatMessageArea = function(props) {
     else{
       messageElements.push(<ChatMessage key={-1} text='No posts here.'>.</ChatMessage>)
     }
+    
     return messageElements;
   }
 

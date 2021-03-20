@@ -8,7 +8,7 @@ import React from 'react';
 export const ChatMessageDateSeparator = function(props) {
 
   return (
-      <div className='chat-message-date-separator'>
+      <div className='chat-message-date-separator' role='heading'>
           <p>{props.displayDate}</p>
      </div>
     );

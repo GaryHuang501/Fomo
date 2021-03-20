@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { fetchPortfolio, fetchPortfolioIds, selectPortfolioIds, setSelectedPortfolioId } from './PortfolioSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ChatBox } from '../chatbox/ChatBox';
+import ChatBox from '../chatbox/ChatBox';
 import { Portfolio } from './Portfolio';
 import PortfolioListener from './PortfolioListener';
 import { StockSearchBar } from '../stockSearch/StockSearchBar';

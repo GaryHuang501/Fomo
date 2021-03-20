@@ -4,7 +4,7 @@ import 'firebase/analytics';
 
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 
-import App  from '../portfolio/App';
+import App  from '../../App';
 import MockAdapter from 'axios-mock-adapter';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -33,7 +33,7 @@ it("Should render login modal when unauthenticated request made", async () => {
 
     const mock = new MockAdapter(axios);
 
-    mock.onGet(`${process.env.REACT_APP_API_URL}/accounts/checklogin`)
+    mock.onGet(`${process.env.REACT_APP_API_URL}/accounts`)
         .reply(401, {});
 
     act(() => {
@@ -46,8 +46,8 @@ it("Should render login modal when unauthenticated request made", async () => {
 it("Should not render login modal when authenticated request made passes", async () => {
     const mock = new MockAdapter(axios);
 
-    mock.onGet(`${process.env.REACT_APP_API_URL}/accounts/checklogin`)
-        .reply(200, {});
+    mock.onGet(`${process.env.REACT_APP_API_URL}/accounts`)
+        .reply(200, {id:'1', name:'name'});
 
      mock.onGet(`${process.env.REACT_APP_API_URL}/accounts/ClientCustomToken`)
         .reply(200, "goodtoken");

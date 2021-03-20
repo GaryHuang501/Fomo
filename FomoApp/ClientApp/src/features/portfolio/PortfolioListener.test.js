@@ -5,6 +5,8 @@ import 'firebase/analytics';
 import { screen, waitFor, within } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
+import MockFireBaseDB from '../../mocks/MockFireBaseDB';
+import MockSnapshot from '../../mocks/MockSnapshot';
 import PortfolioListener from './PortfolioListener';
 import { PortfolioStock } from './PortfolioStock';
 import React from 'react';
@@ -12,64 +14,14 @@ import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import firebase from 'firebase/app';
 import { render } from '../../test-util';
-
-class MockFireBaseRef {
-
-    constructor(path) { 
-        const parts = path.split('/');
-        this.symbolId = parts[1];
-    }
-
-    on(event, callback) {
-        this.onEvent = event;
-        this.callback = callback;
-    }
-
-    off(event){
-        this.offEvent = event;
-    }
-
-    invokeCallBack(snapshot){
-        this.callback(snapshot);
-    }
-}
-
-class Snapshot{
-
-    constructor(value){
-        this.value = value;
-    }
-
-    val(){
-        return this.value;
-    }
-
-    test(){
-        return 'yo';
-    }
-}
-
-let firebaseRefs = [];
-
-const mockFireBaseDB = function (){
-
-    this.ref = function(path) {
-        const ref = new MockFireBaseRef(path);
-        firebaseRefs.push(ref);
-        return ref;
-    }
-
-    return this;
-};
+import { singleQuoteDataPath } from '../../app/FireBasePaths';
 
 let mock;
 
 beforeEach(() => {
     jest.useFakeTimers();
 
-    firebaseRefs = [];
-    firebase.database = mockFireBaseDB;
-    
+    firebase.database = MockFireBaseDB;
     mock = new MockAdapter(axios);
 
     process.env = {
@@ -82,8 +34,13 @@ beforeEach(() => {
 afterEach(() => {
     jest.clearAllTimers();
     jest.restoreAllMocks();
+    firebase.database().reset();
     mock.restore();
 });
+
+function getRefPath(symbolId){
+    return `${singleQuoteDataPath}/${symbolId}`;
+}
 
 it("Should fetch stock data for single symbol in portfoio immediately when loaded", async () => {
 
@@ -219,9 +176,9 @@ it("Should not fetch stock data on batch call when no new notification updates",
     jest.clearAllMocks();
     
     // Notification should do nothing since notification isn't newer
-    for(const ref of firebaseRefs)
+    for(const ref of firebase.database().refs)
     {
-        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
+        ref.invokeCallBack(new MockSnapshot({lastUpdated: '2020-01-01'}));
     }
     
     jest.advanceTimersByTime(10000);
@@ -316,9 +273,9 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
 
     jest.clearAllMocks();
     
-    for(const ref of firebaseRefs)
+    for(const ref of firebase.database().refs)
     {
-        ref.invokeCallBack(new Snapshot({lastUpdated: '2020-01-01'}));
+        ref.invokeCallBack(new MockSnapshot({lastUpdated: '2020-01-01'}));
     }
 
     jest.advanceTimersByTime(20000);
@@ -434,11 +391,11 @@ it("Should only update stocks if the cached stock last updated date is older tha
     
     jest.clearAllMocks();
     
-    const symbol1Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol1.symbolId);
-    const symbol2Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol2.symbolId);
+    const symbol1Ref = firebase.database().refs.find(r => r.path === getRefPath(portfolioSymbol1.symbolId));
+    const symbol2Ref = firebase.database().refs.find(r => r.path === getRefPath(portfolioSymbol2.symbolId));
 
-    symbol1Ref.invokeCallBack(new Snapshot({lastUpdated: '2021-01-01'}));
-    symbol2Ref.invokeCallBack(new Snapshot({lastUpdated: '2019-01-01'}));
+    symbol1Ref.invokeCallBack(new MockSnapshot({lastUpdated: '2021-01-01'}));
+    symbol2Ref.invokeCallBack(new MockSnapshot({lastUpdated: '2019-01-01'}));
  
     jest.advanceTimersByTime(10000);
 
@@ -534,8 +491,8 @@ it("Should not update stock if server data is older than cached in store", async
 
     await Promise.resolve();
        
-    const symbol1Ref = firebaseRefs.find(r => r.symbolId == portfolioSymbol1.symbolId);
-    symbol1Ref.invokeCallBack(new Snapshot({lastUpdated: '2021-01-01'}));
+    const symbol1Ref = firebase.database().refs.find(r => r.path === getRefPath(portfolioSymbol1.symbolId));
+    symbol1Ref.invokeCallBack(new MockSnapshot({lastUpdated: '2021-01-01'}));
  
     jest.advanceTimersByTime(20000);
 
@@ -588,9 +545,9 @@ it("Should not fetch stock data when empty portfolio", async () => {
 
     expect(spy).not.toHaveBeenCalled();
     
-    for(const ref of firebaseRefs)
+    for(const ref of firebase.database().refs)
     {
-        ref.invokeCallBack(new Snapshot(null));
+        ref.invokeCallBack(new MockSnapshot(null));
     }
     
     jest.advanceTimersByTime(20000);

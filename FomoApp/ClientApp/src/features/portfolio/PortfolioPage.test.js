@@ -8,6 +8,7 @@ import axios from 'axios';
 import { render } from '../../test-util';
 
 jest.mock('./PortfolioListener', () => () => (<div>Hello World</div>));
+jest.mock('../chatbox/ChatBox', () => () => (<div>ChatBot!</div>));
 
 beforeEach(() => {
 });
@@ -40,5 +41,4 @@ it("renders portfolio", async () => {
 
     await waitFor(() => expect(screen.getByRole("table")).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText("VOO")).toBeInTheDocument());
-
 });

@@ -43,9 +43,9 @@ export const ChatInputBar = function (props) {
 
   return (<div id='chat-input-bar' className='standard-border'>
             <div className='flex-center' onKeyDown={onEnterPressed}>
-              <ContentEditable id='chat-input-bar-text-field' onChange={onKeyPressed} html={props.message}/>
-              <i className="far fa-smile chat-input-bar-emoji-button chat-input-bar-button" onClick={onShowEmojiPicker}></i>
-              <i className="fas fa-sign-in-alt chat-input-bar-button" id='chat-input-bar-send-button' onClick={onSubmitPressed}></i>
+              <ContentEditable id='chat-input-bar-text-field' role='textbox' onChange={onKeyPressed} html={props.message}/>
+              <i className="far fa-smile chat-input-bar-emoji-button chat-input-bar-button" role='button' onClick={onShowEmojiPicker}></i>
+              <i className="fas fa-sign-in-alt chat-input-bar-button" id='chat-input-bar-send-button' role='button' onClick={onSubmitPressed}></i>
             </div>
           </div>);
 }

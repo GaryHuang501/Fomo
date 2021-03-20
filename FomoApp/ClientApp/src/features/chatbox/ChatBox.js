@@ -14,7 +14,7 @@ import { selectUser } from '../login/LoginSlice';
 /*
   The main chatbox componets for posting messages to a specific portfolio.
 */
-export const ChatBox = function() {
+export default function ChatBox(){
 
   const maxInputLength = process.env.REACT_APP_CHAT_MAX_MESSAGE_LENGTH;
   const dispatch = useDispatch();
