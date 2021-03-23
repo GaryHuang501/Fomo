@@ -10,19 +10,27 @@ namespace FomoAPIIntegrationTests
 {
     public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        public const string CustomUserIdHeader = "CustomUserId";
+
         public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
-
         }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            var userId = AppTestSettings.Instance.TestUserId.ToString();
+
+            if (Request.Headers.ContainsKey(CustomUserIdHeader))
+            {
+                userId = Request.Headers[CustomUserIdHeader].ToString();
+            }
+
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, "Test user"),
-                new Claim(ClaimTypes.NameIdentifier, AppTestSettings.Instance.TestUserId.ToString())
+                new Claim(ClaimTypes.Name, userId),
+                new Claim(ClaimTypes.NameIdentifier, userId)
             };
 
             var identity = new ClaimsIdentity(claims, "Test");

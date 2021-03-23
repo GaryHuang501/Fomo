@@ -8,30 +8,41 @@ namespace FomoAPIIntegrationTests
 {
     public class ApiPath
     {
-        public static string PortfolioPath(int? portfolioId = null) => $"api/Portfolios/{portfolioId}";
+        public static string Portfolio(int? portfolioId = null) => $"api/Portfolios/{portfolioId}";
 
-        public static string PortfolioSymbolsPath(int portfolioId, int? portfolioSymbolId = null) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/{portfolioSymbolId}";
+        public static string PortfolioSymbols(int portfolioId, int? portfolioSymbolId = null) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/{portfolioSymbolId}";
 
-        public static string PortfolioSymbolsReorderPath(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/reorder";
+        public static string PortfolioSymbolsReorder(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/reorder";
 
-        public static string SymbolSearchPath(string ticker, int limit) => $"api/Symbols/?keywords={ticker}&limit={limit}";
+        public static string SymbolSearch(string ticker, int limit) => $"api/Symbols/?keywords={ticker}&limit={limit}";
 
-        public static string GetSingleQuoteDataPath(int[] symbolIds) {
+        public static string GetSingleQuoteData(int[] symbolIds) {
 
-            StringBuilder builder = new StringBuilder();
-
-            if(symbolIds.Length > 0)
-            {
-                builder.Append($"symbolIds={symbolIds[0]}");
-            }
-
-            for (var i = 1; i < symbolIds.Length; i++)
-            {
-                builder.Append($"&symbolIds={symbolIds[i]}");
-            }
-
-            return $"api/SingleQuoteData?{builder.ToString()}";
+            return $"api/SingleQuoteData?{GetMultipleIdsQuery("sids", symbolIds)}";
         }
 
+        public static string Votes => "api/votes";
+
+        public static string GetVotes(int[] symbolIds)
+        {
+            return $"{Votes}?{GetMultipleIdsQuery("sids", symbolIds)}";
+        }
+
+        private static string GetMultipleIdsQuery<T>(string key, T[] values)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (values.Length > 0)
+            {
+                builder.Append($"{key}={values[0]}");
+            }
+
+            for (var i = 1; i < values.Length; i++)
+            {
+                builder.Append($"&{key}={values[i]}");
+            }
+
+            return builder.ToString();
+        }
     }
 }

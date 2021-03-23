@@ -23,14 +23,19 @@ namespace FomoAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get single quote data for the given symbol ids.
+        /// </summary>
+        /// <param name="sids">Symbol Ids to get the data for. Short hand notation to reduce query size.</param>
+        /// <returns><see cref="IEnumerable{T}"/> of the Single Quote Data for the symbols.</returns>
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteData([FromQuery] int[] symbolIds)
+        public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteData([FromQuery] int[] sids)
         {
             List<StockSingleQuoteDataDTO> dataset = new List<StockSingleQuoteDataDTO>();
 
-            foreach (int id in symbolIds)
+            foreach (int id in sids)
             {
-                // Fetching one stock at a time is better than at once due to caching.
+                // Fetching one stock at a time since values are cached.
                 StockSingleQuoteDataDTO quote = await _stockDataService.GetSingleQuoteData(id);
                 dataset.Add(quote);
 

@@ -29,6 +29,9 @@ namespace FomoAPIIntegrationTests.Fixtures
             var deletePortfolioSql = @"DELETE FROM Portfolio;";
             await Connection.ExecuteAsync(deletePortfolioSql, null);
 
+            var deleteVotesSql = @"DELETE FROM Vote;";
+            await Connection.ExecuteAsync(deleteVotesSql, null);
+
             var deleteSymbolSql = @"DELETE FROM Symbol";
             await Connection.ExecuteAsync(deleteSymbolSql, null);
 

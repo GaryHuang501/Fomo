@@ -28,6 +28,7 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
             builder.RegisterType<StockDataRepository>().As<IStockDataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<VoteRepository>().As<IVoteRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerDependency();
             builder.RegisterType<FireBaseDBClient>().As<INotificationClient>().InstancePerLifetimeScope();

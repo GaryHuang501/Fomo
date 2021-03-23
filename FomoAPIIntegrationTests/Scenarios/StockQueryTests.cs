@@ -322,7 +322,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         private async Task<List<StockSingleQuoteDataDTO>> GetSingleQuoteData(int[] symbolIds)
         {
-            string singleQuotePath = ApiPath.GetSingleQuoteDataPath(symbolIds);
+            string singleQuotePath = ApiPath.GetSingleQuoteData(symbolIds);
             var response = await _client.GetAsync(singleQuotePath);
             var data = await response.Content.ReadAsAsync<IEnumerable<StockSingleQuoteDataDTO>>();
 
@@ -331,7 +331,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         private async Task<SymbolSearchResultDTO> SearchSymbol(string ticker, ExchangeType exchange)
         {
-            var response = await _client.GetAsync(ApiPath.SymbolSearchPath(ticker, 1));
+            var response = await _client.GetAsync(ApiPath.SymbolSearch(ticker, 1));
             response.EnsureSuccessStatusCode();
             var searchResultsJson = await response.Content.ReadAsStringAsync();
    

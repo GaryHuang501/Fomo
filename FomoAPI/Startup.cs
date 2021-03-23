@@ -37,9 +37,9 @@ namespace FomoAPI
                     .AddCustomCORS(DevelopmentCorsPolicyName)
                     .AddCustomAntiForgery()
                     .AddCustomHttpClients(Configuration);
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                    .AddApplicationPart(typeof(Startup).Assembly);
+                    .AddApplicationPart(typeof(Startup).Assembly)
+                    .AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

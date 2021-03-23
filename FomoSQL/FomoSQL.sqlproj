@@ -80,6 +80,7 @@
     <Build Include="Stored Procedures\UpdateSymbols.sql" />
     <Build Include="Stored Procedures\DelistSymbols.sql" />
     <Build Include="Settings.sql" />
+    <Build Include="Vote.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DataSetup\Exchanges.sql" />

@@ -11,8 +11,10 @@ using Xunit;
 
 namespace FomoAPIIntegrationTests.ContractTests
 {
-    public class FireBaseContractTests
+    public class FireBaseContractTests: IAsyncLifetime
     {
+        private readonly FirebaseAuthFactory _authFactory;
+
         private readonly FireBaseDBClient _client;
 
         private class Test
@@ -27,13 +29,24 @@ namespace FomoAPIIntegrationTests.ContractTests
             var optionsAccessor = new Mock<IOptionsMonitor<FireBaseOptions>>();
             optionsAccessor.Setup(o => o.CurrentValue).Returns(AppTestSettings.Instance.FireBaseOptions);
 
-            var authFactory = new FirebaseAuthFactory(optionsAccessor.Object, logger.Object);
-            _client = new FireBaseDBClient(mockHttpFactory, optionsAccessor.Object, authFactory);
+            _authFactory = new FirebaseAuthFactory(optionsAccessor.Object, logger.Object);
+            _client = new FireBaseDBClient(mockHttpFactory, optionsAccessor.Object, _authFactory);
+        }
+
+        public async Task InitializeAsync()
+        {
+            await _authFactory.StartAsync(new System.Threading.CancellationToken());
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
         public async Task Should_UpdateAndGet_DataFromFirebase()
         {
+
             var guid = Guid.NewGuid();
             await _client.Upsert($"test/{guid}", new  Test{ Id = guid });
 
