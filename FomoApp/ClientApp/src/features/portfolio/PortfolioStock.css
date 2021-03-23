@@ -1,0 +1,12 @@
+.portfolio-row-name{
+    color: lightseagreen;
+    font-weight: bold;   
+}
+
+.portfolio-stock-positive-delta{
+    color: 	limegreen;
+}
+
+.portfolio-stock-negative-delta{
+    color: red;
+}

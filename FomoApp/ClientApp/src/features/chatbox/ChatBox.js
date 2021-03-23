@@ -76,7 +76,7 @@ export default function ChatBox(){
   return (
     <aside id="chatbox">
       <div id="chatbox-top-filler-box"></div> {/* Empty area to give spacing between scrollbar and rounded bordders*/}
-      <ChatListener userId={user.id} onNewChatMessage={onNewChatMessage}></ChatListener>
+      <ChatListener userId={user.id} onNewChatMessage={onNewChatMessage} aria-level="1" role="heading"></ChatListener>
       <ChatMessageArea chatMessages={chatMessages}></ChatMessageArea>
       { showEmoji ? <div id='chatbox-emoji-picker'><Picker onSelect={onEmojiPicked}></Picker></div> : null }
       <ChatInputBar 

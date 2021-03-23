@@ -1,30 +1,37 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+import QueryHelper from '../../app/QueryHelper';
 import axios from 'axios';
 
-export const fetchStockSingleQuoteDatas = createAsyncThunk('fetchStockSingleQuoteDatas/', async (symbolIds, thunkApi) => {
+export const fetchStockSingleQuoteDatas = createAsyncThunk('stock/fetchStockSingleQuoteDatas/', async (symbolIds, thunkApi) => {
 
-    let idQuery = "";
-
-    for(let i = 0; i < symbolIds.length; i++){
-        const id = symbolIds[i];
-
-        if(i !== 0){
-            idQuery += "&"
-        }
-
-        idQuery += `symbolIds=${id}`
-    }
+    let idQuery = QueryHelper.createIdsQuery("sids", symbolIds);
     
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/singleQuoteData?${idQuery}`);
     return response.data;
 
 });
 
+export const fetchVoteData = createAsyncThunk('vote/fetchVoteData/', async (symbolIds, thunkApi) => {
+
+    let idQuery = QueryHelper.createIdsQuery("sids", symbolIds);
+    
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/vote?${idQuery}`);
+    return response.data;
+});
+
+export const sendVote = createAsyncThunk('vote/sendVote', async (vote) => {
+
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/vote`, { symbolId: vote.symbolId, direction: vote.dir});
+    return response.data;
+});
+
 export const stocksSlice = createSlice({
     name: 'stocks',
     initialState: {
         singleQuoteData:{      
+        },
+        votes:{ 
         }
     },
     reducers: {
@@ -42,7 +49,7 @@ export const stocksSlice = createSlice({
                     state.singleQuoteData[newSingleQuoteData.symbolId] = newSingleQuoteData.data;
                 } 
             }
-        },
+        }
     }
 });
 

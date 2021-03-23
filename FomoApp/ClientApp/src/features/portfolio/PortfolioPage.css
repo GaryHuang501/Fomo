@@ -21,7 +21,7 @@
 }
 
 #portfolio-chatbox-container{
-    grid-column: 10 / span 4;
+    grid-column: 10 / span 3;
     grid-row: 2 / span 2;
     height: 40rem;
 }

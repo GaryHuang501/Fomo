@@ -1,0 +1,11 @@
+.already-voted{
+    color: orange;
+}
+
+.votable{
+    cursor: pointer;
+}
+
+.portfolio-row-votes{
+    min-width: 6rem;
+}

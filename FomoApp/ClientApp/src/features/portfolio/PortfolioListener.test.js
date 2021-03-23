@@ -84,7 +84,7 @@ it("Should fetch stock data for single symbol in portfoio immediately when loade
     };
 
     const mock = new MockAdapter(axios);
-    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`)
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`)
         .reply(200, [singleQuoteData]);
 
     const spy = jest.spyOn(axios, 'get');
@@ -156,7 +156,7 @@ it("Should not fetch stock data on batch call when no new notification updates",
     };
 
     const mock = new MockAdapter(axios);
-    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`)
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`)
         .reply(200, [singleQuoteData]);
 
     const spy = jest.spyOn(axios, 'get');
@@ -251,7 +251,7 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
     };
 
 
-    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1&symbolIds=2`)        
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`)        
         .reply(200, [singleQuoteData1, singleQuoteData2]);
         
     const spy = jest.spyOn(axios, 'get');
@@ -282,7 +282,7 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
 
     await Promise.resolve();
 
-    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1&symbolIds=2`);
+    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`);
 
     await waitFor(() => {
         expect(screen.getByText(singleQuoteData1.data.ticker)).toBeInTheDocument();
@@ -369,7 +369,7 @@ it("Should only update stocks if the cached stock last updated date is older tha
             }
     };
 
-    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`)        
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`)        
         .reply(200, [updateSingleQuoteData1]);
         
     const spy = jest.spyOn(axios, 'get');
@@ -401,7 +401,7 @@ it("Should only update stocks if the cached stock last updated date is older tha
 
     await Promise.resolve();
 
-    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`);
+    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`);
 
     await waitFor(() => {
         var portfolioStock = screen.getAllByRole('row');
@@ -472,7 +472,7 @@ it("Should not update stock if server data is older than cached in store", async
             }
     };
 
-    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`)        
+    mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`)        
         .reply(200, [serverSingleQuoteData1]);
         
     const spy = jest.spyOn(axios, 'get');
@@ -498,7 +498,7 @@ it("Should not update stock if server data is older than cached in store", async
 
     await Promise.resolve();
 
-    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?symbolIds=1`);
+    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`);
 
     await waitFor(() => {
         var portfolioStock = screen.getAllByRole('row');
