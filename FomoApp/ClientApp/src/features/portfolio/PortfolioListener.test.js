@@ -42,7 +42,7 @@ function getRefPath(symbolId){
     return `${singleQuoteDataPath}/${symbolId}`;
 }
 
-it("Should fetch stock data for single symbol in portfoio immediately when loaded", async () => {
+it("Should fetch stock data and vote data for single symbol in portfoio immediately when loaded", async () => {
 
     const portfolioSymbol = { id: 1, symbolId: 1, ticker: "VOO" };
 
@@ -58,8 +58,8 @@ it("Should fetch stock data for single symbol in portfoio immediately when loade
     };
 
     const initialStockData = {
-        singleQuoteData: {
-        }
+        singleQuoteData: {},
+        votes:{}
     };
 
     const initialState = {
@@ -77,15 +77,24 @@ it("Should fetch stock data for single symbol in portfoio immediately when loade
                 price: 12.15,
                 averagePrice: 12.50,
                 changePercent: 12.50,
-                votes: 5,
                 return: 1,
                 lastUpdated: '2020-01-01'
             }
     };
 
+    const voteData = {
+        symbolId: 1,
+        count: 9991,
+        myVoteDirection: 1
+    };
+
     const mock = new MockAdapter(axios);
+
     mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`)
         .reply(200, [singleQuoteData]);
+    
+    mock.onGet(`${process.env.REACT_APP_API_URL}/votes?sids=1`)
+        .reply(200, { 1: voteData });
 
     const spy = jest.spyOn(axios, 'get');
 
@@ -101,11 +110,14 @@ it("Should fetch stock data for single symbol in portfoio immediately when loade
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
-        
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`);
+    expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/votes?sids=1`);
+
     await waitFor(() => {
         expect(screen.getByText(singleQuoteData.data.ticker)).toBeInTheDocument();
         expect(screen.getByText(singleQuoteData.data.price.toString())).toBeInTheDocument();
+        expect(screen.getByText(voteData.count.toString())).toBeInTheDocument();
     });
 });
 
@@ -131,7 +143,8 @@ it("Should not fetch stock data on batch call when no new notification updates",
                 symbolId: portfolioSymbol.symbolId,
                 ticker: portfolioSymbol.ticker
             }
-        }
+        },
+        votes: {}
     };
 
     const initialState = {
@@ -149,7 +162,6 @@ it("Should not fetch stock data on batch call when no new notification updates",
                 price: 12.15,
                 averagePrice: 12.50,
                 changePercent: 12.50,
-                votes: 5,
                 return: 1,
                 lastUpdated: '2020-01-01'
             }
@@ -192,7 +204,7 @@ it("Should not fetch stock data on batch call when no new notification updates",
     });
 });
 
-it("Should fetch stock data for multiple symbol in portfoio on batch call", async () => {
+it("Should fetch stock and vote data for multiple symbol in portfoio on batch call", async () => {
 
     const portfolioSymbol1 = { id: 1, symbolId: 1, ticker: "VOO" };
     const portfolioSymbol2 = { id: 2, symbolId: 2, ticker: "VTI" };
@@ -209,8 +221,8 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
     };
 
     const initialStockData = {
-        singleQuoteData: {
-        }
+        singleQuoteData: {},
+        votes: {}
     };
 
     const initialState = {
@@ -228,7 +240,6 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
                 price: 12.15,
                 averagePrice: 12.50,
                 changePercent: 12.50,
-                votes: 5,
                 return: 1,
                 lastUpdated: '2020-01-01'
             }
@@ -244,12 +255,27 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
                 price: 100.75,
                 averagePrice: 3.50,
                 changePercent: 88.50,
-                votes: 3,
                 return: 1,
                 lastUpdated: '2020-01-01'
             }
     };
 
+    const voteData1 = {
+        symbolId: portfolioSymbol1.symbolId,
+        count: 7777,
+        myVoteDirection: 1
+    };
+
+    const voteData2 = {
+        symbolId: portfolioSymbol2.symbolId,
+        count: 8888,
+        myVoteDirection: 1
+    };
+
+    const mock = new MockAdapter(axios);
+
+    mock.onGet(`${process.env.REACT_APP_API_URL}/votes?sids=1&sids=2`)
+        .reply(200, {[portfolioSymbol1.symbolId]: voteData1, [portfolioSymbol2.symbolId]: voteData2});
 
     mock.onGet(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`)        
         .reply(200, [singleQuoteData1, singleQuoteData2]);
@@ -282,14 +308,17 @@ it("Should fetch stock data for multiple symbol in portfoio on batch call", asyn
 
     await Promise.resolve();
 
-    expect(spy.mock.calls[0][0]).toEqual(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`);
+    expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`);
+    expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/votes?sids=1&sids=2`);
 
     await waitFor(() => {
-        expect(screen.getByText(singleQuoteData1.data.ticker)).toBeInTheDocument();
+        expect(screen.getByText(singleQuoteData1.data.ticker)).toBeInTheDocument();``
         expect(screen.getByText(singleQuoteData1.data.price.toString())).toBeInTheDocument();
+        expect(screen.getByText(voteData1.count.toString())).toBeInTheDocument();
 
         expect(screen.getByText(singleQuoteData2.data.ticker)).toBeInTheDocument();
         expect(screen.getByText(singleQuoteData2.data.price.toString())).toBeInTheDocument();
+        expect(screen.getByText(voteData2.count.toString())).toBeInTheDocument();
     });
 });
 
@@ -345,7 +374,8 @@ it("Should only update stocks if the cached stock last updated date is older tha
         singleQuoteData: {
             [portfolioSymbol1.symbolId]: singleQuoteData1.data,
             [portfolioSymbol2.symbolId]: singleQuoteData2.data
-        }
+        },
+        votes: {}
     };
 
     const initialState = {
@@ -448,7 +478,8 @@ it("Should not update stock if server data is older than cached in store", async
     const initialStockData = {
         singleQuoteData: {
             [portfolioSymbol1.symbolId]: originalQuoteData.data,
-        }
+        },
+        votes: {}
     };
 
     const initialState = {
@@ -523,7 +554,8 @@ it("Should not fetch stock data when empty portfolio", async () => {
 
     const initialStockData = {
         singleQuoteData: {
-        }
+        },
+        votes: {}
     };
 
     const initialState = {

@@ -42,6 +42,9 @@ it("renders with the portfolio symbol with null data", () => {
       singleQuoteData:
       {
         1: null
+      },
+      votes: {
+        1: null
       }
     }
   };
@@ -62,22 +65,29 @@ it("renders with the portfolio symbol with null data", () => {
 
 it("renders with the portfolio symbol with data", async () => {
   const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc' };
+
   const stockData = {
     symbolId: 1,
     ticker: 'SPY',
     price: 12.15,
     averagePrice: 12.50,
     changePercent: 12.50,
-    votes: 5,
-    return: 1,
-    myVote: 0
+    return: 1
   };
+
+  const voteData = {
+    symbolId: 1,
+    count: 5,
+    myVoteDirection: 0
+  }
 
   const initialState = {
     stocks: {
-      singleQuoteData:
-      {
+      singleQuoteData:{
         1: stockData
+      },
+      votes:{
+        1: voteData
       }
     }
   };
@@ -92,5 +102,5 @@ it("renders with the portfolio symbol with data", async () => {
   expect(columns[changeCol].innerHTML).toBe(stockData.changePercent.toFixed(2) + "%");
   expect(columns[averagePriceCol].innerHTML).toBe(stockData.averagePrice.toString());
   expect(columns[returnCol].innerHTML).toBe(stockData.return.toFixed(2) + "%");
-  await waitFor(() => expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual(stockData.votes.toString()));
+  expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual(voteData.count.toString());
 });

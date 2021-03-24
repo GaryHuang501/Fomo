@@ -1,26 +1,43 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
+import MockAdapter from 'axios-mock-adapter';
+import { PortfolioStock } from './PortfolioStock';
 import React from 'react';
 import VoteColumn from './VoteColumn';
 import { act } from 'react-dom/test-utils';
+import axios from 'axios';
 import { render } from '../../test-util';
 
 const positiveDeltaClass = "portfolio-stock-positive-delta";
 const negativeDeltaClass = "portfolio-stock-negative-delta";
+const testUrl = "http://localhost";
+let mock;
 
 beforeEach(() => {
+  mock = new MockAdapter(axios);
+
+  mock.onPost(`${process.env.REACT_APP_API_URL}/votes`)
+      .reply(200, {});
+
+  process.env = {
+      REACT_APP_API_URL: testUrl
+  };
 });
 
 afterEach(() => {
+  mock.restore();
+  process.env = {};
 });
 
 
-it("renders votes count as 0 when no votes found", async () => {
+it("renders count count as 0 when no count found", async () => {
 
   const props  = {
+    symbolId: 1
   }
+
   act(() => {
-    render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={false}/></tr></tbody></table>);
+    render(<table><tbody><tr><VoteColumn {...props} isEditMode={false}/></tr></tbody></table>);
   });
 
   const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
@@ -29,14 +46,15 @@ it("renders votes count as 0 when no votes found", async () => {
   expect(voteFields[0].innerHTML.trim()).toEqual("0");
 });
 
-it("renders upvote button as green rocket ship when votes > 0", async () => {
+it("renders upvote button as green rocket ship when count > 0", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: 0
+        count: 1,
+        myVoteDirection: 0,
+        symbolId: 1
     };
 
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={false}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={false}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -47,14 +65,15 @@ it("renders upvote button as green rocket ship when votes > 0", async () => {
     expect(downVoteButton.classList).toContain("hidden");
 });
 
-it("renders downvote button as red rocket ship when votes < 0", async () => {
+it("renders downvote button as red rocket ship when count < 0", async () => {
     const props  = {
-        votes: -1,
-        myVoteDir: 0
+        count: -1,
+        myVoteDirection: 0,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={false}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={false}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -65,14 +84,15 @@ it("renders downvote button as red rocket ship when votes < 0", async () => {
     expect(upVoteButton.classList).toContain("hidden");
 });
 
-it("renders both vote buttons normally when votes is 0", async () => {
+it("renders both vote buttons normally when count is 0", async () => {
     const props  = {
-        votes: 0,
-        myVoteDir: 0
+        count: 0,
+        myVoteDirection: 0,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={false}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={false}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -85,12 +105,13 @@ it("renders both vote buttons normally when votes is 0", async () => {
 
 it("renders the upvote icon as highlighted when I upvoted before in edit mode", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: 1
+        count: 1,
+        myVoteDirection: 1,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -101,12 +122,13 @@ it("renders the upvote icon as highlighted when I upvoted before in edit mode", 
 
 it("renders the buttons as clickable when in edit mode", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: -1
+        count: 1,
+        myVoteDirection: -1,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -119,12 +141,13 @@ it("renders the buttons as clickable when in edit mode", async () => {
 
 it("renders the downvote icon as highlighted when I downvoted before in edit mode", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: -1
+        count: 1,
+        myVoteDirection: -1,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -133,14 +156,15 @@ it("renders the downvote icon as highlighted when I downvoted before in edit mod
     expect(downVoteButton.classList).toContain("already-voted");
 });
 
-it("renders the icon as not highlighted in edit mode when I made no votes yet", async () => {
+it("renders the icon as not highlighted in edit mode when I made no count yet", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: 0
+        count: 1,
+        myVoteDirection: 0,
+        symbolId: 1
     };
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -153,12 +177,15 @@ it("renders the icon as not highlighted in edit mode when I made no votes yet", 
 
 it("increments the vote count by 1 when I upvote and have not voted before", async () => {
     const props  = {
-        votes: 1,
-        myVoteDir: 0
+        count: 1,
+        myVoteDirection: 0,
+        symbolId: 1
     };
+
+    const spy = jest.spyOn(axios, 'post');
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -166,20 +193,21 @@ it("increments the vote count by 1 when I upvote and have not voted before", asy
 
     fireEvent.click(upVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
-
-    expect(voteFields.length).toEqual(1);
-    await waitFor( () => expect(voteFields[0].innerHTML.trim()).toEqual("2"));
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: 1, delta: 1}));
 });
 
 it("decrements the vote count by 1 when I downvote and have not voted before", async () => {
     const props  = {
-        votes: 3,
-        myVoteDir: 0
+        count: 3,
+        myVoteDirection: 0,
+        symbolId: 1
     };
     
+    const spy = jest.spyOn(axios, 'post');
+
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -187,20 +215,21 @@ it("decrements the vote count by 1 when I downvote and have not voted before", a
 
     fireEvent.click(downVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
-
-    expect(voteFields.length).toEqual(1);
-    await waitFor( () => expect(voteFields[0].innerHTML.trim()).toEqual("2"));
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: -1, delta: -1}));
 });
 
 it("decrements the vote count by 1 when I remove my upvote by clicking it again", async () => {
     const props  = {
-        votes: 10,
-        myVoteDir: 1
+        count: 10,
+        myVoteDirection: 1,
+        symbolId: 1
     };
     
+    const spy = jest.spyOn(axios, 'post');
+
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -208,20 +237,21 @@ it("decrements the vote count by 1 when I remove my upvote by clicking it again"
 
     fireEvent.click(upVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
-
-    expect(voteFields.length).toEqual(1);
-    await waitFor(() => expect(voteFields[0].innerHTML.trim()).toEqual("9"));
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: 0, delta: -1}));
 });
 
 it("increments the vote count by 1 when I remove my downvote by clicking it again", async () => {
     const props  = {
-        votes: 10,
-        myVoteDir: -1
+        count: 10,
+        myVoteDirection: -1,
+        symbolId: 1
     };
-    
+
+    const spy = jest.spyOn(axios, 'post');
+
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -229,20 +259,21 @@ it("increments the vote count by 1 when I remove my downvote by clicking it agai
 
     fireEvent.click(downVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
-
-    expect(voteFields.length).toEqual(1);
-    await waitFor( () => expect(voteFields[0].innerHTML.trim()).toEqual("11"));
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: 0, delta: 1}));
 });
 
 it("increments the vote count by 2 when I switch from downvote to upvote", async () => {
     const props  = {
-        votes: 10,
-        myVoteDir: -1
+        symbolId: 1,
+        count: 10,
+        myVoteDirection: -1
     };
+
+    const spy = jest.spyOn(axios, 'post');
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
     
     const voteButtons = screen.queryAllByRole("button");
@@ -250,20 +281,21 @@ it("increments the vote count by 2 when I switch from downvote to upvote", async
 
     fireEvent.click(upVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
-
-    expect(voteFields.length).toEqual(1);
-    await waitFor( () => expect(voteFields[0].innerHTML.trim()).toEqual("12"));
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: 1, delta: 2}));
 });
 
 it("decrements the vote count by 2 when I switch from upvote to downvote", async () => {
     const props  = {
-        votes: 10,
-        myVoteDir: 1
+        count: 10,
+        myVoteDirection: 1,
+        symbolId: 1
     };
+
+    const spy = jest.spyOn(axios, 'post');
     
     act(() => {
-      render(<table><tbody><tr><VoteColumn votes={props.votes} myVoteDir={props.myVoteDir} isEditMode={true}/></tr></tbody></table>);
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>);
     });
   
     const voteButtons = screen.queryAllByRole("button");
@@ -271,8 +303,51 @@ it("decrements the vote count by 2 when I switch from upvote to downvote", async
 
     fireEvent.click(downVoteButton);
 
-    const voteFields = document.getElementsByClassName("portfolio-row-votes-value")
+    await Promise.resolve();
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: -1, delta: -2}));
+});
 
-    expect(voteFields.length).toEqual(1);
-    await waitFor( () => expect(voteFields[0].innerHTML.trim()).toEqual("8"));
+it("re-renders with new vote values when upvoted", async () => {
+  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc' };
+
+  const stockData = {
+    symbolId: 1,
+    ticker: 'SPY',
+    price: 12.15,
+    averagePrice: 12.50,
+    changePercent: 12.50,
+    return: 1
+  };
+
+  const voteData = {
+    symbolId: 1,
+    count: 9999,
+    myVoteDirection: 0
+  }
+
+  const initialState = {
+    stocks: {
+      singleQuoteData:{
+        1: stockData
+      },
+      votes:{
+        1: voteData
+      }
+    }
+  };
+
+  act(() => {
+    render(<table>
+              <tbody>
+                <PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} />
+              </tbody>
+            </table>, { initialState });
+  });
+
+  const voteButtons = screen.queryAllByRole("button").filter(b => b.classList.contains("fa-rocket"));
+  const upvoteButton = voteButtons[0];
+
+  fireEvent.click(upvoteButton);
+
+  await waitFor( () => expect(screen.getByText(voteData.count + 1)).toBeInTheDocument());
 });

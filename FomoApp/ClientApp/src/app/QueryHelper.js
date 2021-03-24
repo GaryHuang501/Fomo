@@ -1,4 +1,4 @@
-export default {
+const QueryHelper = {
     createIdsQuery: function(key, ids){
         
         let idQuery = "";
@@ -19,4 +19,6 @@ export default {
 
         return idQuery;
     }
-}
+};
+
+export default QueryHelper;

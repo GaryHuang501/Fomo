@@ -46,7 +46,8 @@ it("renders single portfolio stock", () => {
     const initialStockData = {
       singleQuoteData: {
         1: {}
-      }
+      }, 
+      votes: {}
     };
     
     const initialState = {
@@ -87,7 +88,8 @@ it("renders single portfolio stock", () => {
     const initialStockData = {
       singleQuoteData: {
         1: {}
-      }
+      },
+      votes: {}
     };
     
     const initialState = {

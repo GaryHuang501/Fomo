@@ -1,6 +1,6 @@
 import './Portfolio.css';
 
-import { fetchStockSingleQuoteDatas, selectStocksLastUpdatedDates } from './../stocks/stocksSlice';
+import { fetchStockSingleQuoteDatas, fetchVoteData, selectStocksLastUpdatedDates } from './../stocks/stocksSlice';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import PortfolioStockListener from './PortfolioStockListener';
@@ -53,6 +53,7 @@ export default function PortfolioListener(){
 
             if(symbolIds.length > 0){
                 dispatch(fetchStockSingleQuoteDatas(symbolIds));
+                dispatch(fetchVoteData(symbolIds));
             }       
         }
 

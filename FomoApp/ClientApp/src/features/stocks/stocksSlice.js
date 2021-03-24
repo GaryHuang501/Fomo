@@ -16,13 +16,14 @@ export const fetchVoteData = createAsyncThunk('vote/fetchVoteData/', async (symb
 
     let idQuery = QueryHelper.createIdsQuery("sids", symbolIds);
     
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/vote?${idQuery}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/votes?${idQuery}`);
     return response.data;
 });
 
-export const sendVote = createAsyncThunk('vote/sendVote', async (vote) => {
 
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/vote`, { symbolId: vote.symbolId, direction: vote.dir});
+export const sendVote = createAsyncThunk('vote/sendVote', async (vote, thunkApi) => {
+    thunkApi.dispatch(updateVote(vote));
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/votes`, { symbolId: vote.symbolId, direction: vote.direction, delta: vote.delta});
     return response.data;
 });
 
@@ -35,6 +36,28 @@ export const stocksSlice = createSlice({
         }
     },
     reducers: {
+        updateVote: (state, action) => {
+            const vote = action.payload;
+
+            if(!vote){
+                return;
+            }
+
+            const symbolId = vote.symbolId;
+            const votes = state.votes[symbolId];
+
+            if(votes){
+                votes.count += vote.delta;
+                votes.myVoteDirection = vote.direction;
+            }
+            else{
+                state.votes[symbolId] = {
+                    symbolId: symbolId,
+                    count: vote.delta,
+                    myVoteDirection: vote.direction
+                }
+            }
+        }
     },
     extraReducers: {
         [fetchStockSingleQuoteDatas.fulfilled]: (state, action) => {
@@ -48,6 +71,11 @@ export const stocksSlice = createSlice({
                 if(isStaleData){                  
                     state.singleQuoteData[newSingleQuoteData.symbolId] = newSingleQuoteData.data;
                 } 
+            }
+        },
+        [fetchVoteData.fulfilled]: (state, action) => {
+            if(action.payload){
+                state.votes = action.payload;       
             }
         }
     }
@@ -74,8 +102,7 @@ export const selectStocksLastUpdatedDates = function(state){
 
 export const selectStockData = function(state, portfolioSymbol){
 
-    if(portfolioSymbol.symbolId in state.stocks.singleQuoteData 
-        && state.stocks.singleQuoteData[portfolioSymbol.symbolId]){
+    if(portfolioSymbol.symbolId in state.stocks.singleQuoteData && state.stocks.singleQuoteData[portfolioSymbol.symbolId]){
         return state.stocks.singleQuoteData[portfolioSymbol.symbolId];
     }
     else{
@@ -85,9 +112,25 @@ export const selectStockData = function(state, portfolioSymbol){
             price: "Pending",
             averagePrice: "--",
             change: "--",
-            votes: 0
         }
     }
 }
+
+export const selectVoteData = function(state, symbolId){
+
+    if(symbolId in state.stocks.votes && state.stocks.votes[symbolId]){
+        return state.stocks.votes[symbolId];
+    }
+    else{
+        return {
+            count: 0,
+            myVote: 0,
+            symbolId: symbolId
+        };
+    }
+}
+
+export const { updateVote } = stocksSlice.actions;
+
 
 export default stocksSlice.reducer;
