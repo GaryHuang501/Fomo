@@ -43,7 +43,7 @@ export const PortfolioStock = (props) => {
     }
 
     function onShowChart(){
-        window.open(`https://www.tradingview.com/symbols/${portfolioSymbol.ticker}`, "_blank"); 
+        window.open(`${process.env.REACT_APP_CHART_URL}/${portfolioSymbol.ticker}`, "_blank"); 
     }
 
     function onRemove(){
