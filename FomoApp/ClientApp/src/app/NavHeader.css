@@ -9,9 +9,24 @@
   
   #header-nav-bar {
     display: flex;
-    grid-column: col-start 3 / span 16;
+    grid-column: col-start 3 / span 10;
     grid-row: 2;
     height: 4rem;
+  }
+
+  #header-logout {
+    grid-column: col-start 13 / span 1;
+    grid-row: 2;
+    height: 4rem;
+    line-height: 4rem;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+
+  #header-logout a{
+    text-decoration: none;
+    color: white;
   }
   
   .nav-header-item {
@@ -42,7 +57,7 @@
     content: url("../assets/GitHub-Mark-32px.png");
     display: inline;
   }
-  
+
   .check.icon {
     color: white;
     position: absolute;

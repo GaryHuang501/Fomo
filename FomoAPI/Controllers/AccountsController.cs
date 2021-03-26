@@ -71,6 +71,18 @@ namespace FomoAPI.Controllers
         }
 
         /// <summary>
+        /// Log out
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout(string returnUrl)
+        {
+            await _signInManager.SignOutAsync();
+
+            return Redirect(returnUrl);
+        }
+
+        /// <summary>
         /// Callback after external provider to login or register new user
         /// </summary>
         /// <param name="returnUrl">Return URL after logging in</param>

@@ -13,6 +13,17 @@ export const getAccount = createAsyncThunk('login/getAccount', async () => {
     return response.data;
 });
 
+export const signOut = createAsyncThunk('login/signout', async () => {
+    await axios.Post(`${process.env.REACT_APP_API_URL}/accounts/signout`);
+});
+
+function revokeCredentials(state){
+    state.isAuthenticated = false;
+    state.isFirebaseAuthenticated = false;
+    state.customClientToken = false;
+    state.user = null;
+}
+
 export const loginSlice = createSlice({
   name: 'login',
   initialState: {
@@ -26,7 +37,7 @@ export const loginSlice = createSlice({
           state.isAuthenticated = true;
       },
       setUnauthenticated: state => {
-          state.isAuthenticated = false;
+        revokeCredentials(state);
       },
       setFireBaseAuthenticated: state => {
           state.isFirebaseAuthenticated = true;
@@ -55,6 +66,9 @@ export const loginSlice = createSlice({
     [getClientCustomToken.rejected]: (state, action) => {
         state.status = 'failed'
         state.isFirebaseAuthenticated = false;
+    },
+    [signOut.fulfilled]: (state, action) => {
+        revokeCredentials(state);
     }
   }
 });

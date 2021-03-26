@@ -3,7 +3,14 @@ import './NavHeader.css';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
 
-export const NavHeader = function () {
+export const NavHeader = function (props) {
+
+  function onSignOut(){
+    if(props.signOut){
+      props.signOut();
+    }
+  }
+
   return (
     <header id='app-header'>
       <h2 id="header-title">FOMO <span className="check icon"></span></h2>
@@ -14,6 +21,7 @@ export const NavHeader = function () {
         <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/About">About</NavLink></div>
         <div className="nav-header-item"><a className="github-link" href="https://github.com/GaryHuang501/Fomo" aria-label="github"> </a></div>
       </nav>
+      <div id="header-logout" role="button" onClick={onSignOut}>Sign out</div>
     </header>
   );
 }
