@@ -7,6 +7,6 @@ namespace FomoAPI.Application.Commands.Portfolio
 {
     public class ReorderPortfolioCommand
     {
-        public Dictionary<string, int> PortfolioSymbolIdToSortOrder { get; set; }
+        public Dictionary<int, int> PortfolioSymbolIdToSortOrder { get; set; }
     }
 }

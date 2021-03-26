@@ -96,7 +96,6 @@ namespace FomoAPI.Controllers
                 {
                     var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, true);
 
-
                     if (result.Succeeded)
                     {
                         return Redirect(returnUrl);
@@ -114,6 +113,7 @@ namespace FomoAPI.Controllers
 
             var emailUserNamePart = email.Split('@')[0];
             var user = new IdentityUser<Guid> { UserName = emailUserNamePart, Email = email };
+
 
             var result = await _userManager.CreateAsync(user);
 

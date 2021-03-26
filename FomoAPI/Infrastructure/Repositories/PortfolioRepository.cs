@@ -185,8 +185,13 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <param name="portfolioSymbolId">Id of reordered portfolioSymbol</param>
         /// <param name="newSortOrder">New sort order</param>
         /// <returns>True if rows updated. Otherwise portfolio symbol was not found.</returns>
-        public async Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<string, int> portfolioSymbolIdToSortOrder)
+        public async Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<int, int> portfolioSymbolIdToSortOrder)
         {
+            if (!portfolioSymbolIdToSortOrder.Any())
+            {
+                return false;
+            }
+
             var reorderSQL = @"	UPDATE PortfolioSymbol
 	                            SET	
 		                            SortOrder = tvpNewSortOrder.SortOrder
@@ -201,6 +206,7 @@ namespace FomoAPI.Infrastructure.Repositories
 
 
             var reorderTableValueData = portfolioSymbolIdToSortOrder.ToDataTable("PortfolioSymbolId", "SortOrder");
+
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -271,7 +277,9 @@ namespace FomoAPI.Infrastructure.Repositories
                                     ON
                                         Exchange.Id = Symbol.ExchangeId
                                     WHERE
-                                        PortfolioSymbol.PortfolioId = @portfolioId";
+                                        PortfolioSymbol.PortfolioId = @portfolioId
+                                    ORDER BY
+                                        PortfolioSymbol.SortOrder";
 
             using (var connection = new SqlConnection(_connectionString))
             {

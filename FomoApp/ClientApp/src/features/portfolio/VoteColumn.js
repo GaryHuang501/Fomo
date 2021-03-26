@@ -1,7 +1,8 @@
 import './VoteColumn.css';
 
+import { VoteDirectionType, sendVote } from '../stocks/stocksSlice';
+
 import React from 'react';
-import { sendVote } from '../stocks/stocksSlice';
 import { useDispatch } from 'react-redux';
 
 /*
@@ -15,7 +16,6 @@ import { useDispatch } from 'react-redux';
 */
 export default function VoteColumn(props){
 
-    const myVoteDirectionType = Object.freeze({ UPVOTE: 1, NONE: 0, DOWNVOTE: -1});
     
     const myVoteDirection = props.myVoteDirection ?? 0;
     const displayVotes = props.count ?? 0;
@@ -29,7 +29,7 @@ export default function VoteColumn(props){
         const newVoteDirection = parseInt(e.target.dataset.dir);
 
         // if the user clicks the same vote direction, it resets it to 0.
-        let newActualDirection = myVoteDirection === newVoteDirection ? myVoteDirectionType.NONE : newVoteDirection;
+        let newActualDirection = myVoteDirection === newVoteDirection ? VoteDirectionType.NONE : newVoteDirection;
 
         const newVote = {symbolId: props.symbolId, direction: newActualDirection, delta: (newActualDirection - myVoteDirection) };
         dispatch(sendVote(newVote));
@@ -67,8 +67,8 @@ export default function VoteColumn(props){
         setClassesForDisplayOnlyMode();
     }
 
-    let upvoteElement = <span><i className={upVoteClasses} data-dir={myVoteDirectionType.UPVOTE} onClick={onVote} role="button"/></span>;
-    let downVoteElement = <span><i className={downVoteClasses} data-dir={myVoteDirectionType.DOWNVOTE} onClick={onVote} role="button"/></span>
+    let upvoteElement = <span><i className={upVoteClasses} data-dir={VoteDirectionType.UPVOTE} onClick={onVote} role="button"/></span>;
+    let downVoteElement = <span><i className={downVoteClasses} data-dir={VoteDirectionType.DOWNVOTE} onClick={onVote} role="button"/></span>
 
     return (
         <td className="portfolio-column portfolio-row-votes" role='cell'>

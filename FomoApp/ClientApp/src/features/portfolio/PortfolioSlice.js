@@ -2,24 +2,62 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL;
-
 export const fetchPortfolioIds = createAsyncThunk('portfolio/fetchPortfoliIds', async (thunkApi) => {
-    const response = await axios.get(`${apiUrl}/portfolios`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/portfolios`);
 
     return response.data;
 });
 
 export const fetchPortfolio = createAsyncThunk('portfolio/fetchPortfolio', async (id, thunkApi) => {
-    const response = await axios.get(`${apiUrl}/portfolios/${id}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/portfolios/${id}`);
 
     return response.data;
 });
 
 export const addPortfolioStock = createAsyncThunk('portfolio/addPortfolioStock', async (payload, thunkApi) => {
-    const response = await axios.post(`${apiUrl}/portfolios/${payload.portfolioId}/portfolioSymbols`, {symbolId: payload.symbolId});
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/portfolios/${payload.portfolioId}/portfolioSymbols`, {symbolId: payload.symbolId});
 
     return response.data;
+});
+
+export const removePortfolioStock =  createAsyncThunk('portfolio/removePortfolioStock', async (payload) => {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/portfolios/${payload.portfolioId}/portfolioSymbols/${payload.portfolioSymbolId}`);
+
+    return {portfolioId: payload.portfolioId, portfolioSymbolId: payload.portfolioSymbolId};
+});
+
+export const movePortfolioStock =  createAsyncThunk('portfolio/movePortfolioStock', async (payload, thunkApi) => {
+
+    const { portfolioSymbolId, sortDirection}  = payload;
+
+    const portfolio = selectSelectedPortfolio(thunkApi.getState());
+
+    const index = portfolio.portfolioSymbols.findIndex(s => s.id === portfolioSymbolId)
+
+    if(index < 0) return;
+
+    const newIndex = index + sortDirection;
+
+    if(newIndex < 0 || newIndex > portfolio.portfolioSymbols.length) return;
+
+    const newSortedArray = portfolio.portfolioSymbols.slice();
+
+    const temp = newSortedArray[index];
+    
+    newSortedArray[index] = newSortedArray[newIndex];
+    newSortedArray[newIndex] = temp;
+
+    const portfolioSymbolIdToSortOrder = {}
+
+    newSortedArray.forEach((ps, index) => {
+        portfolioSymbolIdToSortOrder[ps.id] = index; 
+    });
+
+    const apiPayload = { portfolioSymbolIdToSortOrder: Object.assign({}, portfolioSymbolIdToSortOrder) }
+
+    await axios.patch(`${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/reorder`, apiPayload);
+
+    return newSortedArray;
 });
 
 export const portfolioSlice = createSlice({
@@ -71,6 +109,14 @@ export const portfolioSlice = createSlice({
         [addPortfolioStock.rejected]: (state, action) => {
             state.addPortfolioSymbolStatus = 'rejected';
         },
+        [removePortfolioStock.fulfilled]: (state, action) => {
+            const portfolioSymbolIdToRemove = action.payload.portfolioSymbolId;
+            const portfolio = state.portfolios[state.selectedPortfolioId]
+            portfolio.portfolioSymbols = portfolio.portfolioSymbols.filter(s => s.id !== portfolioSymbolIdToRemove);
+        },
+        [movePortfolioStock.fulfilled]: (state, action) => {
+            state.portfolios[state.selectedPortfolioId].portfolioSymbols = action.payload;
+        }
     } 
 });
 
@@ -84,5 +130,7 @@ export const selectSelectedPortfolio = function(state){
     const portfolio = state.portfolio.portfolios[state.portfolio.selectedPortfolioId];
     return portfolio ? portfolio : { id: -1, portfolioSymbols: [] };
 }
+
+export const SortDirectionType = Object.freeze({ UP: -1, DOWN: 1});
 
 export default portfolioSlice.reducer;

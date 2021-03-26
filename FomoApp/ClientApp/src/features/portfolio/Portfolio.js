@@ -9,7 +9,7 @@ export const Portfolio = function (props) {
   const portfolio = useSelector(selectSelectedPortfolio);
   
   const portfolioStocks = portfolio.portfolioSymbols.map(portfolioSymbol => {
-    return <PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol}></PortfolioStock>
+    return <PortfolioStock key={portfolioSymbol.symbolId} portfolioId={portfolio.id} portfolioSymbol={portfolioSymbol}></PortfolioStock>
   });
   
   return (
@@ -22,13 +22,7 @@ export const Portfolio = function (props) {
             <th className="portfolio-column portfolio-header-column" role="columnheader">Avg $</th>
             <th className="portfolio-column portfolio-header-column" role="columnheader">ROI</th>
             <th className="portfolio-column portfolio-header-column" role="columnheader">Votes</th>
-            <th className="portfolio-column portfolio-header-column portfolio-row-options-header" role="columnheader">         
-                <span>Up</span>
-                <span>Down</span>
-                <span>Edit</span>
-                <span>Remove</span>
-                <span>Chart</span>
-            </th>
+            <th className="portfolio-column portfolio-header-column portfolio-row-options-header" role="columnheader"><i class="fas fa-ellipsis-v"></i></th>
         </tr>
       </thead>
       <tbody>

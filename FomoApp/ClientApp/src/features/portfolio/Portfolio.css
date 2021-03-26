@@ -1,5 +1,6 @@
 #portfolio{
-    width: 50rem;
+    width: 100%;
+    max-width: 100%;
     border-spacing: 0;
     border-collapse: separate;
     --portfolio-border-size: 0.1rem;
@@ -8,6 +9,7 @@
 
 .portfolio-column{
     text-align: center;
+    overflow: hidden;
 }
 
 .portfolio-row{
@@ -21,20 +23,6 @@
 
 .portfolio-header{
     height: 6rem;
-}
-
-.portfolio-row-options{
-    text-align: right;
-    padding-right: 2rem;
-}
-
-.portfolio-row-options-field{
-    visibility: hidden;
-    text-align: right;
-}
-
-.portfolio-row:hover .portfolio-row-options-field{
-    visibility: visible;
 }
 
 #portfolio .portfolio-stock:nth-child(odd){

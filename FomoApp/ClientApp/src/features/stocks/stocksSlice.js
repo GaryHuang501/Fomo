@@ -130,6 +130,8 @@ export const selectVoteData = function(state, symbolId){
     }
 }
 
+export const VoteDirectionType = Object.freeze({ UPVOTE: 1, NONE: 0, DOWNVOTE: -1});
+
 export const { updateVote } = stocksSlice.actions;
 
 

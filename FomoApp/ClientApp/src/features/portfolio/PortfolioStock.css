@@ -10,3 +10,36 @@
 .portfolio-stock-negative-delta{
     color: red;
 }
+
+.portfolio-row-options{
+    padding-right: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.portfolio-row-options-field{
+    visibility: hidden;
+    text-align: right;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: grey;
+}
+
+.portfolio-row:hover .portfolio-row-options-field{
+    visibility: visible;
+}
+
+.portfolio-row-options-field:hover{
+    color: orange;
+}
+
+#portfolio tr:nth-child(2) .portfolio-row-options-field-move-up{
+    visibility:hidden
+}
+
+#portfolio tr:last-child .portfolio-row-options-field-move-down{
+    visibility:hidden
+}

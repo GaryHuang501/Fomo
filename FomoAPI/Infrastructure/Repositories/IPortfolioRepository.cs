@@ -27,6 +27,6 @@ namespace FomoAPI.Infrastructure.Repositories
 
         Task<bool> RenamePortfolio(int portfolioId, string newName);
 
-        Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<string, int> portfolioSymbolIdToSortOrder);
+        Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<int, int> portfolioSymbolIdToSortOrder);
     }
 }
