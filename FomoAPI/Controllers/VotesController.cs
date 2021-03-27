@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Vote;
+using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

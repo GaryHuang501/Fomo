@@ -1,8 +1,6 @@
-﻿using System;
+﻿using FomoAPI.Controllers.Authorization;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Controllers
 {
@@ -17,7 +15,7 @@ namespace FomoAPI.Controllers
 
             Value = new Dictionary<string, object>
             {
-                { SecurityUserExtensions.UserNameClaimKey, principal.GetUserName().ToString() },
+                { FomoClaimTypes.UserName, principal.GetUserName().ToString() },
             };
         }
     }

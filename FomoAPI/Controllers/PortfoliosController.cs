@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
+using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +62,7 @@ namespace FomoAPI.Controllers
         [HttpPatch("{id}/rename")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> RenameAsync(int id, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
         {
             var success = await _portfolioRepository.RenamePortfolio(id, renamePortfolioCommand.Name);
@@ -84,6 +85,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             await _portfolioRepository.DeletePortfolio(id);
@@ -94,6 +96,7 @@ namespace FomoAPI.Controllers
         [HttpPost("{id}/portfolioSymbols")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<ActionResult<PortfolioSymbol>> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
         {          
            var portfolioSymbol = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.SymbolId);
@@ -107,6 +110,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpPatch("{id}/portfolioSymbols/reorder")]
+        [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> ReorderPortfolioSymbol(int id, [FromBody] ReorderPortfolioCommand reorderPortfolioCommand)
         {
             var success = await _portfolioRepository.ReorderPortfolioSymbol(id, reorderPortfolioCommand.PortfolioSymbolIdToSortOrder);
@@ -119,6 +123,7 @@ namespace FomoAPI.Controllers
         }
 
         [HttpDelete("{id}/portfolioSymbols/{portfolioSymbolid}")]
+        [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> DeletePortfolioSymbol(int portfolioSymbolid)
         {
             await _portfolioRepository.DeletePortfolioSymbol(portfolioSymbolid);

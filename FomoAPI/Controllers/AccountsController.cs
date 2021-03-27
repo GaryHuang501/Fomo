@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using FomoApp.Exceptions;
 using System;
 using FomoAPI.Infrastructure.Clients;
-using System.Collections.Generic;
 using FomoAPI.Application.DTOs;
+using FomoAPI.Infrastructure.Repositories;
+using System.Linq;
+using FomoAPI.Controllers.Authorization;
 
 namespace FomoAPI.Controllers
 {
@@ -18,15 +20,18 @@ namespace FomoAPI.Controllers
     {
         private readonly SignInManager<IdentityUser<Guid>> _signInManager;
         private readonly UserManager<IdentityUser<Guid>> _userManager;
+        private readonly IPortfolioRepository _portfolioRepo;
         private readonly IClientAuthFactory _clientAuthFactory;
 
         public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
                                   UserManager<IdentityUser<Guid>> userManager,
+                                  IPortfolioRepository portfolioRepo,
                                   IClientAuthFactory clientAuthFactory)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _clientAuthFactory = clientAuthFactory;
+            _portfolioRepo = portfolioRepo;
         }
 
         /// <summary>
@@ -97,26 +102,48 @@ namespace FomoAPI.Controllers
             {
 
                 var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                bool success = false;
 
                 if (user == null)
                 {
                     user = await RegisterUser(loginInfo);
                     await _signInManager.SignInAsync(user, false);
-                    return Redirect(returnUrl);
+                    success = true;
                 }
                 else
                 {
                     var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, true);
+                    success = result.Succeeded;
+                }
 
-                    if (result.Succeeded)
-                    {
-                        return Redirect(returnUrl);
-                    }
+                if (!(await VerifyClaims(user)))
+                {
+                    await _signInManager.RefreshSignInAsync(user);
+                }
+
+                if (success)
+                {
+                    return Redirect(returnUrl);
                 }
             }
 
             return StatusCode(StatusCodes.Status500InternalServerError);
 
+        }
+
+        private async Task<bool> VerifyClaims(IdentityUser<Guid> user)
+        {
+            var claims = await _userManager.GetClaimsAsync(user);
+            bool isVerified = true;
+
+            if(claims.FirstOrDefault(c => c.Type == FomoClaimTypes.PortfolioId) == null)
+            {
+                var portfolioIds = await _portfolioRepo.GetPortfolioIds(user.Id);
+                await _userManager.AddClaimAsync(user, new Claim(FomoClaimTypes.PortfolioId, portfolioIds.First().ToString()));
+                isVerified = false;
+            }
+
+            return isVerified;
         }
 
         private async Task<IdentityUser<Guid>> RegisterUser(ExternalLoginInfo loginInfo)
@@ -126,13 +153,16 @@ namespace FomoAPI.Controllers
             var emailUserNamePart = email.Split('@')[0];
             var user = new IdentityUser<Guid> { UserName = emailUserNamePart, Email = email };
 
-
             var result = await _userManager.CreateAsync(user);
 
             if (!result.Succeeded)
             {
                 throw new UserRegistrationException("Unable to register user");
             }
+
+            var portfolio = await _portfolioRepo.CreatePortfolio(user.Id, "default");
+
+            await _userManager.AddClaimAsync(user, new Claim(FomoClaimTypes.PortfolioId, portfolio.Id.ToString()));
 
             result = await _userManager.AddLoginAsync(user, loginInfo);
 

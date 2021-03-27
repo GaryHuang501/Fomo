@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using FomoAPI.Controllers.Authorization;
 
 namespace FomoAPI
 {
@@ -94,6 +95,15 @@ namespace FomoAPI
             services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
                     .AddEntityFrameworkStores<LoginContext>()
                     .AddDefaultTokenProviders();
+
+            services.AddAuthorization(o =>
+           {
+               o.AddPolicy(PolicyTypes.PortfolioOwner, policy =>
+               {
+                   policy.Requirements.Add(new PortfolioOwnerRequirement());
+                   policy.RequireAuthenticatedUser();
+               });
+           });
 
             services.AddAuthentication()
                     .AddGoogle(o =>

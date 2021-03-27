@@ -2,6 +2,7 @@
 using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using FomoAPI.Application.Stores;
+using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients;
 using FomoAPI.Infrastructure.Clients.AlphaVantage;
@@ -9,6 +10,7 @@ using FomoAPI.Infrastructure.Clients.Firebase;
 using FomoAPI.Infrastructure.Notifications;
 using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Infrastructure.Stocks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,8 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<PortfolioOwnerHandler>().As<IAuthorizationHandler>();
+
             builder.RegisterType<FirebaseAuthFactory>().As<IHostedService>().As<IClientAuthFactory>().SingleInstance();
             builder.RegisterType<StockSearchCache>().SingleInstance();
             builder.RegisterType<SingleQuoteCache>().SingleInstance();

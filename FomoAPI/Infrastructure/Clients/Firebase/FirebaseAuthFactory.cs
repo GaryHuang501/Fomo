@@ -79,7 +79,7 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
 
             _googleCreds = GoogleCredential.FromJson(_firebaseOptions.ServiceAccountCredentials);
 
-            _firebaseApp = FirebaseApp.Create(new AppOptions()
+            _firebaseApp = FirebaseApp.DefaultInstance ?? FirebaseApp.Create(new AppOptions()
             {
                 Credential = _googleCreds
             });
