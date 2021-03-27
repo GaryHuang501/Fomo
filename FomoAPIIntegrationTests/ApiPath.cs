@@ -12,7 +12,7 @@ namespace FomoAPIIntegrationTests
 
         public static string PortfolioSymbols(int portfolioId, int? portfolioSymbolId = null) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/{portfolioSymbolId}";
 
-        public static string PortfolioSymbolsReorder(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/reorder";
+        public static string PortfolioSymbolsReorder(int portfolioId) => $"api/Portfolios/{portfolioId}/PortfolioSymbols/sortorder";
 
         public static string SymbolSearch(string ticker, int limit) => $"api/Symbols/?keywords={ticker}&limit={limit}";
 

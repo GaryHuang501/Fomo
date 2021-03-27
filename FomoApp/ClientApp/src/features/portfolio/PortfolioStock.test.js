@@ -149,7 +149,7 @@ describe("Clicking portfolio stock options", () => {
 
   it("clicking up will move stock up", async () => {
 
-    const url = `${process.env.REACT_APP_API_URL}/portfolios/1/portfolioSymbols/reorder`;
+    const url = `${process.env.REACT_APP_API_URL}/portfolios/1/portfolioSymbols/sortOrder`;
     mock.onPatch(url)
       .reply(200, {});
 
@@ -179,7 +179,7 @@ describe("Clicking portfolio stock options", () => {
 
   it("clicking down will move stock down", async () => {
 
-    const url = `${process.env.REACT_APP_API_URL}/portfolios/1/portfolioSymbols/reorder`;
+    const url = `${process.env.REACT_APP_API_URL}/portfolios/1/portfolioSymbols/sortOrder`;
     mock.onPatch(url)
       .reply(200, {});
 

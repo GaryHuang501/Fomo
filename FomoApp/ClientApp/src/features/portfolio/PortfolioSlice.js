@@ -55,7 +55,7 @@ export const movePortfolioStock =  createAsyncThunk('portfolio/movePortfolioStoc
 
     const apiPayload = { portfolioSymbolIdToSortOrder: Object.assign({}, portfolioSymbolIdToSortOrder) }
 
-    await axios.patch(`${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/reorder`, apiPayload);
+    await axios.patch(`${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/sortOrder`, apiPayload);
 
     return newSortedArray;
 });

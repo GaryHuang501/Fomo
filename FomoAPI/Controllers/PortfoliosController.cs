@@ -109,7 +109,7 @@ namespace FomoAPI.Controllers
             return Ok(portfolioSymbol);
         }
 
-        [HttpPatch("{id}/portfolioSymbols/reorder")]
+        [HttpPatch("{id}/portfolioSymbols/sortOrder")]
         [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> ReorderPortfolioSymbol(int id, [FromBody] ReorderPortfolioCommand reorderPortfolioCommand)
         {
