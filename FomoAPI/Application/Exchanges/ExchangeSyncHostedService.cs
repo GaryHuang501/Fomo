@@ -36,9 +36,11 @@ namespace FomoAPI.Application.Exchanges
 
             int minutesInterval = Math.Max(_exchangeSyncOptions.SyncIntervalMinutes, MinimumIntervalMinutes);
 
-            if (!_exchangeSyncOptions.SyncOnStart)
+            TimeSpan startDelay = TimeSpan.FromMinutes(minutesInterval);
+
+            if (_exchangeSyncOptions.SyncOnStart)
             {
-                return Task.CompletedTask;
+                startDelay = TimeSpan.Zero;
             }
 
             _timer = new Timer(async (state) =>

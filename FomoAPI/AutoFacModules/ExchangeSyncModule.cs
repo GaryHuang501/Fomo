@@ -15,14 +15,14 @@ namespace FomoAPI.AutoFacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<ExchangeSyncHostedService>().As<IHostedService>().SingleInstance();
+
             builder.RegisterType<FtpClient>().As<IFtpClient>().InstancePerDependency();
             builder.RegisterType<NasdaqParser>().As<IExchangeParser>().InstancePerDependency();
             builder.RegisterType<ExchangeClient>().As<IExchangeClient>().InstancePerDependency();
             builder.RegisterType<ExchangeSyncChangesetsFactory>().As<IExchangeSyncChangesetsFactory>().InstancePerDependency();
             builder.RegisterType<ExchangeSyncRepository>().As<IExchangeSyncRepository>().InstancePerDependency();
             builder.RegisterType<ExchangeSync>().As<IExchangeSync>().InstancePerDependency();
-
-            builder.RegisterType<ExchangeSyncHostedService>().As<IHostedService>().SingleInstance();
         }
     }
 }
