@@ -5,6 +5,8 @@ import { SortDirectionType, movePortfolioStock, removePortfolioStock } from './P
 import { selectStockData, selectVoteData } from '../stocks/stocksSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
+import EditPortfolioForm  from './EditPortfolioForm';
+import Modal from '../../app/Modal';
 import PercentageColumn from './PercentageColumn';
 import VoteColumn from './VoteColumn';
 
@@ -18,9 +20,27 @@ export const PortfolioStock = (props) => {
      
     const stockData = useSelector(state => selectStockData(state, portfolioSymbol));
     const voteData = useSelector(state => selectVoteData(state, portfolioSymbol.symbolId));
+    const roi = calculateRoi();
+
+    const [showEditPortfolioModal, setShowEditPortfolioModal] = useState(false);
 
     const [isEditMode, setIsEditMode] = useState(false);
 
+    function calculateRoi(){
+        if(stockData.price === 0){
+            return -100;
+        }
+
+        if(portfolioSymbol.averagePrice === 0){
+            return 0;
+        }
+
+        if(stockData.price && portfolioSymbol.averagePrice){
+            return ((stockData.price - portfolioSymbol.averagePrice) /  portfolioSymbol.averagePrice) * 100;
+        }
+
+        return 0;
+    }
 
     function onMouseOver(){
         setIsEditMode(true);
@@ -39,7 +59,11 @@ export const PortfolioStock = (props) => {
     }
 
     function onEdit(){
+        setShowEditPortfolioModal(true);
+    }
 
+    function onCloseEdit(){
+        setShowEditPortfolioModal(false);
     }
 
     function onShowChart(){
@@ -55,11 +79,17 @@ export const PortfolioStock = (props) => {
             <td className="portfolio-column portfolio-row-name" role='cell'>{portfolioSymbol.ticker}</td>
             <td className="portfolio-column portoflio-row-price" role='cell'>{stockData.price}</td>
             <PercentageColumn value={stockData.changePercent} columnValueClassName='portoflio-row-change'></PercentageColumn>
-            <td className="portfolio-column portfolio-row-average-price" role='cell'>{stockData.averagePrice ?? "--"}</td>
-            <PercentageColumn value={stockData.return} columnValueClassName='portoflio-row-return'></PercentageColumn>
+            <td className="portfolio-column portfolio-row-average-price" role='cell'>{portfolioSymbol.averagePrice > 0 ? portfolioSymbol.averagePrice : "--"}</td>
+            <PercentageColumn value={roi} columnValueClassName='portoflio-row-return'></PercentageColumn>
             <VoteColumn symbolId={voteData.symbolId} count={voteData.count} myVoteDirection={voteData.myVoteDirection} isEditMode={isEditMode}></VoteColumn>
             <td className="portfolio-column" role='cell'>
                 <div className="portfolio-row-options">
+                    <span className="portfolio-row-options-edit-modal-container">
+                        {showEditPortfolioModal 
+                            ? <Modal onCancel={onCloseEdit}><EditPortfolioForm onSubmit={onCloseEdit} portfolioSymbolId={portfolioSymbol.id}/></Modal> 
+                            : null
+                        }
+                    </span>
                     <span className="portfolio-row-options-field portfolio-row-options-field-move-up">
                         <i className="fas fa-caret-up" title="Move Up" role="button" onClick={onMoveUp}/>
                     </span>

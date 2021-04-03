@@ -22,8 +22,8 @@ export default function VoteColumn(props){
 
     const dispatch = useDispatch();
 
-    let upVoteClasses = "fas fa-rocket fa-flip-horizontal";
-    let downVoteClasses = "fas fa-rocket fa-flip-vertical"
+    let upVoteClasses = "fas fa-rocket fa-flip-horizontal vote-button";
+    let downVoteClasses = "fas fa-rocket fa-flip-vertical vote-button"
 
     function onVote(e){
         const newVoteDirection = parseInt(e.target.dataset.dir);

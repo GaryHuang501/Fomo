@@ -7,7 +7,7 @@ import {
   BrowserRouter as Router,
   Switch,
 } from 'react-router-dom'
-import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState, signOut } from './features/login/LoginSlice';
+import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState } from './features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
 import { FirebaseManager } from './app/FirebaseManager';
@@ -42,6 +42,7 @@ function App() {
 
   return (
      <Router>
+         <div id='modal-root'></div>
         <NavHeader signOut={signOut}></NavHeader>
         { !isAuthenticated ? <LoginModal></LoginModal> : null }
         { isAuthenticated ? <FirebaseManager></FirebaseManager> : null } 

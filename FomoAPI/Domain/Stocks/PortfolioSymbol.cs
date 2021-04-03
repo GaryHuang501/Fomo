@@ -1,9 +1,5 @@
 ﻿using Dapper;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
@@ -21,11 +17,13 @@ namespace FomoAPI.Domain.Stocks
 
         public bool Delisted { get; private set; }
 
+        public decimal AveragePrice { get; private set; }
+
         public int SortOrder { get; private set; }
 
         [JsonConstructor]
         [ExplicitConstructor]
-        public PortfolioSymbol(int id, int symbolId, string ticker, string exchangeName, string fullName, bool delisted, int sortOrder)
+        public PortfolioSymbol(int id, int symbolId, string ticker, string exchangeName, string fullName, decimal averagePrice, bool delisted, int sortOrder)
         {
             Id = id;
             SymbolId = symbolId;
@@ -34,6 +32,7 @@ namespace FomoAPI.Domain.Stocks
             FullName = fullName;
             Delisted = delisted;
             SortOrder = sortOrder;
+            AveragePrice = averagePrice;
         }
     }
 }

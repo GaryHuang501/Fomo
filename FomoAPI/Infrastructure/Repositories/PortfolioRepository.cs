@@ -11,9 +11,7 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Repositories
 {
-    /// <summary>
-    /// Repository for CRUD operations on a user's portfolio.
-    /// </summary>
+    /// <inheritdoc cref="IPortfolioRepository"></inheritdoc>/>
     public class PortfolioRepository : IPortfolioRepository
     {
         private string _connectionString;
@@ -22,12 +20,6 @@ namespace FomoAPI.Infrastructure.Repositories
             _connectionString = dbOptions.CurrentValue.ConnectionString;
         }
 
-        /// <summary>
-        /// Create new portfolio
-        /// </summary>
-        /// <param name="userId">UserId for owner of portfolio</param>
-        /// <param name="name">Portfolio name</param>
-        /// <returns></returns>
         public async Task<Portfolio> CreatePortfolio(Guid userId, string name)
         {
             var sql = @"INSERT INTO Portfolio (UserId, Name, DateCreated, DateModified)
@@ -41,12 +33,6 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Add symbol to portfolio
-        /// </summary>
-        /// <param name="portfolioId">Id of Portfolio to add symbols to</param>
-        /// <param name="symbolId">Id of symbol to add</param>
-        /// <returns>Newly Added PortfolioSymbol. Return null if symbol was not added: either symbol Id not found or symbol already exists.</returns>
         public async Task<PortfolioSymbol> AddPortfolioSymbol(int portfolioId, int symbolId)
         {
             var sql = @"DECLARE @InsertedId TABLE 
@@ -101,12 +87,6 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Delete symbol from portfolio
-        /// </summary>
-        /// <param name="portfolioId">Id of portfolio to delete symbol from</param>
-        /// <param name="symbolId">Id of symbol to delete</param>
-        /// <returns>Task</returns>
         public async Task DeletePortfolioSymbol(int portfolioSymbolID)
         {
             var sql = @"DELETE PortfolioSymbol 
@@ -119,11 +99,6 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Delete portfolio
-        /// </summary>
-        /// <param name="portfolioId">Id of portfolio to delete</param>
-        /// <returns>Task</returns>
         public async Task DeletePortfolio(int portfolioId)
         {
             var sql = @"
@@ -155,12 +130,7 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Rename portfolio to given name
-        /// </summary>
-        /// <param name="portfolioId">Id of portfolio to rename</param>
-        /// <param name="newName">New name for the portfolio</param>
-        /// <returns>If portfolio was successfully updated</returns>
+
         public async Task<bool> RenamePortfolio(int portfolioId, string newName)
         {
             var sql = @"UPDATE Portfolio
@@ -177,14 +147,22 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Reorder the given portfolio symbol and update  ort order of other PortfolioSymbol in portfolio
-        /// to match new ordering.
-        /// </summary>
-        /// <param name="portfolioId">Id of portfolio</param>
-        /// <param name="portfolioSymbolId">Id of reordered portfolioSymbol</param>
-        /// <param name="newSortOrder">New sort order</param>
-        /// <returns>True if rows updated. Otherwise portfolio symbol was not found.</returns>
+        public async Task<bool> UpdateAveragePrice(int portfolioSymbolId, decimal averagePrice)
+        {
+            var sql = @"UPDATE PortfolioSymbol
+                        SET
+                            AveragePrice = @averagePrice
+                        WHERE 
+                            Id = @portfolioSymbolId;";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var rowsUpdated = await connection.ExecuteAsync(sql, new { portfolioSymbolId, averagePrice });
+
+                return rowsUpdated > 0;
+            }
+        }
+
         public async Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<int, int> portfolioSymbolIdToSortOrder)
         {
             if (!portfolioSymbolIdToSortOrder.Any())
@@ -238,11 +216,6 @@ namespace FomoAPI.Infrastructure.Repositories
             }
         }
 
-        /// <summary>
-        /// Get the portfolio and it's symbols
-        /// </summary>
-        /// <param name="portfolioId">Id of portfolio to fetch</param>
-        /// <returns>Portfolio. Null if does not exist.</returns>
         public async Task<Portfolio> GetPortfolio(int portfolioId)
         {
             Portfolio portfolio;
@@ -263,6 +236,7 @@ namespace FomoAPI.Infrastructure.Repositories
                                         Symbol.Ticker,
                                         Symbol.FullName,
                                         Symbol.ExchangeId,
+                                        PortfolioSymbol.AveragePrice,
                                         Symbol.Delisted,
                                         Exchange.Name [ExchangeName],                        
                                         PortfolioSymbol.SortOrder
@@ -306,11 +280,6 @@ namespace FomoAPI.Infrastructure.Repositories
             return portfolio;
         }
 
-        /// <summary>
-        /// Get the ids of the portfolios the user owns.
-        /// </summary>
-        /// <param name="userId">User Guid ID</param>
-        /// <returns>IEnumerable<int> containing the portfolio ids.</returns>
         public async Task<IEnumerable<int>> GetPortfolioIds(Guid userId)
         {
             var sql = @"SELECT 

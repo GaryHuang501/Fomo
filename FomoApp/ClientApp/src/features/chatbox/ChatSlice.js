@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import ChatStatusType from './ChatStatusType';
+import MessageType  from './MessageType';
 import firebase from 'firebase/app';
 import { userMessagesPath } from '../../app/FireBasePaths';
 
@@ -13,6 +14,7 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad,
       text: messagePayLoad.text,
       id: newMessagePostRef.key,
       timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
+      messageType: MessageType.Message
     };
 
     newMessagePostRef.set(newMessagePost
@@ -23,6 +25,25 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad,
     });
 
     return newMessagePost;
+});
+
+export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi) => {
+
+    const user = thunkApi.getState().login.user;
+    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${user.id}`).push();
+
+    const newMessagePost = {
+      userId: user.id,
+      userName: user.name,
+      text: text,
+      id: newMessagePostRef.key,
+      timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
+      messageType: MessageType.History
+    };
+
+    newMessagePostRef.set(newMessagePost);
+
+    // It will be added to UI automatically if firebase successful saves it.
 });
 
 export const chatSlice = createSlice({

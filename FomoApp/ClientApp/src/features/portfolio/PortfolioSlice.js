@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axios from 'axios';
+import { sendHistory } from '../chatbox/ChatSlice'
 
 export const fetchPortfolioIds = createAsyncThunk('portfolio/fetchPortfoliIds', async (thunkApi) => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/portfolios`);
@@ -17,13 +18,34 @@ export const fetchPortfolio = createAsyncThunk('portfolio/fetchPortfolio', async
 export const addPortfolioStock = createAsyncThunk('portfolio/addPortfolioStock', async (payload, thunkApi) => {
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/portfolios/${payload.portfolioId}/portfolioSymbols`, {symbolId: payload.symbolId});
 
+    thunkApi.dispatch(sendHistory(`Added ${response.data.ticker} to portfolio`));
+
     return response.data;
 });
 
-export const removePortfolioStock =  createAsyncThunk('portfolio/removePortfolioStock', async (payload) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/portfolios/${payload.portfolioId}/portfolioSymbols/${payload.portfolioSymbolId}`);
+export const updateAvergePricePortfolioStock =  createAsyncThunk('portfolio/updateAvgPricePortfolioStock', async (payload, thunkApi) => {
 
-    return {portfolioId: payload.portfolioId, portfolioSymbolId: payload.portfolioSymbolId};
+    const portfolio = selectSelectedPortfolio(thunkApi.getState());
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/${payload.portfolioSymbolId}/averagePrice`;
+    await axios.patch(endPointUrl, { averagePrice: payload.averagePrice});
+
+    const portfolioSymbol = portfolio.portfolioSymbols.find(s => s.id === payload.portfolioSymbolId);
+
+    thunkApi.dispatch(sendHistory(`Updated average price of ${portfolioSymbol.ticker} to ${payload.averagePrice}`));
+
+    return {portfolioId: portfolio.id, portfolioSymbolId: payload.portfolioSymbolId, averagePrice: payload.averagePrice};
+});
+
+export const removePortfolioStock =  createAsyncThunk('portfolio/removePortfolioStock', async (payload, thunkApi) => {
+    const portfolio = selectSelectedPortfolio(thunkApi.getState());
+
+    await axios.delete(`${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/${payload.portfolioSymbolId}`);
+
+    const portfolioSymbol = portfolio.portfolioSymbols.find(s => s.id === payload.portfolioSymbolId);
+
+    thunkApi.dispatch(sendHistory(`${portfolioSymbol.ticker} was removed from portfolio`));
+
+    return {portfolioId: portfolio.id, portfolioSymbolId: payload.portfolioSymbolId};
 });
 
 export const movePortfolioStock =  createAsyncThunk('portfolio/movePortfolioStock', async (payload, thunkApi) => {
@@ -104,10 +126,16 @@ export const portfolioSlice = createSlice({
         [addPortfolioStock.fulfilled]: (state, action) => {
             state.addPortfolioSymbolStatus = 'succeeded';
             state.portfolios[state.selectedPortfolioId].portfolioSymbols.push(action.payload);
-
         },
         [addPortfolioStock.rejected]: (state, action) => {
             state.addPortfolioSymbolStatus = 'rejected';
+        },
+        [updateAvergePricePortfolioStock.fulfilled]: (state, action) => {
+            const portfolioSymbol = state.portfolios[state.selectedPortfolioId].portfolioSymbols.find(s => s.id === action.payload.portfolioSymbolId);
+
+            if(portfolioSymbol){
+                portfolioSymbol.averagePrice = action.payload.averagePrice;
+            }
         },
         [removePortfolioStock.fulfilled]: (state, action) => {
             const portfolioSymbolIdToRemove = action.payload.portfolioSymbolId;

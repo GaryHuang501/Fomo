@@ -9,3 +9,12 @@
 .portfolio-row-votes{
     min-width: 6rem;
 }
+
+.vote-button{
+    z-index: 1;
+    position: relative;
+}
+
+.fa-rocket {
+    z-index: 1 !important;
+}

@@ -122,6 +122,25 @@ namespace FomoAPI.Controllers
             return Ok();
         }
 
+        [HttpPatch("{id}/portfolioSymbols/{portfolioSymbolid}/averagePrice")]
+        [Authorize(PolicyTypes.PortfolioOwner)]
+        public async Task<IActionResult> UpdateAveragePrice(int portfolioSymbolId, [FromBody] UpdateAveragePriceCommand updateAveragePriceCommand)
+        {
+            if(updateAveragePriceCommand.AveragePrice < 0)
+            {
+                return BadRequest("Average Price cannot be less than 0");
+            }
+
+            var success = await _portfolioRepository.UpdateAveragePrice(portfolioSymbolId, updateAveragePriceCommand.AveragePrice);
+
+            if (!success)
+            {
+                return NotFound("PortfolioSymbol was not found.");
+            }
+            return Ok();
+        }
+
+
         [HttpDelete("{id}/portfolioSymbols/{portfolioSymbolid}")]
         [Authorize(PolicyTypes.PortfolioOwner)]
         public async Task<IActionResult> DeletePortfolioSymbol(int portfolioSymbolid)

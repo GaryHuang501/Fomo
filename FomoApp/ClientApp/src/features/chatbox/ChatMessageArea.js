@@ -39,7 +39,8 @@ export const ChatMessageArea = function(props) {
                                 userName={message.userName} 
                                 displayTime={displayTime} 
                                 text={message.text} 
-                                status={message.status}/>
+                                status={message.status}
+                                messageType={message.messageType}/>
 
         messageElements.push(messageElem);
       }

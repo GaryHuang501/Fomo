@@ -16,6 +16,9 @@ export const firebaseSetup = function(){
         measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENTID
       };
     
-      firebase.initializeApp(firebaseConfig);
+      if(firebase.apps.length === 0){
+        firebase.initializeApp(firebaseConfig);
+      }
+      
       firebase.analytics();
 }

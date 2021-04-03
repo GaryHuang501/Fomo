@@ -110,7 +110,6 @@ export const selectStockData = function(state, portfolioSymbol){
             symbolId: portfolioSymbol.symbolId,
             ticker:  portfolioSymbol.ticker,
             price: "Pending",
-            averagePrice: "--",
             change: "--",
         }
     }

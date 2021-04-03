@@ -299,6 +299,44 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.Equal(4, jpm.SortOrder);
         }
 
+        [Fact]
+        public async Task Should_UpdateAveragePricePortfolioSymbol()
+        {
+            // Create Portfolio
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.Portfolio(), new { name = string.Empty }.ToJsonPayload());
+            createPortfolioResponse.EnsureSuccessStatusCode();
+
+            var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
+
+            Assert.True(portfolio.Id > 0);
+
+            // Search for symbols by keyword
+            SymbolSearchResultDTO jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
+
+            // Add symbols to Portfolio
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbols(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            addJPMResponse.EnsureSuccessStatusCode();
+            var jpmPortfolioSymbol = await addJPMResponse.Content.ReadAsAsync<PortfolioSymbol>();
+
+            var newAvgPricePayload = new
+            {
+                AveragePrice = 1.24m
+            }.ToJsonPayload();
+
+            var updateAveragePriceResponse = await _client.PatchAsync(ApiPath.PortfolioSymbolsAveragePrice(portfolio.Id, jpmPortfolioSymbol.Id), newAvgPricePayload);
+
+            updateAveragePriceResponse.EnsureSuccessStatusCode();
+
+            var getPortfolioResponse = await _client.GetAsync(ApiPath.Portfolio(portfolio.Id));
+            var fetchedPortfolio = await getPortfolioResponse.Content.ReadAsAsync<Portfolio>();
+
+            Assert.Equal(portfolio.Id, fetchedPortfolio.Id);
+
+            var jpm = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "JPM");
+
+            Assert.Equal(1.24m, jpm.AveragePrice);
+ 
+        }
         private async Task<SymbolSearchResultDTO> FetchSymbol(string ticker, ExchangeType exchange)
         {
             var response = await _client.GetAsync(ApiPath.SymbolSearch(ticker, 1));

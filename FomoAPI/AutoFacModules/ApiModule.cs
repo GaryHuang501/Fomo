@@ -12,10 +12,6 @@ using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Infrastructure.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.AutoFacModules
 {

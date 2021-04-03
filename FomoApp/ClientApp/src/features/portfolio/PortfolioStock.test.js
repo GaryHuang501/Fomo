@@ -42,7 +42,7 @@ it("renders with the portfolio symbol with no data", () => {
   expect(columns[priceCol].innerHTML).toBe("Pending");
   expect(columns[changeCol].innerHTML).toBe("--%");
   expect(columns[averagePriceCol].innerHTML).toBe("--");
-  expect(columns[returnCol].innerHTML).toBe("--%");
+  expect(columns[returnCol].innerHTML).toBe("0.00%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual("0");
 });
 
@@ -70,21 +70,19 @@ it("renders with the portfolio symbol with null data", () => {
   expect(columns[priceCol].innerHTML).toBe("Pending");
   expect(columns[changeCol].innerHTML).toBe("--%");
   expect(columns[averagePriceCol].innerHTML).toBe("--");
-  expect(columns[returnCol].innerHTML).toBe("--%");
+  expect(columns[returnCol].innerHTML).toBe("0.00%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual("0");
 });
 
 
 it("renders with the portfolio symbol with data", async () => {
-  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc' };
+  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 12.50, return: 1 };
 
   const stockData = {
     symbolId: 1,
     ticker: 'SPY',
     price: 12.15,
-    averagePrice: 12.50,
-    changePercent: 12.50,
-    return: 1
+    changePercent: 12.50, 
   };
 
   const voteData = {
@@ -112,11 +110,99 @@ it("renders with the portfolio symbol with data", async () => {
   expect(columns[symbolCol].innerHTML).toBe(portfolioSymbol.ticker);
   expect(columns[priceCol].innerHTML).toBe(stockData.price.toString());
   expect(columns[changeCol].innerHTML).toBe(stockData.changePercent.toFixed(2) + "%");
-  expect(columns[averagePriceCol].innerHTML).toBe(stockData.averagePrice.toString());
-  expect(columns[returnCol].innerHTML).toBe(stockData.return.toFixed(2) + "%");
+  expect(columns[averagePriceCol].innerHTML).toBe(portfolioSymbol.averagePrice.toString());
+  expect(columns[returnCol].innerHTML).toBe("-2.80%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual(voteData.count.toString());
 });
 
+describe("renders 0.00% ROI", () => {
+
+  it("renders 0.00 ROI when stock price is not set but average price is", async () => {
+    const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 12.50, return: 1 };
+
+    const stockData = {
+      symbolId: 1,
+      ticker: 'SPY',
+      price: null,
+      changePercent: null, 
+    };
+
+    const initialState = {
+      stocks: {
+        singleQuoteData:{
+          1: stockData
+        },
+        votes:{
+        }
+      }
+    };
+
+    act(() => {
+      render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} /></tbody></table>, { initialState });
+    });
+
+    const columns = screen.queryAllByRole('cell');
+    expect(columns[returnCol].innerHTML).toBe("0.00%");
+  });
+
+  it("renders 0.00 ROI when both average price and stock price is not set", async () => {
+    const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: null, return: 1 };
+
+    const stockData = {
+      symbolId: 1,
+      ticker: 'SPY',
+      price: null,
+      changePercent: null, 
+    };
+
+    const initialState = {
+      stocks: {
+        singleQuoteData:{
+          1: stockData
+        },
+        votes:{
+        }
+      }
+    };
+
+    act(() => {
+      render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} /></tbody></table>, { initialState });
+    });
+
+    const columns = screen.queryAllByRole('cell');
+    expect(columns[returnCol].innerHTML).toBe("0.00%");
+    expect(columns[averagePriceCol].innerHTML).toBe("--");
+  });
+
+  it("renders 0.00 ROI when stock price is set but average price is 0", async () => {
+    const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 0, return: 1 };
+
+    const stockData = {
+      symbolId: 1,
+      ticker: 'SPY',
+      price: 100
+    };
+
+    const initialState = {
+      stocks: {
+        singleQuoteData:{
+          1: stockData
+        },
+        votes:{
+        }
+      }
+    };
+
+    act(() => {
+      render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} /></tbody></table>, { initialState });
+    });
+
+    const columns = screen.queryAllByRole('cell');
+    expect(columns[returnCol].innerHTML).toBe("0.00%");
+    expect(columns[averagePriceCol].innerHTML).toBe("--");
+
+  });
+});
 
 describe("Clicking portfolio stock options", () => {
 

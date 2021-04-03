@@ -6,6 +6,10 @@
     width: 100%;
 }
 
+.chat-history{
+    color: cadetblue;
+}
+
 .chat-align-left{
     text-align: left;
 }
