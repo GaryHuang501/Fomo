@@ -5,6 +5,9 @@ import React, { useState } from 'react';
 import { updateAvergePricePortfolioStock } from './PortfolioSlice';
 import { useDispatch } from 'react-redux';
 
+/*
+    Form to edit the portfolio stock settings or values
+*/
 export default function EditPortfolioForm(props){
 
     const dispatch = useDispatch();

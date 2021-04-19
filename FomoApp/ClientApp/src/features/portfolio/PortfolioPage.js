@@ -11,7 +11,7 @@ import { StockSearchBar } from '../stockSearch/StockSearchBar';
 import { TickerTape } from './TickerTape';
 import { selectUser } from '../login/LoginSlice'
 
-export const PortfolioPage = function() {
+export default function PortfolioPage() {
 
   const dispatch = useDispatch();
   const portfolioIds = useSelector(selectPortfolioIds);
@@ -45,6 +45,7 @@ export const PortfolioPage = function() {
             <h3 id='portfolio-chatbox-header'>{ (user != null ? user.name : "") + "'s Portfolio"}</h3>
             <ChatBox></ChatBox>
         </section>
+        <footer id='portfolio-footer'></footer>
     </main>
   );
 }

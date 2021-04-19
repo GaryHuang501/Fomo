@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const LeaderBoardPage = function() {
+export default function LeaderBoardPage() {
   return (
     <main id="leaderboard-page">
     </main>

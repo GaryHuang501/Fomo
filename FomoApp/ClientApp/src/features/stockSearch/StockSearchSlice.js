@@ -33,8 +33,8 @@ export const stockSearchSlice = createSlice({
       state.status = 'loading';
     },
     [searchStocks.fulfilled]: (state, action) => {
-      state.status = 'succeeded';      
       state.stocks[action.meta.arg] = action.payload ?? [];
+      state.status = 'succeeded';      
     },
     [searchStocks.rejected]: (state, action) => {
       state.status = 'failed';

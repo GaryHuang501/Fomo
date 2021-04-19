@@ -1,13 +1,23 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FomoAPIIntegrationTests
 {
     public static class TestUtil
     {
-        public static async Task<Guid> CreateNewUser(string dbConnectionString)
+        public static async Task ClearUsers(string dbConnectionString, List<Guid> idsToDelete)
+        {
+            var sql = @"DELETE FROM [dbo].[AspNetUsers] WHERE ID IN @ids";
+           
+            using var connection = new SqlConnection(dbConnectionString);
+
+            await connection.ExecuteAsync(sql, new {ids = idsToDelete });
+        }
+
+        public static async Task<Guid> CreateNewUser(string dbConnectionString, string userName = null, string userEmail = null)
         {
             var newUserId = Guid.NewGuid();
 
@@ -30,8 +40,8 @@ namespace FomoAPIIntegrationTests
                      VALUES
                            (
 			                @UserId,
-			                @UserId,  
-                            @UserId,
+			                @UserName,  
+                            @UserName,
 			                @UserEmail,
 			                @UserEmail,
 			                1,
@@ -47,7 +57,11 @@ namespace FomoAPIIntegrationTests
 
             using var connection = new SqlConnection(dbConnectionString);
             
-            await connection.ExecuteAsync(sql, new { UserId = newUserId, UserEmail = $"{newUserId}@fomo-app.com" });
+            await connection.ExecuteAsync(sql, new { 
+                UserId = newUserId, 
+                UserEmail = $"{userEmail ?? newUserId.ToString()}@fomo-app.com",
+                UserName = userName ?? newUserId.ToString()
+            });
 
             return newUserId;
         }

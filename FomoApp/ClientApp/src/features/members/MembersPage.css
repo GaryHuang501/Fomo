@@ -1,0 +1,12 @@
+#members-page{
+    background-color: white;
+    grid-column: col-start 1 / span 16;
+    grid-row: 2;
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: repeat(16, [col-start] 1fr);
+}
+
+#members-page-content{
+    grid-column: 3 / span 12;
+}

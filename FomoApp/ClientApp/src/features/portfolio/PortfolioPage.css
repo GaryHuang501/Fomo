@@ -5,7 +5,13 @@
     min-height: 100%;
     display: grid;
     grid-template-columns: repeat(16, [col-start] 1fr);
-    grid-template-rows: max-content max-content auto;
+    grid-template-rows: max-content max-content max-content max-content;
+}
+
+#portfolio-footer{
+    grid-row: 4;
+    grid-column: col-start 1 / span 16;
+    min-height: 5rem;
 }
 
 #portfolio-stock-search-container{

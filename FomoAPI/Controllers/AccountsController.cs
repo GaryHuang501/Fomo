@@ -151,6 +151,12 @@ namespace FomoAPI.Controllers
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
 
             var emailUserNamePart = email.Split('@')[0];
+
+            if (string.IsNullOrWhiteSpace(emailUserNamePart))
+            {
+                throw new UserRegistrationException("Empty user name received from email");
+            }
+
             var user = new IdentityUser<Guid> { UserName = emailUserNamePart, Email = email };
 
             var result = await _userManager.CreateAsync(user);

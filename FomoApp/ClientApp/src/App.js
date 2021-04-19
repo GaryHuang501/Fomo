@@ -11,11 +11,11 @@ import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState 
 import { useDispatch, useSelector } from 'react-redux'
 
 import { FirebaseManager } from './app/FirebaseManager';
-import { LeaderBoardPage } from './features/leaderboard/LeaderBoardPage';
+import  LeaderBoardPage  from './features/leaderboard/LeaderBoardPage';
 import { LoginModal } from './features/login/LoginModal';
-import { MembersPage } from './features/members/MembersPage';
+import MembersPage  from './features/members/MembersPage';
 import { NavHeader } from './app/NavHeader';
-import { PortfolioPage } from './features/portfolio/PortfolioPage';
+import  PortfolioPage  from './features/portfolio/PortfolioPage';
 import { axiosSetup } from './app/AxiosSetup';
 import { firebaseSetup } from './app/FirebaseSetup';
 

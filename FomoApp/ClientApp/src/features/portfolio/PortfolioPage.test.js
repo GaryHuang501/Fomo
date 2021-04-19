@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
-import { PortfolioPage } from './PortfolioPage';
+import PortfolioPage from './PortfolioPage';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
