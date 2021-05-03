@@ -2,6 +2,8 @@
 using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Moq;
 using System;
 using System.IO;
 
@@ -20,10 +22,7 @@ namespace FomoAPIIntegrationTests
         private readonly IConfiguration _firebaseSettingsConfig;
         private readonly IConfiguration _testAppSettingsConfig;
 
-        public Guid TestUserId
-        {
-            get { return Guid.Parse(_testAppSettingsConfig["TestUser:UserId"]); }
-        }
+        public Guid DefaultUserID { get; private set; }
 
         public string TestDBConnectionString
         {
@@ -68,11 +67,28 @@ namespace FomoAPIIntegrationTests
         {
             get { return int.Parse(_testAppSettingsConfig["Database:DefaultBulkCopyBatchSize"]); }
         }
+
         public AppTestSettings()
         {
             _testAppSettingsConfig = CreateConfiguration("appsettings.Test.json");
             _launchSettingsConfig = CreateConfiguration("launchSettings.json");
             _firebaseSettingsConfig = CreateConfiguration("firebase.json");
+
+            DefaultUserID = TestUtil.CreateNewUser(TestDBConnectionString).Result;
+        }
+
+        public IOptionsMonitor<DbOptions> GetDbOptionsMonitor()
+        {
+            var dbOptions = new DbOptions
+            {
+                ConnectionString = TestDBConnectionString
+            };
+
+            var dbOptionsMonitor = new Mock<IOptionsMonitor<DbOptions>>();
+
+            dbOptionsMonitor.Setup(d => d.CurrentValue).Returns(dbOptions);
+
+            return dbOptionsMonitor.Object;
         }
 
         private IConfiguration CreateConfiguration(string fileName)

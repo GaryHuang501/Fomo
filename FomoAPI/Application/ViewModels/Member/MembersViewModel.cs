@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace FomoAPI.Application.ViewModels
+namespace FomoAPI.Application.ViewModels.Member
 {
     /// <summary>
     /// UI Data to display on the members page.

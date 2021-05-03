@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Application.ViewModels
+namespace FomoAPI.Application.ViewModels.Member
 {
     /// <inheritdoc cref="IMemberQueries"/>
     public class MemberQueries : IMemberQueries

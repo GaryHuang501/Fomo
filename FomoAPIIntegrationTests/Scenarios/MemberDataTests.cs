@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.ViewModels;
+using FomoAPI.Application.ViewModels.Member;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using FomoAPIIntegrationTests.Fixtures;
 using Microsoft.Extensions.Options;
@@ -12,7 +13,7 @@ using Xunit;
 
 namespace FomoAPIIntegrationTests.Scenarios
 {
-    public class MemberDataTests : IClassFixture<FomoApiFixture>
+    public class MemberDataTests : IClassFixture<FomoApiFixture>, IAsyncLifetime
     {
         private readonly HttpClient _client;
 
@@ -20,13 +21,18 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             webApiFactoryFixture.CreateServer(FomoApiFixture.WithNoHostedServices);
             _client = webApiFactoryFixture.GetClientNotAuth();
+        }
 
-            var mockDbOptions = new Mock<IOptionsMonitor<DbOptions>>();
-            mockDbOptions.Setup(x => x.CurrentValue).Returns(new DbOptions
-            {
-                ConnectionString = AppTestSettings.Instance.TestDBConnectionString
-            });
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
 
+        public async Task InitializeAsync()
+        {
+            var cleanFixture = new CleanDBFixture();
+
+            await cleanFixture.InitializeAsync();
         }
 
         [Fact]
@@ -34,53 +40,42 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             var a_users = new List<Guid>();
             var d_users = new List<Guid>();
-            var test_user = "60811430-C2CF-491F-DD9F-08D827B943FE"; // default test user;
             var z_users = new List<Guid>();
             var other_users = new List<Guid>();
 
-            try
-            {
-                a_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Abe"));
+            a_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Abe"));
 
-                d_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Dave"));
-                d_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Dan"));
+            d_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Dave"));
+            d_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Dan"));
 
-                z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zack"));
-                z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zane"));
-                z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zoro"));
-                z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zax"));
+            z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zack"));
+            z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zane"));
+            z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zoro"));
+            z_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "Zax"));
 
-                other_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "!12AK47"));
-                other_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "__UK__"));
+            other_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "!12AK47"));
+            other_users.Add(await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString, "__UK__"));
 
-                var membersResponse = await _client.GetAsync(ApiPath.MembersData(100, 0));
+            var httpMessage = new HttpRequestMessage(HttpMethod.Get, ApiPath.MembersData(100, 0));
+            httpMessage.Headers.Add(TestAuthHandler.CustomUserIdHeader, a_users.First().ToString());
 
-                var viewModel = await membersResponse.Content.ReadAsAsync<MembersViewModel>();
+            var membersResponse = await _client.SendAsync(httpMessage);
 
-                int total = a_users.Count + d_users.Count + z_users.Count + other_users.Count + 1;
+            var viewModel = await membersResponse.Content.ReadAsAsync<MembersViewModel>();
 
-                Assert.Equal(total, viewModel.Total);
+            int total = a_users.Count + d_users.Count + z_users.Count + other_users.Count;
 
-                Assert.Equal(a_users.Count, viewModel.MemberGroupings['A'].Count);
-                Assert.Equal(d_users.Count, viewModel.MemberGroupings['D'].Count);
-                Assert.Single(viewModel.MemberGroupings['F']);
-                Assert.Equal(z_users.Count, viewModel.MemberGroupings['Z'].Count);
-                Assert.Equal(other_users.Count, viewModel.UncategorizedMembers.Count());
+            Assert.Equal(total, viewModel.Total);
 
-                Assert.True((new string[]{ "Abe" }).SequenceEqual(viewModel.MemberGroupings['A'].Select(m => m.Name)));
-                Assert.True((new string[] { "Dan", "Dave" }).SequenceEqual(viewModel.MemberGroupings['D'].Select(m => m.Name)));
-                Assert.True((new string[] { "Zack", "Zane", "Zax", "Zoro" }).SequenceEqual(viewModel.MemberGroupings['Z'].Select(m => m.Name)));
-                Assert.True((new string[] { "!12AK47", "__UK__" }).SequenceEqual(viewModel.UncategorizedMembers.Select(m => m.Name)));
+            Assert.Equal(a_users.Count, viewModel.MemberGroupings['A'].Count);
+            Assert.Equal(d_users.Count, viewModel.MemberGroupings['D'].Count);
+            Assert.Equal(z_users.Count, viewModel.MemberGroupings['Z'].Count);
+            Assert.Equal(other_users.Count, viewModel.UncategorizedMembers.Count());
 
-                Assert.Equal(test_user.ToLower(), viewModel.MemberGroupings['F'].Single().Id.ToString().ToLower());
-            }
-            finally
-            {
-                await TestUtil.ClearUsers(AppTestSettings.Instance.TestDBConnectionString, a_users);
-                await TestUtil.ClearUsers(AppTestSettings.Instance.TestDBConnectionString, d_users);
-                await TestUtil.ClearUsers(AppTestSettings.Instance.TestDBConnectionString, z_users);
-                await TestUtil.ClearUsers(AppTestSettings.Instance.TestDBConnectionString, other_users);
-            }
+            Assert.True((new string[] { "Abe" }).SequenceEqual(viewModel.MemberGroupings['A'].Select(m => m.Name)));
+            Assert.True((new string[] { "Dan", "Dave" }).SequenceEqual(viewModel.MemberGroupings['D'].Select(m => m.Name)));
+            Assert.True((new string[] { "Zack", "Zane", "Zax", "Zoro" }).SequenceEqual(viewModel.MemberGroupings['Z'].Select(m => m.Name)));
+            Assert.True((new string[] { "!12AK47", "__UK__" }).SequenceEqual(viewModel.UncategorizedMembers.Select(m => m.Name)));
         }
     }
 }

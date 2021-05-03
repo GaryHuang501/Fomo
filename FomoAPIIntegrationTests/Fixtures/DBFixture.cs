@@ -5,8 +5,7 @@ using Xunit;
 namespace FomoAPIIntegrationTests.Fixtures
 {
     /// <summary>
-    /// Fixture to clear out non user data from database
-    /// to create allow for clean slate.
+    /// Fixture to connect to database
     /// </summary>
     public class DBFixture : IAsyncLifetime
     {

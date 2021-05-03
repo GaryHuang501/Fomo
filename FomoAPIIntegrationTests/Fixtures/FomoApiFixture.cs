@@ -1,8 +1,11 @@
 ﻿using FomoAPI.Application.Exchanges;
+using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;

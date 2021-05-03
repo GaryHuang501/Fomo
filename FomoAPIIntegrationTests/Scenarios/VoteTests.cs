@@ -16,11 +16,10 @@ using Xunit;
 
 namespace FomoAPIIntegrationTests.Scenarios
 {
-    public class VoteTests : IClassFixture<FomoApiFixture>, IAsyncLifetime
+    public class VoteTests : IClassFixture<FomoApiFixture>, IClassFixture<ExchangeSyncSetupFixture>, IAsyncLifetime
     {
         private readonly HttpClient _client;
         private readonly ISymbolRepository _symbolRepo;
-        private readonly IVoteRepository _voteRepo;
 
         public VoteTests(FomoApiFixture webApiFactoryFixture)
         {
@@ -33,25 +32,20 @@ namespace FomoAPIIntegrationTests.Scenarios
                 ConnectionString = AppTestSettings.Instance.TestDBConnectionString
             });
 
-            _voteRepo = new VoteRepository(mockDbOptions.Object);
             _symbolRepo = new SymbolRepository(mockDbOptions.Object);
         }
 
         public async Task InitializeAsync()
         {
-            await ClearVotes();
+            using (var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString))
+            {
+                await connection.ExecuteAsync("DELETE FROM Vote", null);
+            }
         }
 
         public Task DisposeAsync()
         {
             return Task.CompletedTask;
-        }
-
-        private async Task ClearVotes()
-        {
-            var sql = @"DELETE FROM Vote";
-            using var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString);
-            await connection.ExecuteAsync(sql);
         }
 
         [Fact]
@@ -88,19 +82,15 @@ namespace FomoAPIIntegrationTests.Scenarios
         [InlineData(VoteDirection.None)]
         public async Task Should_SaveVoteForUser(VoteDirection voteDirection)
         {
+            string user1Id = (await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString)).ToString();
+
             Symbol jpmSymbol = await _symbolRepo.GetSymbol("JPM");
 
             var voteCommand = new VoteCommand { SymbolId = jpmSymbol.Id, Direction = voteDirection };
 
-            var saveResponse = await _client.PostAsync(ApiPath.Votes, voteCommand.ToJsonPayload());
+            await SendVoteForCustomUser(voteCommand, user1Id);
 
-            saveResponse.EnsureSuccessStatusCode();
-
-            var fetchResponse = await _client.GetAsync($"{ApiPath.Votes}?sids={jpmSymbol.Id}");
-
-            fetchResponse.EnsureSuccessStatusCode();
-
-            Dictionary<int, TotalVotes> voteData = await fetchResponse.Content.ReadAsAsync<Dictionary<int, TotalVotes>>();
+            Dictionary<int, TotalVotes> voteData = await GetVoteData(user1Id, new int[] { jpmSymbol.Id});
 
             Assert.Single(voteData);
             Assert.True(voteData.ContainsKey(jpmSymbol.Id));
@@ -109,31 +99,25 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.Equal((int)voteDirection, totalVotes.Count);
             Assert.Equal(voteDirection, totalVotes.MyVoteDirection);
             Assert.Equal(jpmSymbol.Id, totalVotes.SymbolId);
-            Assert.Equal(AppTestSettings.Instance.TestUserId, totalVotes.UserId);
+            Assert.Equal(user1Id, totalVotes.UserId.ToString());
         }
 
         [Fact]
         public async Task Should_HandleUpdatingDownVoteToUpVote()
         {
+            string user1Id = (await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString)).ToString();
+
             Symbol jpmSymbol = await _symbolRepo.GetSymbol("JPM");
 
             var downVoteCommand = new VoteCommand { SymbolId = jpmSymbol.Id, Direction = VoteDirection.DownVote };
 
-            var downVoteResponse = await _client.PostAsync(ApiPath.Votes, downVoteCommand.ToJsonPayload());
-
-            downVoteResponse.EnsureSuccessStatusCode();
+            await SendVoteForCustomUser(downVoteCommand, user1Id);
 
             var upVoteCommand = new VoteCommand { SymbolId = jpmSymbol.Id, Direction = VoteDirection.UpVote };
 
-            var upVoteResponse = await _client.PostAsync(ApiPath.Votes, upVoteCommand.ToJsonPayload());
+            await SendVoteForCustomUser(upVoteCommand, user1Id);
 
-            upVoteResponse.EnsureSuccessStatusCode();
-
-            var fetchResponse = await _client.GetAsync(ApiPath.GetVotes(new int[] { jpmSymbol.Id }));
-
-            fetchResponse.EnsureSuccessStatusCode();
-
-            Dictionary<int, TotalVotes> voteData = await fetchResponse.Content.ReadAsAsync<Dictionary<int, TotalVotes>>();
+            Dictionary<int, TotalVotes> voteData = await GetVoteData(user1Id, new int[] { jpmSymbol.Id });
 
             Assert.Single(voteData);
             Assert.True(voteData.ContainsKey(jpmSymbol.Id));
@@ -141,6 +125,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             var totalVotes = voteData[jpmSymbol.Id];
             Assert.Equal(1, totalVotes.Count);
             Assert.Equal(VoteDirection.UpVote, totalVotes.MyVoteDirection);
+            Assert.Equal(user1Id, totalVotes.UserId.ToString());
         }
 
         [Fact]
@@ -155,13 +140,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             await SendVoteForCustomUser(voteCommand, user1Id); 
 
-            var httpMessage = new HttpRequestMessage(HttpMethod.Get, ApiPath.GetVotes(new int[] {jpmSymbol.Id }));
-            httpMessage.Headers.Add(TestAuthHandler.CustomUserIdHeader, user2Id);
-            var fetchResponse = await _client.SendAsync(httpMessage);
-
-            fetchResponse.EnsureSuccessStatusCode();
-
-            Dictionary<int, TotalVotes> voteData = await fetchResponse.Content.ReadAsAsync<Dictionary<int, TotalVotes>>();
+            Dictionary<int, TotalVotes> voteData = await GetVoteData(user2Id, new int[] { jpmSymbol.Id });
 
             Assert.Single(voteData);
             Assert.True(voteData.ContainsKey(jpmSymbol.Id));
@@ -199,13 +178,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             await SendVoteForCustomUser(voteCommandBac2, user2Id);
             await SendVoteForCustomUser(voteCommandBac3, user3Id);
 
-            var httpMessage = new HttpRequestMessage(HttpMethod.Get, ApiPath.GetVotes(new int[] { jpmSymbol.Id, bacSymbol.Id }));
-            httpMessage.Headers.Add(TestAuthHandler.CustomUserIdHeader, user1Id);
-            var fetchResponse = await _client.SendAsync(httpMessage);
-
-            fetchResponse.EnsureSuccessStatusCode();
-
-            Dictionary<int, TotalVotes> voteData = await fetchResponse.Content.ReadAsAsync<Dictionary<int, TotalVotes>>();
+            Dictionary<int, TotalVotes> voteData = await GetVoteData(user1Id, new int[] { jpmSymbol.Id, bacSymbol.Id });
 
             Assert.Equal(2, voteData.Count);
             Assert.True(voteData.ContainsKey(jpmSymbol.Id));
@@ -219,6 +192,19 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             Assert.Equal(voteCommandJpm1.Direction, jpmVoteData.MyVoteDirection);
             Assert.Equal(voteCommandBac1.Direction, bacVoteData.MyVoteDirection);
+        }
+
+        private async Task<Dictionary<int, TotalVotes>> GetVoteData(string userId, int[] symbolIds)
+        {
+            var httpMessage = new HttpRequestMessage(HttpMethod.Get, ApiPath.GetVotes(symbolIds));
+            httpMessage.Headers.Add(TestAuthHandler.CustomUserIdHeader, userId);
+            var fetchResponse = await _client.SendAsync(httpMessage);
+
+            fetchResponse.EnsureSuccessStatusCode();
+
+            Dictionary<int, TotalVotes> voteData = await fetchResponse.Content.ReadAsAsync<Dictionary<int, TotalVotes>>();
+
+            return voteData;
         }
 
         private async Task SendVoteForCustomUser(VoteCommand voteCommand, string userId)

@@ -9,8 +9,8 @@ using Xunit;
 namespace FomoAPIIntegrationTests.Fixtures
 {
     /// <summary>
-    /// Fixture to clear out non user data from database
-    /// to create allow for clean slate.
+    /// Fixture to clear out all data from database
+    /// to create allow for clean slate during tests
     /// </summary>
     public class CleanDBFixture : DBFixture
     {
@@ -37,6 +37,9 @@ namespace FomoAPIIntegrationTests.Fixtures
 
             var deleteExchangeSyncHistory = @"DELETE FROM ExchangeSyncHistory";
             await Connection.ExecuteAsync(deleteExchangeSyncHistory, null);
+
+            var deleteUsersSQL = @"DELETE FROM AspNetUsers;";
+            await Connection.ExecuteAsync(deleteUsersSQL, null);
         }
     }
 }

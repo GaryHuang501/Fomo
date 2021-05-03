@@ -3,6 +3,8 @@ using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using FomoAPI.Application.Stores;
 using FomoAPI.Application.ViewModels;
+using FomoAPI.Application.ViewModels.LeaderBoard;
+using FomoAPI.Application.ViewModels.Member;
 using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients;
@@ -27,6 +29,7 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<SingleQuoteCache>().SingleInstance();
       
             builder.RegisterType<MemberQueries>().As<IMemberQueries>().InstancePerLifetimeScope();
+            builder.RegisterType<LeaderBoardQueries>().As<ILeaderBoardQueries>().InstancePerLifetimeScope();
 
             builder.RegisterType<PortfolioRepository>().As<IPortfolioRepository>().InstancePerLifetimeScope();
             builder.RegisterType<StockDataRepository>().As<IStockDataRepository>().InstancePerLifetimeScope();

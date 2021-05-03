@@ -27,19 +27,15 @@ export const PortfolioStock = (props) => {
     const [isEditMode, setIsEditMode] = useState(false);
 
     function calculateRoi(){
-        if(stockData.price === 0){
+        if(!stockData.price || stockData.price === 0){
             return -100;
         }
 
-        if(portfolioSymbol.averagePrice === 0){
+        if(!portfolioSymbol.averagePrice || portfolioSymbol.averagePrice === 0){
             return 0;
         }
 
-        if(stockData.price && portfolioSymbol.averagePrice){
-            return ((stockData.price - portfolioSymbol.averagePrice) /  portfolioSymbol.averagePrice) * 100;
-        }
-
-        return 0;
+        return ((stockData.price - portfolioSymbol.averagePrice) /  portfolioSymbol.averagePrice) * 100;
     }
 
     function onMouseOver(){

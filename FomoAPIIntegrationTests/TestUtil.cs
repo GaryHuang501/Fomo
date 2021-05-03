@@ -8,15 +8,6 @@ namespace FomoAPIIntegrationTests
 {
     public static class TestUtil
     {
-        public static async Task ClearUsers(string dbConnectionString, List<Guid> idsToDelete)
-        {
-            var sql = @"DELETE FROM [dbo].[AspNetUsers] WHERE ID IN @ids";
-           
-            using var connection = new SqlConnection(dbConnectionString);
-
-            await connection.ExecuteAsync(sql, new {ids = idsToDelete });
-        }
-
         public static async Task<Guid> CreateNewUser(string dbConnectionString, string userName = null, string userEmail = null)
         {
             var newUserId = Guid.NewGuid();
@@ -60,7 +51,7 @@ namespace FomoAPIIntegrationTests
             await connection.ExecuteAsync(sql, new { 
                 UserId = newUserId, 
                 UserEmail = $"{userEmail ?? newUserId.ToString()}@fomo-app.com",
-                UserName = userName ?? newUserId.ToString()
+                UserName = userName ?? newUserId.ToString().ToUpper()
             });
 
             return newUserId;

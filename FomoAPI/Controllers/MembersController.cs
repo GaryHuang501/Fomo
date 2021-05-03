@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Application.ViewModels;
+using FomoAPI.Application.ViewModels.Member;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FomoAPI.Controllers

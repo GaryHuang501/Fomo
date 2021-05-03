@@ -337,6 +337,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.Equal(1.24m, jpm.AveragePrice);
  
         }
+
         private async Task<SymbolSearchResultDTO> FetchSymbol(string ticker, ExchangeType exchange)
         {
             var response = await _client.GetAsync(ApiPath.SymbolSearch(ticker, 1));

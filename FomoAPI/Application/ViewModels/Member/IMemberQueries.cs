@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Application.ViewModels
+namespace FomoAPI.Application.ViewModels.Member
 {
     /// <summary>
     /// Query data to display on the member page UI componets

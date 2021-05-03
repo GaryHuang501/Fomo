@@ -15,7 +15,7 @@ namespace FomoAPIIntegrationTests
     {
         public const string CustomUserIdHeader = "CustomUserId";
 
-        private readonly IPortfolioRepository _portfolioRepository;
+        private Guid _defaultUserId;
 
         public TestAuthHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -25,21 +25,19 @@ namespace FomoAPIIntegrationTests
             ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
-            _portfolioRepository = portfolioRepository;
         }
 
-        protected async override Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var userId = AppTestSettings.Instance.TestUserId.ToString();
+            string userId;
 
             if (Request.Headers.ContainsKey(CustomUserIdHeader))
             {
                 userId = Request.Headers[CustomUserIdHeader].ToString();
             }
-
-            if (Request.Headers.ContainsKey(CustomUserIdHeader))
+            else
             {
-                userId = Request.Headers[CustomUserIdHeader].ToString();
+                userId = AppTestSettings.Instance.DefaultUserID.ToString();
             }
 
             string portfolioId = "0";
@@ -62,7 +60,7 @@ namespace FomoAPIIntegrationTests
 
             var result = AuthenticateResult.Success(ticket);
 
-            return result;
+            return Task.FromResult(result);
         }
     }
 }
