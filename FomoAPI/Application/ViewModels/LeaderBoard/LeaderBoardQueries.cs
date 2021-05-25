@@ -3,21 +3,17 @@ using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.ViewModels.LeaderBoard
 {
+    /// <summary>
+    /// SQL query to populate the view model.
+    /// </summary>
     public class LeaderBoardQueries : ILeaderBoardQueries
     {
         private string _connectionString;
-
-        private const string MostBullishHeader = "Most Bullish Stock";
-
-        private const string MostBearishHeader = "Most Bearish Stock";
-
-        private const string BestPerformingHeader = "Best Performing User";
-
-        private const string WorstPerformerHeader = "Worst Performing User";
 
         public LeaderBoardQueries(IOptionsMonitor<DbOptions> dbOptions)
         {
@@ -38,15 +34,19 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
 
         private async Task<Board> GetMostBullish(int top)
         {
-            return await GetStockRatingBoard(top, MostBullishHeader, SortDirection.Descending);
+            var boardValues = await GetStockRatingBoard(top, SortDirection.Descending);
+            var board = new Board(BoardColumns.MostBullish, boardValues);
+            return board;
         }
 
         private async Task<Board> GetMostBearish(int top)
         {
-            return await GetStockRatingBoard(top, MostBearishHeader, SortDirection.Ascending);
+            var boardValues = await GetStockRatingBoard(top, SortDirection.Ascending);
+            var board = new Board(BoardColumns.MostBearish, boardValues);
+            return board;
         }
 
-        private async Task<Board> GetStockRatingBoard(int top, string header, SortDirection sortDirection)
+        private async Task<IEnumerable<BoardValue>> GetStockRatingBoard(int top, SortDirection sortDirection)
         {
             string sql = @" SELECT
                                 CAST(Id AS VARCHAR(36)) [Id],
@@ -74,21 +74,25 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
             using (var connection = new SqlConnection(_connectionString))
             {
                 var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
-                return new Board(header, boardValues);
+                return boardValues;
             }
         }
 
         private async Task<Board> GetBestPerformer(int top)
         {
-            return await GetUserRating(top, BestPerformingHeader, SortDirection.Descending);
+            var boardValues = await GetUserRating(top, SortDirection.Descending);
+            var board = new Board(BoardColumns.BestPerformer, boardValues);
+            return board;
         }
 
         private async Task<Board> GetWorstPerformer(int top)
         {
-            return await GetUserRating(top, WorstPerformerHeader, SortDirection.Ascending);
+            var boardValues = await GetUserRating(top, SortDirection.Ascending);
+            var board = new Board(BoardColumns.WorstPerformer, boardValues);
+            return board;
         }
 
-        private async Task<Board> GetUserRating(int top, string header, SortDirection sortDirection)
+        private async Task<IEnumerable<BoardValue>> GetUserRating(int top, SortDirection sortDirection)
         {
             string sql = @"
                             SELECT
@@ -127,7 +131,7 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
             using (var connection = new SqlConnection(_connectionString))
             {
                 var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
-                return new Board(header, boardValues);
+                return boardValues;
             }
         }
 

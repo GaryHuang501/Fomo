@@ -37,12 +37,12 @@ export default function VoteColumn(props){
 
     function setClassesForDisplayOnlyMode(){
         if(displayVotes > 0){
-            upVoteClasses += " portfolio-stock-positive-delta";
+            upVoteClasses += " positive-delta";
             downVoteClasses += " hidden";
         }
         else if (displayVotes < 0){
             upVoteClasses += " hidden";
-            downVoteClasses += " portfolio-stock-negative-delta";   
+            downVoteClasses += " negative-delta";   
         }
     }
 

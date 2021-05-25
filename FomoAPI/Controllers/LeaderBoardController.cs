@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Application.ViewModels.LeaderBoard;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FomoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LeaderBoardController : ControllerBase
     {
         private readonly ILeaderBoardQueries _leaderBoardQueries;
@@ -17,7 +19,7 @@ namespace FomoAPI.Controllers
             _leaderBoardQueries = leaderBoardQueries;
         }
 
-        public async Task<ActionResult<LeaderBoardViewModel>> GetMembers([FromQuery] int limit)
+        public async Task<ActionResult<LeaderBoardViewModel>> Get([FromQuery] int limit)
         {
             var viewModel = await _leaderBoardQueries.GetLeaderBoardData(limit);
 

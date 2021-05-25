@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +10,7 @@ namespace FomoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SingleQuoteDataController : ControllerBase
     {
         private ILogger<SymbolsController> _logger;

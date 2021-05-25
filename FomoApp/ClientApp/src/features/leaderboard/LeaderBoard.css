@@ -1,0 +1,35 @@
+.leader-board{
+    display: inline-block;
+    width: 20rem;
+    min-height: 20rem;
+    margin-right: 5rem;
+    margin-bottom: 5rem;
+    padding: 1rem 2rem 1rem 2rem;
+    box-sizing: border-box;
+}
+
+.leader-board-header{
+    text-align: center;
+    color: white;
+}
+
+.leader-board-column-headers{
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.leader-board-header-green{
+    background: green;
+}
+
+.leader-board-header-red{
+    background: red;
+}
+
+.leader-board-negative-header{
+    background: var(--negative-delta);
+}
+
+.leader-board-positive-header{
+    background: var(--positive-delta);
+}

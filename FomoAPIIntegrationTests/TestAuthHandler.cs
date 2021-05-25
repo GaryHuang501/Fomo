@@ -15,8 +15,6 @@ namespace FomoAPIIntegrationTests
     {
         public const string CustomUserIdHeader = "CustomUserId";
 
-        private Guid _defaultUserId;
-
         public TestAuthHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             IPortfolioRepository portfolioRepository,

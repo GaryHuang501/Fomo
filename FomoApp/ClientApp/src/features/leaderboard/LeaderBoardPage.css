@@ -1,0 +1,17 @@
+#leader-board-page {
+    background-color: white;
+    grid-column: col-start 1 / span 16;
+    grid-row: 2;
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: repeat(16, [col-start] 1fr);
+    grid-template-rows: max-content max-content max-content max-content;
+}
+
+#leader-board-container{
+    padding-top: 2rem;
+    grid-column: 3 / span 12;
+    grid-row: 3;
+    min-height: 20rem;
+    margin: 0px auto;
+}

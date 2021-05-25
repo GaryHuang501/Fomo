@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Vote;
 using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,7 @@ namespace FomoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class VotesController : ControllerBase
     {
 

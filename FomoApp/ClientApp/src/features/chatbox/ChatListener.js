@@ -9,6 +9,7 @@ export const ChatListener = function(props) {
     
     const userId = props.userId;
     const onNewChatMessageCallback = props.onNewChatMessage;
+    const onClearListenersCallback = props.onClearChatListeners;
 
     useEffect(()=> {
 
@@ -29,8 +30,13 @@ export const ChatListener = function(props) {
 
         return () => { 
             chatMessagesRef.off('child_added');
+
+            console.log("clearing");
+            if(onClearListenersCallback){
+                onClearListenersCallback();
+            }
         };
-    }, [onNewChatMessageCallback, userId]);
+    }, [onNewChatMessageCallback, onClearListenersCallback, userId]);
 
   return (null);
 }

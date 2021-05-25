@@ -73,10 +73,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             var leaderBoardResponse = await _client.GetAsync(ApiPath.LeaderBoard(100));
             var leaderBoardViewModel = await leaderBoardResponse.Content.ReadAsAsync<LeaderBoardViewModel>();
 
-            Assert.Equal("Worst Performing User", leaderBoardViewModel.WorstPerformers.Column);
-            Assert.Equal("Best Performing User", leaderBoardViewModel.BestPerformers.Column);
-            Assert.Equal("Most Bearish Stock", leaderBoardViewModel.MostBearish.Column);
-            Assert.Equal("Most Bullish Stock", leaderBoardViewModel.MostBullish.Column);
+            Assert.Equal("Worst Performing User", leaderBoardViewModel.WorstPerformers.Header);
+            Assert.Equal("Best Performing User", leaderBoardViewModel.BestPerformers.Header);
+            Assert.Equal("Most Bearish Stock", leaderBoardViewModel.MostBearish.Header);
+            Assert.Equal("Most Bullish Stock", leaderBoardViewModel.MostBullish.Header);
         }
 
         [Fact]

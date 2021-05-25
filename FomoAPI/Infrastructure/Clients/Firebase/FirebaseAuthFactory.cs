@@ -55,10 +55,11 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
         /// Creates a custom token to be returned to client to log into firebase api.
         /// </summary>
         /// <returns>The token string</returns>
-        public async Task<string> CreateClientToken(string userId, IReadOnlyDictionary<string, object> claims)
+        public async Task<string> CreateClientToken(Guid userId, IReadOnlyDictionary<string, object> claims)
         {
-            await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(userId, claims);
-            string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
+            string userIdString = userId.ToString();
+            await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(userIdString, claims);
+            string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userIdString);
 
             return customToken;
         }
@@ -136,6 +137,36 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
             _lastRenewTime = DateTime.UtcNow;
 
             _semaphore.Release();
+        }
+
+        public async Task<bool> VerifyUser(Guid userId)
+        {
+            try
+            {
+                UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userId.ToString());
+            }
+            catch(FirebaseException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task CreateUser(Guid userId, string userName, string email)
+        {
+            UserRecordArgs args = new UserRecordArgs()
+            {
+                Email = email,
+                EmailVerified = false,
+                PhoneNumber = null,
+                Password = Guid.NewGuid().ToString(), // Create a random password. Doesn't matter as we'll use a service account to manage users.
+                DisplayName = userName,
+                PhotoUrl = null,
+                Disabled = false,
+                Uid = userId.ToString(),           
+            };
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
         }
     }
 }

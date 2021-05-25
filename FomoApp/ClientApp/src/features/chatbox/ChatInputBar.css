@@ -5,12 +5,12 @@
     padding: 0.5rem;
     box-sizing: border-box;
     background-color: var(--lightorangegrey);
+    z-index: 800;
 }
 
 #chat-input-bar-text-field{
     min-height: 2rem;
     background-color: white;
-    border-radius: 0.5rem;
     box-sizing: border-box;
     flex-grow: 1;
     max-width: calc(100% - 8rem);

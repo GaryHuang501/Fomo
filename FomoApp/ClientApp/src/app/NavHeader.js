@@ -17,7 +17,7 @@ export const NavHeader = function (props) {
       <nav id="header-nav-bar">
         <div className="nav-header-item"><NavLink exact activeClassName="nav-header-item-selected" to="/">Portfolio</NavLink></div>
         <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Leaderboard">Leaderboard</NavLink></div>
-        <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Members">Members</NavLink></div>
+        <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Friends">Friends</NavLink></div>
         <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Faq">FAQ</NavLink></div>
         <div className="nav-header-item"><a className="github-link" href="https://github.com/GaryHuang501/Fomo" aria-label="github"> </a></div>
       </nav>

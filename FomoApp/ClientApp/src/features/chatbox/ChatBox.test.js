@@ -18,12 +18,17 @@ afterEach(() => {
     firebase.database().reset();
 });
 
-it("renders newly submitted message", async () => {
+it("renders newly submitted message for my user", async () => {
 
     const initialState = {
         login: {
-            user: {
-                id: "100"
+            selectedUser: {
+                id: "100",
+                name: "selectedUser"
+            },
+            myUser: {
+                id: "200",
+                name: "myUser"
             }
         }
     };
@@ -54,7 +59,8 @@ it("renders newly submitted message", async () => {
     await waitFor(() => {
         const messages = screen.getAllByRole("log");
         expect(messages.length).toEqual(1);
-        expect(within(messages[0]).getByText(inputText));
+        expect(within(messages[0]).getByText(inputText)).toBeInTheDocument();
+        expect(within(messages[0]).getByText("myUser")).toBeInTheDocument();
     });
 });
 
@@ -63,7 +69,10 @@ it("renders multiple loaded messages from server", async () => {
 
     const initialState = {
         login: {
-            user: {
+            selectedUser: {
+                id: userId
+            },
+            myUser: {
                 id: userId
             }
         }

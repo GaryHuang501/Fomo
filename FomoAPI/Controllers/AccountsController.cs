@@ -35,16 +35,38 @@ namespace FomoAPI.Controllers
         }
 
         /// <summary>
-        /// Gets user info
+        /// Gets user info for current logged in user.
         /// </summary>
-        /// <returns>Returns OK if authorized</returns>
+        /// <returns>Returns <see cref="UserDTO"/>if authorized</returns>
         [HttpGet("")]
         [Authorize]
         public async Task<ActionResult<UserDTO>> GetAccount()
         {
-            var user = await _userManager.GetUserAsync(User);
+            IdentityUser<Guid> myUser = await _userManager.GetUserAsync(User);
 
-            return Ok(new UserDTO(user.Id, user.UserName));
+            var userDTO = new UserDTO(myUser.Id, myUser.UserName);
+
+            return Ok(userDTO);
+        }
+
+        /// <summary>
+        /// Gets user info for selected user.
+        /// </summary>
+        /// <returns>Returns <see cref="LoginInfoDTO"/>if authorized</returns>
+        [HttpGet("{userId}")]
+        [Authorize]
+        public async Task<ActionResult<UserDTO>> GetAccount(string userId)
+        {
+            if (!Guid.TryParse(userId, out Guid selectedUserGuid))
+            {
+                return BadRequest("UserId must be a valid Guid");
+            }
+
+            IdentityUser<Guid> selectedUser = await _userManager.FindByIdAsync(userId);
+
+            var userDTO = new UserDTO(selectedUser.Id, selectedUser.UserName);
+
+            return Ok(userDTO);
         }
 
         /// <summary>
@@ -57,7 +79,7 @@ namespace FomoAPI.Controllers
         {
             var claims = new UserClaims(User);
 
-            return await _clientAuthFactory.CreateClientToken(claims.UserID, claims.Value);
+            return await _clientAuthFactory.CreateClientToken(Guid.Parse(claims.UserID), claims.Value);
         }
 
         /// <summary>
@@ -121,6 +143,11 @@ namespace FomoAPI.Controllers
                     await _signInManager.RefreshSignInAsync(user);
                 }
 
+                if (!(await _clientAuthFactory.VerifyUser(user.Id)))
+                {
+                    await _clientAuthFactory.CreateUser(user.Id, user.UserName, user.Email);
+                }
+
                 if (success)
                 {
                     return Redirect(returnUrl);
@@ -179,6 +206,5 @@ namespace FomoAPI.Controllers
 
             return user;
         }
-
     }
 }

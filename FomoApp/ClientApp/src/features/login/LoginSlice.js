@@ -13,11 +13,18 @@ export const getAccount = createAsyncThunk('login/getAccount', async () => {
     return response.data;
 });
 
+export const getAccountForId = createAsyncThunk('login/getAccount/id', async (id) => {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts/${id}`)
+    return response.data;
+});
+
+
 function revokeCredentials(state){
     state.isAuthenticated = false;
     state.isFirebaseAuthenticated = false;
     state.customClientToken = false;
-    state.user = null;
+    state.selectedUser = null;
+    state.myUser = null;
 }
 
 export const loginSlice = createSlice({
@@ -26,7 +33,8 @@ export const loginSlice = createSlice({
     isAuthenticated: false, 
     isFirebaseAuthenticated: false,
     customClientToken: null,
-    user: null
+    selectedUser: null,
+    myUser: null
   },
   reducers: {
       setAuthenticated: state => {
@@ -46,11 +54,21 @@ export const loginSlice = createSlice({
     [getAccount.fulfilled]: (state, action) => {
         state.status = 'succeeded'
         state.isAuthenticated = true;
-        state.user = action.payload;
+        state.myUser = action.payload;
     },
     [getAccount.rejected]: (state, action) => {
         state.status = 'failed'
         state.isAuthenticated = false;
+    },
+    [getAccountForId.pending]: (state, action) => {
+        state.status = 'loading'
+    },
+    [getAccountForId.fulfilled]: (state, action) => {
+        state.status = 'succeeded'
+        state.selectedUser = action.payload;
+    },
+    [getAccountForId.rejected]: (state, action) => {
+        state.status = 'failed'
     },
     [getClientCustomToken.pending]: (state, action) => {
       state.status = 'loading'
@@ -74,6 +92,10 @@ export const selectClientCustomToken = state => state.login.customClientToken;
 
 export const selectFirebaseAuthenticatedState = state => state.login.isFirebaseAuthenticated;
 
-export const selectUser = state => state.login.user;
+export const selectUser = state => state.login.selectedUser;
+
+export const selectMyUser = state => state.login.myUser;
+
+export const selectIsMyUserPage = state => (state.login.selectedUser && state.login.myUser) && (state.login.selectedUser.id === state.login.myUser.id);
 
 export default loginSlice.reducer;

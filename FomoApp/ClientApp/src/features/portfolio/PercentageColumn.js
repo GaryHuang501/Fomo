@@ -7,8 +7,8 @@ import React from 'react';
 */
 export default function PercentageColumn(props){
 
-    const positiveClassName = 'portfolio-stock-positive-delta';
-    const negativeClassName = 'portfolio-stock-negative-delta';
+    const positiveClassName = 'positive-delta';
+    const negativeClassName = 'negative-delta';
 
     let displayValue = props.value;
     let colorClassName = '';

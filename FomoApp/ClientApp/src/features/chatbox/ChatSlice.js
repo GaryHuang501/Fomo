@@ -5,13 +5,15 @@ import MessageType  from './MessageType';
 import firebase from 'firebase/app';
 import { userMessagesPath } from '../../app/FireBasePaths';
 
-export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad, thunkApi) => {
+export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayload, thunkApi) => {
 
-    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${messagePayLoad.userId}`).push();
+    const message = messagePayload.message;
+    const ownerId = messagePayload.ownerId;
+    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${ownerId}`).push();
 
     const newMessagePost = {
-      ...messagePayLoad,
-      text: messagePayLoad.text,
+      ...message,
+      text: message.text,
       id: newMessagePostRef.key,
       timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
       messageType: MessageType.Message
@@ -29,12 +31,12 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayLoad,
 
 export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi) => {
 
-    const user = thunkApi.getState().login.user;
-    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${user.id}`).push();
+    const myUser = thunkApi.getState().login.myUser;
+    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${myUser.id}`).push();
 
     const newMessagePost = {
-      userId: user.id,
-      userName: user.name,
+      userId: myUser.id,
+      userName: myUser.name,
       text: text,
       id: newMessagePostRef.key,
       timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
@@ -73,8 +75,8 @@ export const chatSlice = createSlice({
             }
         },
         clearMessages: (state, action) => {
-            state.messages = [];
-            state.messageIds = [];
+            state.messages.length = 0;
+            state.messageIds.length = 0;
         }
     },
     extraReducers: {

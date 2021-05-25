@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using FomoAPI.Application.ViewModels;
 using FomoAPI.Application.ViewModels.Member;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FomoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MembersController : ControllerBase
     {
         private readonly IMemberQueries _memberQueries;

@@ -49,9 +49,11 @@ function App() {
         { isFirebaseAuthenticated ?
           <Switch>
             <Route exact path="/" component={PortfolioPage}/>
+            <Route exact path="/portfolio" component={PortfolioPage}/>
+            <Route exact path="/portfolio/:urlUserId" component={PortfolioPage}/>
             <Route exact path="/Leaderboard" component={LeaderBoardPage} />
-            <Route exact path="/Members" component={MembersPage} />
-            <Route exact path="/About" component={MembersPage} />
+            <Route exact path="/Friends" component={MembersPage} />
+            <Route exact path="/Faq" component={MembersPage} />
             <Redirect to="/" />
           </Switch> : null}
     </Router>

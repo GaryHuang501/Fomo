@@ -3,14 +3,6 @@
     font-weight: bold;   
 }
 
-.portfolio-stock-positive-delta{
-    color: 	limegreen;
-}
-
-.portfolio-stock-negative-delta{
-    color: red;
-}
-
 .portfolio-row-options{
     padding-right: 2rem;
     display: flex;

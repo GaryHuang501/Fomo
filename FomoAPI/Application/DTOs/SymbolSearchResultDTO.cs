@@ -20,9 +20,9 @@ namespace FomoAPI.Application.DTOs
 
         public string ExchangeName { get; set; }
 
-        public string FullName { get; private set; }
+        public string FullName { get; set; }
 
-        public decimal Match { get; private set; }
+        public decimal Match { get; set; }
 
         public int SymbolId { get; set; }
 

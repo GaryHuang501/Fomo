@@ -42,14 +42,17 @@ namespace FomoAPI.Controllers
             return Ok(portfolio);
         }
 
-        [HttpGet()]
+        [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<int>>> GetPortfolioIds()
+        public async Task<ActionResult<IEnumerable<int>>> GetPortfolioIds([FromQuery]string userId)
         {
-            Guid userId = User.GetUserId();
+            if(!Guid.TryParse(userId, out Guid userGuid))
+            {
+                return BadRequest("UserId must be a valid GUID");
+            }
 
-            var ids = await _portfolioRepository.GetPortfolioIds(userId);
+            var ids = await _portfolioRepository.GetPortfolioIds(userGuid);
 
             if (ids == null)
             {

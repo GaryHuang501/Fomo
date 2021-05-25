@@ -20,6 +20,7 @@ export const PortfolioStock = (props) => {
      
     const stockData = useSelector(state => selectStockData(state, portfolioSymbol));
     const voteData = useSelector(state => selectVoteData(state, portfolioSymbol.symbolId));
+    const showOptions = props.showOptions;
     const roi = calculateRoi();
 
     const [showEditPortfolioModal, setShowEditPortfolioModal] = useState(false);
@@ -27,10 +28,14 @@ export const PortfolioStock = (props) => {
     const [isEditMode, setIsEditMode] = useState(false);
 
     function calculateRoi(){
-        if(!stockData.price || stockData.price === 0){
-            return -100;
+        if(!stockData.price){
+            return null;
         }
 
+        if(stockData.price === 0){
+            return -100;
+        }
+        
         if(!portfolioSymbol.averagePrice || portfolioSymbol.averagePrice === 0){
             return 0;
         }
@@ -79,29 +84,32 @@ export const PortfolioStock = (props) => {
             <PercentageColumn value={roi} columnValueClassName='portoflio-row-return'></PercentageColumn>
             <VoteColumn symbolId={voteData.symbolId} count={voteData.count} myVoteDirection={voteData.myVoteDirection} isEditMode={isEditMode}></VoteColumn>
             <td className="portfolio-column" role='cell'>
-                <div className="portfolio-row-options">
-                    <span className="portfolio-row-options-edit-modal-container">
-                        {showEditPortfolioModal 
-                            ? <Modal onCancel={onCloseEdit}><EditPortfolioForm onSubmit={onCloseEdit} portfolioSymbolId={portfolioSymbol.id}/></Modal> 
-                            : null
-                        }
-                    </span>
-                    <span className="portfolio-row-options-field portfolio-row-options-field-move-up">
-                        <i className="fas fa-caret-up" title="Move Up" role="button" onClick={onMoveUp}/>
-                    </span>
-                    <span className="portfolio-row-options-field portfolio-row-options-field-move-down">
-                        <i className="fas fa-caret-down" title="Move Down" role="button"  onClick={onMoveDown}/>
-                    </span>
-                    <span className="portfolio-row-options-field portfolio-row-options-field-edit">
-                        <i className="far fa-edit" title="Edit" role="button" onClick={onEdit}/>
-                    </span>
-                    <span className="portfolio-row-options-field portfolio-row-options-field-chart">
-                        <i className="fas fa-chart-line" title="Show Chart" role="button" onClick={onShowChart}/>
-                    </span>
-                    <span className="portfolio-row-options-field portfolio-row-options-field-remove">
-                        <i className="fas fa-trash" title="Remove" role="button" onClick={onRemove}/>
-                    </span>
-                </div>
+                {
+                    !showOptions ? null :
+                    <div className="portfolio-row-options">
+                        <span className="portfolio-row-options-edit-modal-container">
+                            {showEditPortfolioModal 
+                                ? <Modal onCancel={onCloseEdit}><EditPortfolioForm onSubmit={onCloseEdit} portfolioSymbolId={portfolioSymbol.id}/></Modal> 
+                                : null
+                            }
+                        </span>
+                        <span className="portfolio-row-options-field portfolio-row-options-field-move-up">
+                            <i className="fas fa-caret-up" title="Move Up" role="button" onClick={onMoveUp}/>
+                        </span>
+                        <span className="portfolio-row-options-field portfolio-row-options-field-move-down">
+                            <i className="fas fa-caret-down" title="Move Down" role="button"  onClick={onMoveDown}/>
+                        </span>
+                        <span className="portfolio-row-options-field portfolio-row-options-field-edit">
+                            <i className="far fa-edit" title="Edit" role="button" onClick={onEdit}/>
+                        </span>
+                        <span className="portfolio-row-options-field portfolio-row-options-field-chart">
+                            <i className="fas fa-chart-line" title="Show Chart" role="button" onClick={onShowChart}/>
+                        </span>
+                        <span className="portfolio-row-options-field portfolio-row-options-field-remove">
+                            <i className="fas fa-trash" title="Remove" role="button" onClick={onRemove}/>
+                        </span>
+                    </div>
+                }
             </td>
         </tr>
     );

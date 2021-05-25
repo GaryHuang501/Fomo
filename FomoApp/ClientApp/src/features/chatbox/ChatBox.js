@@ -2,14 +2,14 @@ import './ChatBox.css';
 import 'emoji-mart/css/emoji-mart.css'
 
 import React, { useCallback, useState } from 'react';
-import { messageReceived, selectMessages, sendMessage } from './ChatSlice';
+import { clearMessages, messageReceived, selectMessages, sendMessage } from './ChatSlice';
+import { selectMyUser, selectUser } from '../login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ChatInputBar } from './ChatInputBar';
 import { ChatListener } from './ChatListener';
 import { ChatMessageArea } from './ChatMessageArea';
 import { Picker } from 'emoji-mart';
-import { selectUser } from '../login/LoginSlice';
 
 /*
   The main chatbox componets for posting messages to a specific portfolio.
@@ -22,9 +22,12 @@ export default function ChatBox(){
   const [showEmoji, setShowEmoji] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
 
-  const user = useSelector(selectUser);
+  const myUser = useSelector(selectMyUser);
+  const owningUser = useSelector(selectUser);
+
   const chatMessages = useSelector(selectMessages);
   const onNewChatMessage = useCallback( message => { dispatch(messageReceived(message)); }, [dispatch]);
+  const onClearChatListeners = useCallback( () => { dispatch(clearMessages()); }, [dispatch]);
 
   function submitMessage(){
     if(inputMessage.length === 0){
@@ -32,12 +35,12 @@ export default function ChatBox(){
     }
     const newMessage = {
       id: -1, // will be set by dispatched action
-      userId: user.id,
-      userName: user.name,
+      userId: myUser.id,
+      userName: myUser.name,
       text: inputMessage.replace(/<br>/gi, '\n'),
     };
 
-    dispatch(sendMessage(newMessage));
+    dispatch(sendMessage({ ownerId: owningUser.id, message: newMessage}));
     setInputMessage('');
   }
 
@@ -76,8 +79,15 @@ export default function ChatBox(){
   return (
     <aside id="chatbox">
       <div id="chatbox-top-filler-box"></div> {/* Empty area to give spacing between scrollbar and rounded bordders*/}
-      <ChatListener userId={user.id} onNewChatMessage={onNewChatMessage} aria-level="1" role="heading"></ChatListener>
-      <ChatMessageArea chatMessages={chatMessages}></ChatMessageArea>
+      <ChatListener 
+        userId={owningUser.id} 
+        onNewChatMessage={onNewChatMessage} 
+        onClearChatListeners={onClearChatListeners}
+        aria-level="1" role="heading">
+      </ChatListener>
+      <ChatMessageArea 
+        chatMessages={chatMessages}>          
+      </ChatMessageArea>
       { showEmoji ? <div id='chatbox-emoji-picker'><Picker onSelect={onEmojiPicked}></Picker></div> : null }
       <ChatInputBar 
         onSubmitPressed={submitMessage} 

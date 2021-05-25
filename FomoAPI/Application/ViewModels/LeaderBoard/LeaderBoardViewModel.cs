@@ -3,6 +3,9 @@ using System;
 
 namespace FomoAPI.Application.ViewModels.LeaderBoard
 {
+    /// <summary>
+    /// View Model to display the boards for the leader board page.
+    /// </summary>
     public class LeaderBoardViewModel
     {
         public Board MostBullish { get; private set; }

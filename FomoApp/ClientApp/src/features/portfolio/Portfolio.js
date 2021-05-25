@@ -7,9 +7,15 @@ import { useSelector } from 'react-redux'
 
 export const Portfolio = function (props) {
   const portfolio = useSelector(selectSelectedPortfolio);
-  
+  const isMyUserPage = props.isMyUserPage;
+
   const portfolioStocks = portfolio.portfolioSymbols.map(portfolioSymbol => {
-    return <PortfolioStock key={portfolioSymbol.symbolId} portfolioId={portfolio.id} portfolioSymbol={portfolioSymbol}></PortfolioStock>
+    return <PortfolioStock 
+              key={portfolioSymbol.symbolId} 
+              portfolioId={portfolio.id} 
+              portfolioSymbol={portfolioSymbol}
+              showOptions={isMyUserPage}
+              ></PortfolioStock>
   });
   
   return (

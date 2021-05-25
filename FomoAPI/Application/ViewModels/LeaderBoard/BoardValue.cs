@@ -4,6 +4,9 @@ using System;
 
 namespace FomoAPI.Application.ViewModels
 {
+    /// <summary>
+    /// Represents each row or ranking in a board.
+    /// </summary>
     public class BoardValue
     {
         public string Id { get; private set; }

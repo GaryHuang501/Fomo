@@ -3,8 +3,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { sendHistory } from '../chatbox/ChatSlice'
 
-export const fetchPortfolioIds = createAsyncThunk('portfolio/fetchPortfoliIds', async (thunkApi) => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/portfolios`);
+export const fetchPortfolioIds = createAsyncThunk('portfolio/fetchPortfoliIds', async (userId, thunkApi) => {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/portfolios?userId=${userId}`);
 
     return response.data;
 });

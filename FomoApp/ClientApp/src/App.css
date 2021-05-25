@@ -1,5 +1,7 @@
 :root {
   --lightorangegrey: #f1ebe4;
+  --positive-delta: limegreen;
+  --negative-delta: red;
 }
 
 #root {
@@ -23,6 +25,14 @@
   border: 0.1rem solid lightgrey;
 }
 
+.standard-border-radius{
+  border-radius: 0.5rem;
+}
+
+.large-border-radius{
+  border-radius: 1rem;
+}
+
 .flex-center{
   display: flex;
   justify-content: center;
@@ -33,4 +43,12 @@
 
 .hidden{
   visibility: hidden;
+}
+
+.positive-delta{
+  color: 	var(--positive-delta);
+}
+
+.negative-delta{
+  color: var(--negative-delta);
 }

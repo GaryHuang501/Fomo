@@ -117,7 +117,7 @@ it("renders with the portfolio symbol with data", async () => {
 
 describe("renders 0.00% ROI", () => {
 
-  it("renders 0.00 ROI when stock price is not set but average price is", async () => {
+  it("renders --% ROI when stock price is not set but average price is", async () => {
     const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 12.50, return: 1 };
 
     const stockData = {
@@ -142,10 +142,10 @@ describe("renders 0.00% ROI", () => {
     });
 
     const columns = screen.queryAllByRole('cell');
-    expect(columns[returnCol].innerHTML).toBe("0.00%");
+    expect(columns[returnCol].innerHTML).toBe("--%");
   });
 
-  it("renders 0.00 ROI when both average price and stock price is not set", async () => {
+  it("renders --% ROI when both average price and stock price is not set", async () => {
     const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: null, return: 1 };
 
     const stockData = {
@@ -170,7 +170,7 @@ describe("renders 0.00% ROI", () => {
     });
 
     const columns = screen.queryAllByRole('cell');
-    expect(columns[returnCol].innerHTML).toBe("0.00%");
+    expect(columns[returnCol].innerHTML).toBe("--%");
     expect(columns[averagePriceCol].innerHTML).toBe("--");
   });
 
@@ -242,9 +242,12 @@ describe("Clicking portfolio stock options", () => {
     const spy = jest.spyOn(axios, 'patch');
 
     act(() => {
-      render(<Portfolio />, { initialState: initialState });
+      render(<Portfolio isMyUserPage={true}/>, { initialState: initialState });
     });
 
+    const columns = screen.queryAllByRole('cell');
+    await waitFor(() => expect(columns[columns.length - 1].getElementsByClassName("portfolio-row-options").length > 0).toBeTruthy());
+    
     const upButtons = screen.getAllByTitle("Move Up");
 
     expect(upButtons.length).toEqual(3);
@@ -272,7 +275,7 @@ describe("Clicking portfolio stock options", () => {
     const spy = jest.spyOn(axios, 'patch');
 
     act(() => {
-      render(<Portfolio />, { initialState: initialState });
+      render(<Portfolio isMyUserPage={true}/>, { initialState: initialState });
     });
 
     const downButtons = screen.getAllByTitle("Move Down");
@@ -304,7 +307,7 @@ describe("Clicking portfolio stock options", () => {
     const spy = jest.spyOn(axios, 'delete');
 
     act(() => {
-      render(<Portfolio />, { initialState: initialState });
+      render(<Portfolio isMyUserPage={true}/>, { initialState: initialState });
     });
 
     const deleteButtons = screen.getAllByTitle("Remove");
@@ -323,4 +326,31 @@ describe("Clicking portfolio stock options", () => {
     await waitFor(() => expect(within(stocks[0]).getByText("VOO")).toBeInTheDocument());
     expect(within(stocks[1]).getByText("BA")).toBeInTheDocument();
   });
+});
+
+it('should not show options when showOptions flag is false', async () => {
+  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 0, return: 1 };
+
+  const stockData = {
+    symbolId: 1,
+    ticker: 'SPY',
+    price: 100
+  };
+
+  const initialState = {
+    stocks: {
+      singleQuoteData:{
+        1: stockData
+      },
+      votes:{
+      }
+    }
+  };
+
+  act(() => {
+    render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} showOptions={false}/></tbody></table>, { initialState });
+  });
+
+  const columns = screen.queryAllByRole('cell');
+  expect(columns[columns.length - 1].getElementsByClassName("portfolio-row-options").length === 0).toBeTruthy();
 });

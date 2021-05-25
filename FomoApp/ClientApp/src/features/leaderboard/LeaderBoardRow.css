@@ -1,0 +1,24 @@
+
+.leader-board-row{
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.leader-board-row:hover{
+    background-color: lightskyblue;
+    cursor: pointer;
+}
+
+.leader-board-name{
+    width: 12rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leader-board-value{
+    width: 8rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

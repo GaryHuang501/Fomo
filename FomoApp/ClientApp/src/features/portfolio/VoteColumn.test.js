@@ -8,8 +8,8 @@ import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import { render } from '../../test-util';
 
-const positiveDeltaClass = "portfolio-stock-positive-delta";
-const negativeDeltaClass = "portfolio-stock-negative-delta";
+const positiveDeltaClass = "positive-delta";
+const negativeDeltaClass = "negative-delta";
 const testUrl = "http://localhost";
 let mock;
 
