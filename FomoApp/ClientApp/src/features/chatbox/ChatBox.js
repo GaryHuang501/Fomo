@@ -10,9 +10,11 @@ import { ChatInputBar } from './ChatInputBar';
 import { ChatListener } from './ChatListener';
 import { ChatMessageArea } from './ChatMessageArea';
 import { Picker } from 'emoji-mart';
+import { userMessagesPath } from '../../app/FireBasePaths';
 
 /*
-  The main chatbox componets for posting messages to a specific portfolio.
+  Chatbox for reading and writing messages. 
+  One instance per page.
 */
 export default function ChatBox(){
 
@@ -24,6 +26,8 @@ export default function ChatBox(){
 
   const myUser = useSelector(selectMyUser);
   const owningUser = useSelector(selectUser);
+  const path = `${userMessagesPath}/${owningUser.id}`;
+
 
   const chatMessages = useSelector(selectMessages);
   const onNewChatMessage = useCallback( message => { dispatch(messageReceived(message)); }, [dispatch]);
@@ -80,7 +84,7 @@ export default function ChatBox(){
     <aside id="chatbox">
       <div id="chatbox-top-filler-box"></div> {/* Empty area to give spacing between scrollbar and rounded bordders*/}
       <ChatListener 
-        userId={owningUser.id} 
+        path={path} 
         onNewChatMessage={onNewChatMessage} 
         onClearChatListeners={onClearChatListeners}
         aria-level="1" role="heading">

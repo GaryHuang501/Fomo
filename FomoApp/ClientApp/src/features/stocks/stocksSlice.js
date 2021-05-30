@@ -2,8 +2,9 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import QueryHelper from '../../app/QueryHelper';
 import axios from 'axios';
+import { sendHistory } from '../chatbox/ChatSlice'
 
-export const fetchStockSingleQuoteDatas = createAsyncThunk('stock/fetchStockSingleQuoteDatas/', async (symbolIds, thunkApi) => {
+export const fetchStockSingleQuoteDatas = createAsyncThunk('stock/fetchStockSingleQuoteDatas', async (symbolIds, thunkApi) => {
 
     let idQuery = QueryHelper.createIdsQuery("sids", symbolIds);
     
@@ -12,7 +13,7 @@ export const fetchStockSingleQuoteDatas = createAsyncThunk('stock/fetchStockSing
 
 });
 
-export const fetchVoteData = createAsyncThunk('vote/fetchVoteData/', async (symbolIds, thunkApi) => {
+export const fetchVoteData = createAsyncThunk('vote/fetchVoteData', async (symbolIds, thunkApi) => {
 
     let idQuery = QueryHelper.createIdsQuery("sids", symbolIds);
     
@@ -22,10 +23,25 @@ export const fetchVoteData = createAsyncThunk('vote/fetchVoteData/', async (symb
 
 
 export const sendVote = createAsyncThunk('vote/sendVote', async (vote, thunkApi) => {
+
     thunkApi.dispatch(updateVote(vote));
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/votes`, { symbolId: vote.symbolId, direction: vote.direction, delta: vote.delta});
+    
+    const voteText = `${getVoteDirectionName(vote.direction)} ${vote.ticker}`;
+     
+    thunkApi.dispatch(sendHistory(voteText))
     return response.data;
 });
+
+
+function getVoteDirectionName(direction){
+    switch(direction){
+        case 1: return "Upvoted";
+        case 0: return "Abstained";
+        case -1: return "Downvoted";
+        default: throw new Error("Unknown Vote direction");
+    }
+}
 
 export const stocksSlice = createSlice({
     name: 'stocks',

@@ -1,11 +1,14 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
+import MockFireBaseDB from '../../mocks/MockFireBaseDB';
+import MockFireBaseRef from '../../mocks/MockFireBaseRef';
 import { PortfolioStock } from './PortfolioStock';
 import React from 'react';
 import VoteColumn from './VoteColumn';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
+import firebase from 'firebase/app';
 import { render } from '../../test-util';
 
 const positiveDeltaClass = "positive-delta";
@@ -14,19 +17,23 @@ const testUrl = "http://localhost";
 let mock;
 
 beforeEach(() => {
+  MockFireBaseDB.ServerValue =  { TIMESTAMP : 1000 };
+  firebase.database = MockFireBaseDB;
+
   mock = new MockAdapter(axios);
+
+  process.env = {
+    REACT_APP_API_URL: testUrl
+  };
 
   mock.onPost(`${process.env.REACT_APP_API_URL}/votes`)
       .reply(200, {});
-
-  process.env = {
-      REACT_APP_API_URL: testUrl
-  };
 });
 
 afterEach(() => {
   mock.restore();
   process.env = {};
+  firebase.database().reset();
 });
 
 
@@ -305,6 +312,99 @@ it("decrements the vote count by 2 when I switch from upvote to downvote", async
 
     await Promise.resolve();
     await waitFor( () => expect(spy).toHaveBeenCalledWith(`${testUrl}/votes`, {symbolId: 1, direction: -1, delta: -2}));
+});
+
+describe("sends activity when voted", () =>{
+
+  const props  = {
+    count: 10,
+    myVoteDirection: 0,
+    symbolId: 1,
+    ticker: "BAC"
+  };
+  
+  const initialState = {
+    login: {
+      selectedUser: {
+          id: "200",
+          name: "myUser"
+      },
+      myUser: {
+          id: "200",
+          name: "myUser"
+      }
+    } 
+  };
+
+  it("sends activity for downvote", async () => {
+
+    act(() => {
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>, {initialState});
+    });
+  
+    const spy = jest.spyOn(axios, 'post');
+  
+    const voteButtons = screen.queryAllByRole("button");
+    const upVoteButton = voteButtons[0];
+
+    fireEvent.click(upVoteButton);
+
+    await Promise.resolve();
+
+    await waitFor( () => {
+      const historyRef = firebase.database().refs.filter(r => r.path === 'friendActivity')[0];
+      expect(historyRef).toBeDefined();
+      expect(historyRef.messageQueue[0].text).toEqual("Upvoted BAC")
+    });
+  });
+
+  it("sends activity for downvote", async () => {
+
+    act(() => {
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>, {initialState});
+    });
+  
+    const spy = jest.spyOn(axios, 'post');
+  
+    const voteButtons = screen.queryAllByRole("button");
+    const downVoteButton = voteButtons[1];
+    
+    fireEvent.click(downVoteButton);
+
+    await Promise.resolve();
+
+    await waitFor( () => {
+      const historyRef = firebase.database().refs.filter(r => r.path === 'friendActivity')[0];
+      expect(historyRef).toBeDefined();
+      expect(historyRef.messageQueue[0].text).toEqual("Downvoted BAC")
+    });
+  });
+
+  it("sends activity for abstaining", async () => {
+
+    props.myVoteDirection = -1;
+
+    act(() => {
+      render(<table><tbody><tr><VoteColumn {...props} isEditMode={true}/></tr></tbody></table>, {initialState});
+    });
+  
+    const spy = jest.spyOn(axios, 'post');
+  
+    const voteButtons = screen.queryAllByRole("button");
+    const downVoteButton = voteButtons[1];
+    
+    fireEvent.click(downVoteButton);
+
+    await Promise.resolve();
+
+    fireEvent.click(downVoteButton);
+
+    await waitFor( () => {
+      const historyRef = firebase.database().refs.filter(r => r.path === 'friendActivity')[0];
+      expect(historyRef).toBeDefined();
+      expect(historyRef.messageQueue[0].text).toEqual("Abstained BAC")
+    });
+  });
 });
 
 it("re-renders with new vote values when upvoted", async () => {

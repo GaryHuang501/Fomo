@@ -14,6 +14,16 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+#chatbox-bottom-filler-box{
+    border-radius: 0 0 1rem 1rem;
+    border: 0.1rem solid lightgrey;
+    border-top: 0;
+    height: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 #chatbox-emoji-picker .emoji-mart-scroll{
     animation: emojiSlide 0.5s forwards;
     height: 0px;

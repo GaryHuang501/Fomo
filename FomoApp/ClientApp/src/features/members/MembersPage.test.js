@@ -2,9 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 
 import MembersPage from './MembersPage';
 import MockAdapter from 'axios-mock-adapter';
+import MockFireBaseDB from '../../mocks/MockFireBaseDB';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
+import firebase from 'firebase/app';
 import { render } from '../../test-util';
 
 const testUrl = "http://localhost";
@@ -15,6 +17,11 @@ let offset;
 let endPointUrl;
 
 beforeEach(() => {
+  window.HTMLElement.prototype.scrollIntoView = function() {};
+
+  MockFireBaseDB.ServerValue =  { TIMESTAMP : 1000 };
+  firebase.database = MockFireBaseDB;
+
   mock = new MockAdapter(axios);
 
   process.env = {
@@ -31,6 +38,7 @@ beforeEach(() => {
 afterEach(() => {
   mock.restore();
   process.env = {};
+  firebase.database().reset();
 });
 
 
@@ -248,9 +256,10 @@ it("should skip headers for letters without members", async () => {
   expect(within(memberLists[1]).queryAllByRole("listitem").length).toEqual(1);
   expect(within(memberLists[1]).getByText("Zoro")).toBeInTheDocument();
 
-  expect(headers.length).toEqual(2);
+  expect(headers.length).toEqual(3);
   expect(within(headers[0]).getByText("A")).toBeInTheDocument();
   expect(within(headers[1]).getByText("Z")).toBeInTheDocument();
+  expect(within(headers[2]).getByText("Friend Activity")).toBeInTheDocument();
 });
 
 it("renders all members in a 'Others' category when the first character in their username is not a letter", async () => {
@@ -291,7 +300,8 @@ it("renders all members in a 'Others' category when the first character in their
   expect(within(memberLists[1]).queryAllByRole("listitem").length).toEqual(1);
   expect(within(memberLists[1]).getByText("carl")).toBeInTheDocument();
 
-  expect(headers.length).toEqual(2);
+  expect(headers.length).toEqual(3);
   expect(within(headers[0]).getByText("A")).toBeInTheDocument();
   expect(within(headers[1]).getByText("Others")).toBeInTheDocument();
+  expect(within(headers[2]).getByText("Friend Activity")).toBeInTheDocument();
 });

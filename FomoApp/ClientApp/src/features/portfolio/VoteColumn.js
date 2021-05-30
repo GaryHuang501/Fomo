@@ -31,7 +31,12 @@ export default function VoteColumn(props){
         // if the user clicks the same vote direction, it resets it to 0.
         let newActualDirection = myVoteDirection === newVoteDirection ? VoteDirectionType.NONE : newVoteDirection;
 
-        const newVote = {symbolId: props.symbolId, direction: newActualDirection, delta: (newActualDirection - myVoteDirection) };
+        const newVote = {
+            symbolId: props.symbolId, 
+            ticker: props.ticker,
+            direction: newActualDirection,
+            delta: (newActualDirection - myVoteDirection) 
+        };
         dispatch(sendVote(newVote));
     }
 

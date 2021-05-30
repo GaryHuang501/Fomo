@@ -1,24 +1,23 @@
 import firebase from 'firebase/app';
 import { useEffect } from 'react/cjs/react.development';
-import { userMessagesPath } from '../../app/FireBasePaths';
 
 /*
     Listens for anys new chat messages and loads the most recent chat messages
 */
 export const ChatListener = function(props) {
     
-    const userId = props.userId;
+    const path = props.path;
     const onNewChatMessageCallback = props.onNewChatMessage;
     const onClearListenersCallback = props.onClearChatListeners;
 
     useEffect(()=> {
 
-        if(!userId){
+        if(!path){
             return;
         }
 
         const messageFetchLimit = parseInt(process.env.REACT_APP_CHAT_LAST_MESSAGES_COUNT) ?? 10;
-        const chatMessagesRef = firebase.database().ref(`${userMessagesPath}/${userId}`).limitToLast(messageFetchLimit);
+        const chatMessagesRef = firebase.database().ref(path).limitToLast(messageFetchLimit);
 
         chatMessagesRef.on('child_added', (snapshot) => {
             const message = snapshot.val();
@@ -31,12 +30,11 @@ export const ChatListener = function(props) {
         return () => { 
             chatMessagesRef.off('child_added');
 
-            console.log("clearing");
             if(onClearListenersCallback){
                 onClearListenersCallback();
             }
         };
-    }, [onNewChatMessageCallback, onClearListenersCallback, userId]);
+    }, [onNewChatMessageCallback, onClearListenersCallback, path]);
 
   return (null);
 }

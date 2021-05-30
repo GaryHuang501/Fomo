@@ -47,7 +47,17 @@ it("updates average price when submitted", async () => {
             portfolioSymbols: [portfolioSymbol]
           }
         }
-      }
+      },
+      login: {
+        selectedUser: {
+            id: "200",
+            name: "myUser"
+        },
+        myUser: {
+            id: "200",
+            name: "myUser"
+        }
+      } 
     };
 
     let submitCalled = false;
@@ -68,7 +78,7 @@ it("updates average price when submitted", async () => {
     fireEvent.change(averagePriceInput, { target: { value: 2.50 }} );
     fireEvent.click(submit);
 
-    Promise.resolve();
+    await Promise.resolve();
     await waitFor( () => expect(spy).toHaveBeenCalledWith(endPointUrl, {averagePrice: "2.50"}));
 
     expect(submitCalled).toBe(true);

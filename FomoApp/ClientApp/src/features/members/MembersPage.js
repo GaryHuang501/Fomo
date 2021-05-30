@@ -3,6 +3,7 @@ import './MembersPage.css';
 import { getMemberData, selectMemberData } from './MembersSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
+import FriendActivityBox from '../chatbox/FriendActivityBox'
 import { MembersList } from './MembersList';
 import { MembersListSeparator } from './MembersListSeparator';
 import React from 'react';
@@ -49,6 +50,10 @@ export default function MembersPage(){
       <div id="members-page-content">
         {elements}
       </div>
+      <section id='member-page-friend-activity-box-container'>
+          <h3 id='member-page-friend-activity-box-header'>Friend Activity</h3>
+          <FriendActivityBox></FriendActivityBox>
+      </section>
     </main>
   );
 }

@@ -82,7 +82,7 @@ export const PortfolioStock = (props) => {
             <PercentageColumn value={stockData.changePercent} columnValueClassName='portoflio-row-change'></PercentageColumn>
             <td className="portfolio-column portfolio-row-average-price" role='cell'>{portfolioSymbol.averagePrice > 0 ? portfolioSymbol.averagePrice : "--"}</td>
             <PercentageColumn value={roi} columnValueClassName='portoflio-row-return'></PercentageColumn>
-            <VoteColumn symbolId={voteData.symbolId} count={voteData.count} myVoteDirection={voteData.myVoteDirection} isEditMode={isEditMode}></VoteColumn>
+            <VoteColumn symbolId={voteData.symbolId} count={voteData.count} myVoteDirection={voteData.myVoteDirection} ticker={stockData.ticker} isEditMode={isEditMode}></VoteColumn>
             <td className="portfolio-column" role='cell'>
                 {
                     !showOptions ? null :

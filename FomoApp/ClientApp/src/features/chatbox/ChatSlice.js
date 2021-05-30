@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { friendActivityPath, userMessagesPath } from '../../app/FireBasePaths';
 
 import ChatStatusType from './ChatStatusType';
 import MessageType  from './MessageType';
 import firebase from 'firebase/app';
-import { userMessagesPath } from '../../app/FireBasePaths';
 
 export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayload, thunkApi) => {
 
@@ -33,6 +33,7 @@ export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi)
 
     const myUser = thunkApi.getState().login.myUser;
     const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${myUser.id}`).push();
+    const newActivityPostRef = firebase.database().ref(friendActivityPath).push();
 
     const newMessagePost = {
       userId: myUser.id,
@@ -42,10 +43,18 @@ export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi)
       timeStampCreated: firebase.database.ServerValue.TIMESTAMP,
       messageType: MessageType.History
     };
+    
+    const newActivityPost = {
+        ...newMessagePost,
+        id: newActivityPostRef.key,
+        messageType: MessageType.Activity
+    }
 
     newMessagePostRef.set(newMessagePost);
-
-    // It will be added to UI automatically if firebase successful saves it.
+    newActivityPostRef.set(newActivityPost);
+    
+    // It will be added to UI automatically if firebase successful saves it
+    // as it will trigger listener to add as new message.
 });
 
 export const chatSlice = createSlice({

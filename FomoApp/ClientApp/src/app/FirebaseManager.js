@@ -18,18 +18,30 @@ export const FirebaseManager = function() {
   }, [dispatch]);
 
   useEffect(() => {
+    let refreshTokenInterval;
+
     async function signIn(){
       if(clientToken){
         try{
           await firebase.auth().signInWithCustomToken(clientToken)
           dispatch(setFireBaseAuthenticated());
+
+          // Token expires after 1 hour.
+          refreshTokenInterval = setInterval(() => {
+            console.log("refeshing")
+            dispatch(getClientCustomToken());
+          }, process.env.REACT_APP_FIREBASE_TOKEN_REFRESH_MS);
         }
         catch(ex){
         }
       }
     }
-    
+
     signIn();
+
+    return (() => {
+      clearInterval(refreshTokenInterval);
+    });
   }, [dispatch, clientToken]);
 
 

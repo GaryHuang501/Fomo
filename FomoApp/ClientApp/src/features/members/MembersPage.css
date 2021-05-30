@@ -9,4 +9,15 @@
 
 #members-page-content{
     grid-column: 3 / span 12;
+    grid-row: 1;
+}
+
+#member-page-friend-activity-box-header{
+    margin-left: 1rem;
+}
+
+#member-page-friend-activity-box-container{
+    grid-column: 13 / span 3;
+    grid-row: 1;
+    height: 45rem;
 }

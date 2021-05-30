@@ -4,8 +4,8 @@ export default class MockFireBaseRef {
     constructor(path) { 
         this.path = path;
 
-        if(MockFireBaseRef.messageQueue == null){
-            MockFireBaseRef.messageQueue = [];
+        if(this.messageQueue == null){
+            this.messageQueue = [];
         }
     }
 
@@ -19,7 +19,7 @@ export default class MockFireBaseRef {
     }
 
     set(value){
-        MockFireBaseRef.messageQueue.push(value);
+        this.messageQueue.push(value);
     }
 
     push(){
@@ -36,15 +36,15 @@ export default class MockFireBaseRef {
     }
 
     invokeCallAllPending(){
-        let message = MockFireBaseRef.messageQueue.shift();
+        let message = this.messageQueue.shift();
 
         while(message){      
             this.invokeCallBack(new MockSnapshot(message));
-            message = MockFireBaseRef.messageQueue.shift();
+            message = this.messageQueue.shift();
         }
     }
     
     reset(){
-        MockFireBaseRef.messageQueue = [];
+        this.messageQueue = [];
     }
 }
