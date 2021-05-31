@@ -2,8 +2,7 @@ import './ChatBox.css';
 import 'emoji-mart/css/emoji-mart.css'
 
 import React, { useCallback, useState } from 'react';
-import { clearMessages, messageReceived, selectMessages, sendMessage } from './ChatSlice';
-import { selectMyUser, selectUser } from '../login/LoginSlice';
+import { messageReceived, selectMessages, selectRefAlreadyExists, sendMessage } from './ChatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ChatInputBar } from './ChatInputBar';
@@ -16,7 +15,7 @@ import { userMessagesPath } from '../../app/FireBasePaths';
   Chatbox for reading and writing messages. 
   One instance per page.
 */
-export default function ChatBox(){
+export default function ChatBox(props){
 
   const maxInputLength = process.env.REACT_APP_CHAT_MAX_MESSAGE_LENGTH;
   const dispatch = useDispatch();
@@ -24,14 +23,15 @@ export default function ChatBox(){
   const [showEmoji, setShowEmoji] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
 
-  const myUser = useSelector(selectMyUser);
-  const owningUser = useSelector(selectUser);
+  const myUser = props.myUser;
+  const owningUser = props.selectedUser;
+
   const path = `${userMessagesPath}/${owningUser.id}`;
+  const refAlreadyExist = useSelector(state => selectRefAlreadyExists(state, path));
 
+  const chatMessages = useSelector(state => selectMessages(state, path));
 
-  const chatMessages = useSelector(selectMessages);
-  const onNewChatMessage = useCallback( message => { dispatch(messageReceived(message)); }, [dispatch]);
-  const onClearChatListeners = useCallback( () => { dispatch(clearMessages()); }, [dispatch]);
+  const onNewChatMessage = useCallback( message => { dispatch(messageReceived({path: path, message: message})); }, [dispatch, path]);
 
   function submitMessage(){
     if(inputMessage.length === 0){
@@ -44,7 +44,7 @@ export default function ChatBox(){
       text: inputMessage.replace(/<br>/gi, '\n'),
     };
 
-    dispatch(sendMessage({ ownerId: owningUser.id, message: newMessage}));
+    dispatch(sendMessage({ message: newMessage, path: path}));
     setInputMessage('');
   }
 
@@ -86,7 +86,7 @@ export default function ChatBox(){
       <ChatListener 
         path={path} 
         onNewChatMessage={onNewChatMessage} 
-        onClearChatListeners={onClearChatListeners}
+        bindNewListener={!refAlreadyExist}
         aria-level="1" role="heading">
       </ChatListener>
       <ChatMessageArea 

@@ -56,7 +56,7 @@ export default function PortfolioPage() {
               selectedUser != null ? 
               <section id='portfolio-chatbox-container'>
                   <h3 id='portfolio-chatbox-header'>{ `${selectedUser.name}'s Portfolio` }</h3>
-                  <ChatBox></ChatBox>
+                  <ChatBox myUser={myUser} selectedUser={selectedUser}></ChatBox>
               </section>
                   : null 
             }

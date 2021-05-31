@@ -1,7 +1,7 @@
 import './FriendActivityBox.css';
 
 import React, { useCallback } from 'react';
-import { clearMessages, messageReceived, selectMessages } from './ChatSlice';
+import { messageReceived, selectMessages, selectRefAlreadyExists } from './ChatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ChatListener } from './ChatListener';
@@ -15,17 +15,19 @@ export default function FriendActivityBox(){
 
   const dispatch = useDispatch();
   const path = friendActivityPath;
-  const activityMessages = useSelector(selectMessages);
-  const onNewChatMessage = useCallback( message => { dispatch(messageReceived(message)); }, [dispatch]);
-  const onClearChatListeners = useCallback( () => { dispatch(clearMessages()); }, [dispatch]);
+  const refAlreadyExist = useSelector(state => selectRefAlreadyExists(state, path));
+  const activityMessages = useSelector(state => selectMessages(state, path));
+  const onNewChatMessage = useCallback( message => { dispatch(messageReceived({path: path, message: message})); }, [dispatch, path]);
+  // const onClearChatListeners = useCallback( () => { dispatch(clearMessages()); }, [dispatch]);
 
   return (
     <aside id="friend-activity-box">
       <div id="chatbox-top-filler-box"></div> {/* Empty area to give spacing between scrollbar and rounded bordders*/}
       <ChatListener 
         path = {path} 
-        onNewChatMessage={onNewChatMessage} 
-        onClearChatListeners={onClearChatListeners}
+        onNewChatMessage={onNewChatMessage}
+        bindNewListener={!refAlreadyExist}
+        // onClearChatListeners={onClearChatListeners}
         aria-level="1" role="heading">
       </ChatListener>
       <ChatMessageArea 

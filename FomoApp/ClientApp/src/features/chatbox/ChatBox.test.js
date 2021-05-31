@@ -20,21 +20,18 @@ afterEach(() => {
 
 it("renders newly submitted message for my user", async () => {
 
-    const initialState = {
-        login: {
-            selectedUser: {
-                id: "100",
-                name: "selectedUser"
-            },
-            myUser: {
-                id: "200",
-                name: "myUser"
-            }
-        }
+    const myUser = {
+        id: "100",
+        name: "myUser"
+    };
+
+    const selectedUser = {
+        id: "200",
+        name: "selectedUser"
     };
 
     act(() => {
-        render(<ChatBox/>, { initialState });
+        render(<ChatBox myUser={myUser} selectedUser={selectedUser} />);
     });
 
     const inputText = "hello!";
@@ -67,15 +64,14 @@ it("renders newly submitted message for my user", async () => {
 it("renders multiple loaded messages from server", async () => {
     const userId = "999";
 
-    const initialState = {
-        login: {
-            selectedUser: {
-                id: userId
-            },
-            myUser: {
-                id: userId
-            }
-        }
+    const myUser = {
+        id: userId,
+        name: "myUser"
+    };
+  
+    const selectedUser = {
+        id: userId,
+        name: "myUser"
     };
 
     const chatMessages = [
@@ -100,7 +96,7 @@ it("renders multiple loaded messages from server", async () => {
     ];
 
     act(() => {
-        render(<ChatBox/>, { initialState });
+        render(<ChatBox myUser={myUser} selectedUser={selectedUser} />);
     });
 
     expect(firebase.database().refs.length).toEqual(1);

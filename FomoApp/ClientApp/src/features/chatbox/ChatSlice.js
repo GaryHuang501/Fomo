@@ -8,8 +8,9 @@ import firebase from 'firebase/app';
 export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayload, thunkApi) => {
 
     const message = messagePayload.message;
-    const ownerId = messagePayload.ownerId;
-    const newMessagePostRef = firebase.database().ref(`${userMessagesPath}/${ownerId}`).push();
+    const path = messagePayload.path;
+
+    const newMessagePostRef = firebase.database().ref(path).push();
 
     const newMessagePost = {
       ...message,
@@ -22,11 +23,11 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', (messagePayload,
     newMessagePostRef.set(newMessagePost
       ,(error) => {
         if (error) {
-          thunkApi.dispatch(messageError({ id: newMessagePost.id }));
+          thunkApi.dispatch(messageError({ id: newMessagePost.id, path: path }));
         } 
     });
 
-    return newMessagePost;
+    return {path: path, message: newMessagePost};
 });
 
 export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi) => {
@@ -57,59 +58,77 @@ export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi)
     // as it will trigger listener to add as new message.
 });
 
+function AddMessageToState(state, message, path, status){
+    const pathExists = path in state;
+
+    if(!pathExists){
+        state[path] = {
+            messageIds: [],
+            messages:{}
+        }
+    }
+
+    const messageExists = message.id in state[path].messages;
+    message.status = status;
+
+    if(!messageExists){
+        state[path].messageIds.push(message.id);
+    }
+
+    state[path].messages[message.id] = message;
+}
+
 export const chatSlice = createSlice({
     name: 'chat',
     initialState: {
-        messageIds: [],
-        messages:{}
     },
     reducers: {
         messageReceived: (state, action) => {
-            const message = action.payload;
-            const messageExists = message.id in state.messages;
-            message.status = ChatStatusType.SENT;
+            const path = action.payload.path;
+            const message = action.payload.message;
 
-            if(!messageExists){
-                state.messageIds.push(action.payload.id);
-            }
-
-            state.messages[message.id] = message;
+            AddMessageToState(state, message, path, ChatStatusType.SENT);
         },
         messageError: (state, action) => {
-            const message = action.payload;
-            const messageExists = message.id in state.messages;
+            const path = action.payload.path;
+            const messageId = action.payload.id;
+            const messageExists = path in state && messageId in state[path].messages;
 
             if(messageExists){
-                message.status = ChatStatusType.ERROR;
+                state[path].messages[messageId] = ChatStatusType.ERROR;
             }
         },
-        clearMessages: (state, action) => {
-            state.messages.length = 0;
-            state.messageIds.length = 0;
-        }
     },
     extraReducers: {
         [sendMessage.fulfilled]: (state, action) => {
-            const message = action.payload;
-            const messageExists = message.id in state.messages;
+            const message = action.payload.message;
+            const path = action.payload.path;
+            const messageExists = path in state && message.id in state[path].messages;
 
             // Possible server already saves the message and callbacked to save into store already.
             if(messageExists) return;
-            
-            state.messageIds.push(action.payload.id);
-            state.messages[action.payload.id] = {
-                ...action.payload, 
-                timeStampCreated: (new Date()).getTime(),
-                status: ChatStatusType.PENDING
-            };
+
+            message.timeStampCreated = (new Date()).getTime();
+
+            AddMessageToState(state, message, path, ChatStatusType.PENDING);          
         }
     } 
 });
 
 export const { addMessage, clearMessages, messageReceived, messageError } = chatSlice.actions;
 
-export const selectMessages = state => {
-    return state.chat.messageIds.map( id => state.chat.messages[id]);
+export function selectMessages(state, path){
+    if(path in state.chat){
+        const chat = state.chat[path];
+        return chat.messageIds.map( id => chat.messages[id]);
+    }
+    else{
+        return [];
+    }
+}
+
+export function selectRefAlreadyExists(state, path){
+    return path in state.chat;
 }
 
 export default chatSlice.reducer;

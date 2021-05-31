@@ -9,6 +9,7 @@ export const ChatListener = function(props) {
     const path = props.path;
     const onNewChatMessageCallback = props.onNewChatMessage;
     const onClearListenersCallback = props.onClearChatListeners;
+    const bindNewListener = props.bindNewListener;
 
     useEffect(()=> {
 
@@ -19,21 +20,17 @@ export const ChatListener = function(props) {
         const messageFetchLimit = parseInt(process.env.REACT_APP_CHAT_LAST_MESSAGES_COUNT) ?? 10;
         const chatMessagesRef = firebase.database().ref(path).limitToLast(messageFetchLimit);
 
-        chatMessagesRef.on('child_added', (snapshot) => {
-            const message = snapshot.val();
+        if(bindNewListener){
 
-            if(onNewChatMessageCallback){
-                onNewChatMessageCallback(message);
-            }
-        });
+            chatMessagesRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
 
-        return () => { 
-            chatMessagesRef.off('child_added');
+                if(onNewChatMessageCallback){
+                    onNewChatMessageCallback(message);
+                }
+            });
+        }
 
-            if(onClearListenersCallback){
-                onClearListenersCallback();
-            }
-        };
     }, [onNewChatMessageCallback, onClearListenersCallback, path]);
 
   return (null);
