@@ -2,6 +2,7 @@
   --lightorangegrey: #f1ebe4;
   --positive-delta: limegreen;
   --negative-delta: red;
+  --standard-border-size: 0.1rem;
 }
 
 #root {

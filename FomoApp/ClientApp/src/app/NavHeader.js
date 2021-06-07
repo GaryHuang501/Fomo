@@ -1,7 +1,12 @@
 import './NavHeader.css';
+import '../assets/fontawesome-free-5.14.0-web/css/fontawesome.min.css';
+import '../assets/fontawesome-free-5.14.0-web/css/solid.min.css';
+import '../assets/fontawesome-free-5.14.0-web/css/regular.min.css';
 
-import { NavLink } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
+
+import DesktopNavMenu from './DesktopNavMenu';
+import MobileNavMenu from './MobileNavMenu';
 
 export const NavHeader = function (props) {
 
@@ -15,11 +20,8 @@ export const NavHeader = function (props) {
     <header id='app-header'>
       <h2 id="header-title">FOMO <span className="check icon"></span></h2>
       <nav id="header-nav-bar">
-        <div className="nav-header-item"><NavLink exact activeClassName="nav-header-item-selected" to="/">Portfolio</NavLink></div>
-        <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Leaderboard">Leaderboard</NavLink></div>
-        <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Friends">Friends</NavLink></div>
-        <div className="nav-header-item"><NavLink activeClassName="nav-header-item-selected" to="/Faq">FAQ</NavLink></div>
-        <div className="nav-header-item"><a className="github-link" href="https://github.com/GaryHuang501/Fomo" aria-label="github"> </a></div>
+        <MobileNavMenu/>
+        <DesktopNavMenu/>
       </nav>
       <div id="header-logout" role="button" onClick={onSignOut}>Sign out</div>
     </header>

@@ -18,7 +18,6 @@ export default function FriendActivityBox(){
   const refAlreadyExist = useSelector(state => selectRefAlreadyExists(state, path));
   const activityMessages = useSelector(state => selectMessages(state, path));
   const onNewChatMessage = useCallback( message => { dispatch(messageReceived({path: path, message: message})); }, [dispatch, path]);
-  // const onClearChatListeners = useCallback( () => { dispatch(clearMessages()); }, [dispatch]);
 
   return (
     <aside id="friend-activity-box">
@@ -27,7 +26,6 @@ export default function FriendActivityBox(){
         path = {path} 
         onNewChatMessage={onNewChatMessage}
         bindNewListener={!refAlreadyExist}
-        // onClearChatListeners={onClearChatListeners}
         aria-level="1" role="heading">
       </ChatListener>
       <ChatMessageArea 

@@ -5,10 +5,11 @@
     min-height: 100%;
     display: grid;
     grid-template-columns: repeat(16, [col-start] 1fr);
+    grid-template-rows: min-content max-content;
 }
 
 #members-page-content{
-    grid-column: 3 / span 12;
+    grid-column: 3 / span 8;
     grid-row: 1;
 }
 
@@ -17,7 +18,23 @@
 }
 
 #member-page-friend-activity-box-container{
-    grid-column: 13 / span 3;
+    grid-column: 12 / span 3;
     grid-row: 1;
     height: 45rem;
+    display: flex;
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 1320px) {
+
+    #member-page-friend-activity-box-container{
+        grid-column: 3 / span 8;
+        grid-row: 1;
+        height: 45rem;
+    }
+
+    #members-page-content{
+        grid-column: 3 / span 13;
+        grid-row: 2;
+    }
 }

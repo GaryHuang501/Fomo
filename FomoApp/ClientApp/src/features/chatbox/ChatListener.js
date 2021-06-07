@@ -31,7 +31,7 @@ export const ChatListener = function(props) {
             });
         }
 
-    }, [onNewChatMessageCallback, onClearListenersCallback, path]);
+    }, [onNewChatMessageCallback, onClearListenersCallback, path, bindNewListener]);
 
   return (null);
 }

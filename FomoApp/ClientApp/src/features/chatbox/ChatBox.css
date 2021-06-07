@@ -2,6 +2,7 @@
     height: 100%;
     width: 100%;
     display: flex;
+    overflow-y: hidden;
     flex-direction: column;
     background-color: white;
 }
@@ -17,7 +18,7 @@
 
 #chatbox-bottom-filler-box{
     border-radius: 0 0 1rem 1rem;
-    border: 0.1rem solid lightgrey;
+    border: var(--standard-border-size) solid lightgrey;
     border-top: 0;
     height: 1rem;
     width: 100%;

@@ -60,22 +60,25 @@ export const sendHistory = createAsyncThunk('chat/sendHistory', (text, thunkApi)
 
 function AddMessageToState(state, message, path, status){
     const pathExists = path in state;
+    let chat = state[path];
 
     if(!pathExists){
-        state[path] = {
+        chat = {
             messageIds: [],
             messages:{}
         }
+
+        state[path] = chat;
     }
 
-    const messageExists = message.id in state[path].messages;
-    message.status = status;
+    const messageExists = message.id in chat.messages;
 
     if(!messageExists){
-        state[path].messageIds.push(message.id);
+        chat.messageIds.push(message.id);
     }
 
-    state[path].messages[message.id] = message;
+    message.status = status;
+    chat.messages[message.id] = message;
 }
 
 export const chatSlice = createSlice({
