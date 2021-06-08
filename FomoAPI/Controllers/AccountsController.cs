@@ -11,6 +11,8 @@ using FomoAPI.Application.DTOs;
 using FomoAPI.Infrastructure.Repositories;
 using System.Linq;
 using FomoAPI.Controllers.Authorization;
+using Microsoft.Extensions.Options;
+using FomoAPI.Application.ConfigurationOptions;
 
 namespace FomoAPI.Controllers
 {
@@ -22,16 +24,19 @@ namespace FomoAPI.Controllers
         private readonly UserManager<IdentityUser<Guid>> _userManager;
         private readonly IPortfolioRepository _portfolioRepo;
         private readonly IClientAuthFactory _clientAuthFactory;
+        private readonly IOptionsMonitor<AccountsOptions> _accountsOptions;
 
         public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
                                   UserManager<IdentityUser<Guid>> userManager,
                                   IPortfolioRepository portfolioRepo,
-                                  IClientAuthFactory clientAuthFactory)
+                                  IClientAuthFactory clientAuthFactory,
+                                  IOptionsMonitor<AccountsOptions> accountsOptions)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _clientAuthFactory = clientAuthFactory;
             _portfolioRepo = portfolioRepo;
+            _accountsOptions = accountsOptions;
         }
 
         /// <summary>
@@ -92,9 +97,24 @@ namespace FomoAPI.Controllers
         [AllowAnonymous]
         public IActionResult Login(string provider, string returnUrl)
         {
-
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, "/api/accounts/ExternalLoginCallback?returnurl=" + returnUrl);
             return new ChallengeResult(provider, properties);
+        }
+
+
+        [HttpGet("Login/Demo")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginDemo([FromQuery]string returnUrl)
+        {
+            var demoUser = _accountsOptions.CurrentValue.DemoUser;
+            var signInResult = await _signInManager.PasswordSignInAsync(demoUser.UserName, demoUser.Password, false, false);
+
+            if (signInResult.Succeeded)
+            {
+                return Redirect(returnUrl);
+            }
+
+            return Unauthorized();
         }
 
         /// <summary>
