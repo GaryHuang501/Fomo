@@ -42,7 +42,7 @@ it("renders with the portfolio symbol with no data", () => {
   expect(columns[priceCol].innerHTML).toBe("Pending");
   expect(columns[changeCol].innerHTML).toBe("--%");
   expect(columns[averagePriceCol].innerHTML).toBe("--");
-  expect(columns[returnCol].innerHTML).toBe("0.00%");
+  expect(columns[returnCol].innerHTML).toBe("--%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual("0");
 });
 
@@ -70,7 +70,7 @@ it("renders with the portfolio symbol with null data", () => {
   expect(columns[priceCol].innerHTML).toBe("Pending");
   expect(columns[changeCol].innerHTML).toBe("--%");
   expect(columns[averagePriceCol].innerHTML).toBe("--");
-  expect(columns[returnCol].innerHTML).toBe("0.00%");
+  expect(columns[returnCol].innerHTML).toBe("--%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual("0");
 });
 
@@ -110,7 +110,7 @@ it("renders with the portfolio symbol with data", async () => {
   expect(columns[symbolCol].innerHTML).toBe(portfolioSymbol.ticker);
   expect(columns[priceCol].innerHTML).toBe(stockData.price.toString());
   expect(columns[changeCol].innerHTML).toBe(stockData.changePercent.toFixed(2) + "%");
-  expect(columns[averagePriceCol].innerHTML).toBe(portfolioSymbol.averagePrice.toString());
+  expect(columns[averagePriceCol].innerHTML).toBe(portfolioSymbol.averagePrice.toFixed(2));
   expect(columns[returnCol].innerHTML).toBe("-2.80%");
   expect(columns[votesCol].getElementsByClassName("portfolio-row-votes-value")[0].innerHTML.trim()).toEqual(voteData.count.toString());
 });

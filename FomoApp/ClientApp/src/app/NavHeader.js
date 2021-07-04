@@ -3,10 +3,9 @@ import '../assets/fontawesome-free-5.14.0-web/css/fontawesome.min.css';
 import '../assets/fontawesome-free-5.14.0-web/css/solid.min.css';
 import '../assets/fontawesome-free-5.14.0-web/css/regular.min.css';
 
-import React, { useState } from 'react';
-
 import DesktopNavMenu from './DesktopNavMenu';
 import MobileNavMenu from './MobileNavMenu';
+import React from 'react';
 
 export const NavHeader = function (props) {
 

@@ -297,21 +297,22 @@ it("Should fetch stock and vote data for multiple symbol in portfoio on batch ca
 
     await Promise.resolve();
 
-    jest.clearAllMocks();
     
     for(const ref of firebase.database().refs)
     {
         ref.invokeCallBack(new MockSnapshot({lastUpdated: '2020-01-01'}));
     }
 
-    jest.advanceTimersByTime(20000);
-
-    await Promise.resolve();
-
     expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1&sids=2`);
     expect(spy).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/votes?sids=1&sids=2`);
 
+    expect(spy).not.toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=1`);
+    expect(spy).not.toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/singleQuoteData?sids=2`);
+    expect(spy).not.toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/votes?sids=1`);
+    expect(spy).not.toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/votes?sids=2`);
+
     await waitFor(() => {
+
         expect(screen.getByText(singleQuoteData1.data.ticker)).toBeInTheDocument();``
         expect(screen.getByText(singleQuoteData1.data.price.toString())).toBeInTheDocument();
         expect(screen.getByText(voteData1.count.toString())).toBeInTheDocument();

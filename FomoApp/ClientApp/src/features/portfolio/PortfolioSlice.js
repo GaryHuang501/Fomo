@@ -159,6 +159,15 @@ export const selectSelectedPortfolio = function(state){
     return portfolio ? portfolio : { id: -1, portfolioSymbols: [] };
 }
 
+export const selectSelectedPortfolioSymbols = function(state) {
+
+    if(!state.portfolio.selectedPortfolioId || !(state.portfolio.selectedPortfolioId in state.portfolio.portfolios)){
+        return [];
+    }
+
+    return state.portfolio.portfolios[state.portfolio.selectedPortfolioId].portfolioSymbols;
+}
+
 export const SortDirectionType = Object.freeze({ UP: -1, DOWN: 1});
 
 export default portfolioSlice.reducer;

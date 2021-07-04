@@ -33,7 +33,6 @@ export const sendVote = createAsyncThunk('vote/sendVote', async (vote, thunkApi)
     return response.data;
 });
 
-
 function getVoteDirectionName(direction){
     switch(direction){
         case 1: return "Upvoted";
@@ -91,30 +90,19 @@ export const stocksSlice = createSlice({
         },
         [fetchVoteData.fulfilled]: (state, action) => {
             if(action.payload){
-                state.votes = action.payload;       
+                state.votes = {...state.votes, ...action.payload};       
             }
         }
     }
 });
 
-export const selectStocksLastUpdatedDates = function(state){
-
-    const dates = {};
-
-    for(const symbolId in state.stocks.singleQuoteData){
-
-        if(state.stocks.singleQuoteData == null || !state.stocks.singleQuoteData[symbolId]){
-            dates[symbolId] = new Date("2000-01-01");
-        }
-        else
-        {
-            dates[symbolId] = state.stocks.singleQuoteData[symbolId].lastUpdated;
-        }
+export const selectStockLastUpdated = function(state, symbolId){
+    if(state.stocks.singleQuoteData == null || !state.stocks.singleQuoteData[symbolId]){
+        return new Date("2000-01-01");
     }
 
-    return dates;
+    return state.stocks.singleQuoteData[symbolId].lastUpdated;
 }
-
 
 export const selectStockData = function(state, portfolioSymbol){
 
@@ -125,14 +113,14 @@ export const selectStockData = function(state, portfolioSymbol){
         return {
             symbolId: portfolioSymbol.symbolId,
             ticker:  portfolioSymbol.ticker,
-            price: "Pending",
-            change: "--",
+            price: 0,
+            change: 0,
         }
     }
 }
 
 export const selectVoteData = function(state, symbolId){
-
+    
     if(symbolId in state.stocks.votes && state.stocks.votes[symbolId]){
         return state.stocks.votes[symbolId];
     }

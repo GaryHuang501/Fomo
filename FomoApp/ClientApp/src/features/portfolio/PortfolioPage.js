@@ -39,7 +39,7 @@ export default function PortfolioPage() {
       dispatch(fetchPortfolio(portfolioIds[0]));
     }
   }, [portfolioIds, dispatch]);
-
+  
   return (
     <main id="portfolio-page">
         <section id='portfolio-stock-search-container'>

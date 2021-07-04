@@ -75,12 +75,16 @@ export const PortfolioStock = (props) => {
         dispatch(removePortfolioStock({portfolioId: portfolioId, portfolioSymbolId: portfolioSymbol.id}));
     }
 
+    function formatAmount(amount, defaultVal){
+        return amount > 0 ? amount.toFixed(2) : defaultVal;
+    }
+
     return (
         <tr className="portfolio-row portfolio-stock" role='row' onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
             <td className="portfolio-column portfolio-row-name" role='cell'>{portfolioSymbol.ticker}</td>
-            <td className="portfolio-column portoflio-row-price" role='cell'>{stockData.price}</td>
+            <td className="portfolio-column portoflio-row-price" role='cell'>{formatAmount(stockData.price, "Pending")}</td>
             <PercentageColumn value={stockData.changePercent} columnValueClassName='portoflio-row-change'></PercentageColumn>
-            <td className="portfolio-column portfolio-row-average-price" role='cell'>{portfolioSymbol.averagePrice > 0 ? portfolioSymbol.averagePrice : "--"}</td>
+            <td className="portfolio-column portfolio-row-average-price" role='cell'>{formatAmount(portfolioSymbol.averagePrice, "--")}</td>
             <PercentageColumn value={roi} columnValueClassName='portoflio-row-return'></PercentageColumn>
             <VoteColumn symbolId={voteData.symbolId} count={voteData.count} myVoteDirection={voteData.myVoteDirection} ticker={stockData.ticker} isEditMode={isEditMode}></VoteColumn>
             <td className="portfolio-column" role='cell'>
