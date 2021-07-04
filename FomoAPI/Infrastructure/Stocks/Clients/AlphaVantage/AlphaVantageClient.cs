@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Enums;
-using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Data;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using FomoAPI.Infrastructure.Stocks;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
 {
     /// Client to send requests to the third party AlphaVantage API for stock information.
     public class AlphaVantageClient : IStockClient
@@ -64,7 +64,9 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                 return new List<SymbolSearchResult>();
             }
 
-            return content.BestMatches.Select(m => new SymbolSearchResult(ticker: m.Symbol, fullName: m.Name, m.MatchScore));
+            int rank = 1;
+
+            return content.BestMatches.Select(m => new SymbolSearchResult(ticker: m.Symbol, fullName: m.Name, rank++)).ToList();
         }
 
         public async Task<SingleQuoteQueryResult> GetSingleQuoteData(StockQuery query, string ticker, string exchangeName)
@@ -91,8 +93,6 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
             where TData : StockData  
         {
             AlphaVantageQueryResult<TData> queryResult;
-
-            _logger.LogWarning(symbolId.ToString());
 
             try
             {
@@ -122,17 +122,17 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                         var errorJson = await response.Content.ReadAsStringAsync();
                         var errorObject = JsonConvert.DeserializeObject<AlphaVantageQueryError>(errorJson);
                         queryResult = new AlphaVantageQueryResult<TData>(error: errorObject);
-                        _logger.LogError("Alphavantage Error for query: {error}", query.Ticker, JsonConvert.SerializeObject(errorObject));
+                        _logger.LogError("Alphavantage Error for {url} query: {error}", urlWithQueryString, errorJson);
                     }
                     catch(Exception ex)
                     {
                         queryResult = new AlphaVantageQueryResult<TData>(errorMessage: $"Exception: {ex.Message}");
-                        _logger.LogError(ex, "Failed to parse alphavantage data for query {query}", query.Ticker);
+                        _logger.LogError(ex, "Failed to parse alphavantage data for query {url}", urlWithQueryString);
                     }
                 }
                 else
                 {
-                    _logger.LogError("Failed to retrieve data from AlphaVantage: {reason}", response.ReasonPhrase);
+                    _logger.LogError("Failed to retrieve single quote data from AlphaVantage: {reason}", response.ReasonPhrase);
                     queryResult = new AlphaVantageQueryResult<TData>(errorMessage: response.ReasonPhrase);
                 }
             }

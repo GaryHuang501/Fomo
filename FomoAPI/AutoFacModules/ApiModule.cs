@@ -8,13 +8,15 @@ using FomoAPI.Application.ViewModels.Member;
 using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Clients;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Clients.Firebase;
 using FomoAPI.Infrastructure.Notifications;
 using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Infrastructure.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Hosting;
+using FomoAPI.Infrastructure.Clients.FinnHub;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
 
 namespace FomoAPI.AutoFacModules
 {
@@ -36,7 +38,9 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<SymbolRepository>().As<ISymbolRepository>().InstancePerLifetimeScope();
             builder.RegisterType<VoteRepository>().As<IVoteRepository>().InstancePerLifetimeScope();
 
-            builder.RegisterType<AlphaVantageClient>().As<IStockClient>().InstancePerDependency();
+            builder.RegisterType<AlphaVantageParserFactory>().As<IAlphaVantageDataParserFactory>().InstancePerDependency();
+
+            builder.RegisterType<FinnHubClient>().As<IStockClient>().InstancePerDependency();
             builder.RegisterType<FireBaseDBClient>().As<INotificationClient>().InstancePerLifetimeScope();
             builder.RegisterType<StockDataService>().As<IStockDataService>().InstancePerLifetimeScope();
             builder.RegisterType<StockNotificationCenter>().As<IStockNotificationCenter>().InstancePerLifetimeScope();

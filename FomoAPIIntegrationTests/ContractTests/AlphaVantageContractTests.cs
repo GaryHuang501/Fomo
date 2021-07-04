@@ -1,8 +1,8 @@
 ﻿using FomoAPI.Domain.Stocks;
 using FomoAPI.Domain.Stocks.Queries;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
-using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
 using FomoAPI.Infrastructure.ConfigurationOptions;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -41,14 +41,8 @@ namespace FomoAPIIntegrationTests.ContractTests
 
             Assert.False(singleQuoteResult.HasError);
 
-            Assert.True(singleQuoteResult.Data.Low >= 0);
-            Assert.True(singleQuoteResult.Data.High >= 0);
-            Assert.True(singleQuoteResult.Data.Open >= 0);
-            Assert.True(singleQuoteResult.Data.Volume >= 0);
-            Assert.True(singleQuoteResult.Data.Price >= 0);
-            Assert.True(singleQuoteResult.Data.PreviousClose >= 0);
+            Assert.True(singleQuoteResult.Data.Price > 0);
             Assert.True(singleQuoteResult.Data.LastUpdated > new DateTime());
-            Assert.True(singleQuoteResult.Data.LastTradingDay > new DateTime());
             Assert.Equal(ticker, singleQuoteResult.Data.Ticker);
         }
 
@@ -80,7 +74,7 @@ namespace FomoAPIIntegrationTests.ContractTests
             SymbolSearchResult msftSymbol = searchResults.First();
 
             Assert.Contains("Microsoft", msftSymbol.FullName);
-            Assert.Equal(1.0000m, msftSymbol.Match);
+            Assert.Equal(1.0000m, msftSymbol.Rank);
         }
 
         public void Dispose()

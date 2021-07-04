@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Data
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Data
 {
     public class AlphaVantageSingleQuote
     {
@@ -14,16 +14,10 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Data
             return new SingleQuoteData(
                     symbolId: symbolId,
                     ticker: Data.Symbol,
-                    high: Data.High,
-                    low: Data.Low,
-                    open: Data.Open,
                     price: Data.Price,
-                    previousClose: Data.PreviousClose,
-                    volume: Data.Volume,
                     change: Data.Change,
                     changePercent: decimal.Parse(Data.ChangePercent.Trim().Replace("%", string.Empty)),
-                    lastUpdated: Data.LastUpdated,
-                    lastTradingDay: Data.LastTradingDay
+                    lastUpdated: Data.LastUpdated
                 );
         }
     }

@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.ConfigurationOptions
 {
-    public class AlphaVantageOptions
+    public class FinnHubOptions
     {
+
         [Required]
         public string ApiKey { get; set; }
 
@@ -14,7 +18,10 @@ namespace FomoAPI.Infrastructure.ConfigurationOptions
         [Url]
         public string Url { get; set; }
 
-        public AlphaVantageOptions()
+        [Range(5, 50)]
+        public int SearchLimit { get; set; }
+
+        public FinnHubOptions()
         {
         }
     }

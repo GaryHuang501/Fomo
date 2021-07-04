@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
 {
     /// <summary>
     /// Constants representing the Url Query Parameters Keys when fetching data from AlphaVantage

@@ -6,12 +6,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using FomoAPI.Common;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
 {
     /// <summary>
     /// Query that will be serialized as a web request to AlphaVantage for stock data.
     /// </summary>
-    /// <remarks>Function is Global quote in AlphaVantage</remarks>
+    /// <remarks>
+    /// Function is Global quote in AlphaVantage.
+    /// This object can be reused for many types of queries as AlphaVantage uses same structure for other queries.</remarks>
     public class AlphaVantageQuery
     {
         public QueryFunctionType FunctionType { get; }
@@ -40,7 +42,5 @@ namespace FomoAPI.Infrastructure.Clients.AlphaVantage
                 { AlphaVantageQueryKeys.DataType, DataType.Name }
             });
         }
-
-
     }
 }

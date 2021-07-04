@@ -170,10 +170,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO msftStock = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
-            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 200, 200, 200, 200, 200, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
-            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 333.33m, 333.33m, 333.33m, 333.33m, 300, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
-            var tslaData = new SingleQuoteData(tslaStock.SymbolId, tslaStock.Ticker, 888.88m, 888.88m, 888.88m, 888.88m, 888.88m, 800, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
-            var msftData = new SingleQuoteData(msftStock.SymbolId, msftStock.Ticker, 225, 225, 225, 225, 225, 200, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
+            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
+            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
+            var tslaData = new SingleQuoteData(tslaStock.SymbolId, tslaStock.Ticker, 888.88m, 0, 0, DateTime.UtcNow);
+            var msftData = new SingleQuoteData(msftStock.SymbolId, msftStock.Ticker, 225, 0, 0, DateTime.UtcNow);
 
             await SetSingleQuoteData(new UpsertSingleQuoteData(jpmStock.SymbolId, jpmData));
             await SetSingleQuoteData(new UpsertSingleQuoteData(fbData.SymbolId, fbData));
@@ -242,8 +242,8 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
-            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 200, 200, 200, 200, 200, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
-            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 333.33m, 333.33m, 333.33m, 333.33m, 300, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
+            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
+            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
 
             await SetSingleQuoteData(new UpsertSingleQuoteData(jpmStock.SymbolId, jpmData));
             await SetSingleQuoteData(new UpsertSingleQuoteData(fbData.SymbolId, fbData));
@@ -283,7 +283,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
-            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 200, 200, 200, 200, 200, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
+            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
 
             await SetSingleQuoteData(new UpsertSingleQuoteData(jpmStock.SymbolId, jpmData));
 
@@ -321,7 +321,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO jpmStock = await FetchSymbol("JPM", ExchangeType.NYSE);
 
             // Add singlequote stocks
-            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 200, 200, 200, 200, 200, 0, 0, DateTime.UtcNow, DateTime.UtcNow);
+            var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
 
             await SetSingleQuoteData(new UpsertSingleQuoteData(jpmStock.SymbolId, jpmData));
 

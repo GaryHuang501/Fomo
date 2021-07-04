@@ -1,4 +1,4 @@
-﻿namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Data
+﻿namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Data
 {
     public class AlphaVantageSymbolSearchResponse
     {

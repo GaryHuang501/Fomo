@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.Clients.AlphaVantage.Data;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Data;
 using Newtonsoft.Json;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers
 {
     /// <summary>
     /// Parser class used in AlphaVantage to map CSV query response data to StockSingleQuoteData.

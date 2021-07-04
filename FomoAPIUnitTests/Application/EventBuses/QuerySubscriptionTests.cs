@@ -1,6 +1,6 @@
 ﻿using FomoAPI.Application.EventBuses;
 using FomoAPI.Domain.Stocks.Queries;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Enums;
 using System;
 using System.Linq;

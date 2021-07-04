@@ -2,7 +2,7 @@
 using FomoAPI.Domain.Stocks.Queries;
 using System.IO;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers
 {
     public interface IAlphaVantageDataParser<T> where T : StockData
     {

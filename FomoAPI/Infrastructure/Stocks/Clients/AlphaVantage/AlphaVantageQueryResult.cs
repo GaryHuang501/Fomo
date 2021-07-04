@@ -2,7 +2,7 @@
 using FomoAPI.Domain.Stocks;
 using System;
 
-namespace FomoAPI.Infrastructure.Clients.AlphaVantage
+namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
 {
     /// <summary>
     /// Wrapper class holding the Query Data from AlphaVantage

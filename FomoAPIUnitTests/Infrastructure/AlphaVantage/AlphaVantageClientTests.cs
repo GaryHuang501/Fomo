@@ -1,8 +1,8 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Domain.Stocks.Queries;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
-using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPIUnitTests.Domain.Stocks.Queries;
@@ -130,16 +130,10 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
             var singleQuoteData = new SingleQuoteData(
                     symbolId: 1,
                     ticker: "MSFT",
-                    high: 1,
-                    low: 2,
-                    open: 3,
-                    previousClose: 4,
-                    volume: 5,
-                    change: 6,
                     price: 7,
+                    change: 0.7m,
                     changePercent: 0.9m,
-                    lastUpdated: DateTime.UtcNow,
-                    lastTradingDay: DateTime.UtcNow
+                    lastUpdated: DateTime.UtcNow
                 );
 
             var client = new AlphaVantageClient(_mockHttpFactory.Object, _mockAlphaVantageOptionsAccessor.Object, _mockParserFactory.Object, _mockLogger.Object);

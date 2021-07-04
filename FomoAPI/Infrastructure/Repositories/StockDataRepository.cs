@@ -36,15 +36,9 @@ namespace FomoAPI.Infrastructure.Repositories
                             SymbolId,
                             Symbol.Ticker,
                             Price,
-                            High,
-                            Low,
-                            [Open],
-                            PreviousClose,
                             Change,
                             ChangePercent,
-                            Volume,
-                            LastUpdated,
-                            LastTradingDay
+                            LastUpdated
                         FROM
                             SingleQuoteData
                         INNER JOIN
@@ -66,24 +60,18 @@ namespace FomoAPI.Infrastructure.Repositories
                                     SingleQuoteData
                                 SET
                                     Price = @Price,
-                                    High = @High,
-                                    Low = @Low,
-                                    [Open] = @Open,
-                                    PreviousClose = @PreviousClose,
                                     Change = @Change,
                                     ChangePercent = @ChangePercent,
-                                    Volume = @Volume,
-                                    LastUpdated = @LastUpdated,
-                                    LastTradingDay = @LastTradingDay
+                                    LastUpdated = @LastUpdated
                                 WHERE
                                     SymbolId = @SymbolId;
                             END
                         ELSE
                             BEGIN
                                 INSERT INTO SingleQuoteData
-                                (SymbolId, Price, High, Low, [Open], PreviousClose, Change, ChangePercent, Volume, LastUpdated, LastTradingDay)
+                                (SymbolId, Price, Change, ChangePercent,LastUpdated)
                                 VALUES
-                                (@SymbolId, @Price, @High, @Low, @Open, @PreviousClose, @Change, @ChangePercent, @Volume, @LastUpdated, @LastTradingDay);
+                                (@SymbolId, @Price, @Change, @ChangePercent, @LastUpdated);
                             END;";
 
             using (var connection = new SqlConnection(_connectionString))

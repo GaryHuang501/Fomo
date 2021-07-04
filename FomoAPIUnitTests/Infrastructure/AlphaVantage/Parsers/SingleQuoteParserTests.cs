@@ -1,4 +1,4 @@
-﻿using FomoAPI.Infrastructure.Clients.AlphaVantage.Parsers;
+﻿using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,14 +21,7 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage.Parsers
             var singleQuoteData = parser.ParseCsv(-1, reader);
 
             Assert.Equal("MSFT", singleQuoteData.Ticker);
-            Assert.Equal(134.8800m, singleQuoteData.Open);
-            Assert.Equal(139.1000m, singleQuoteData.High);
-            Assert.Equal(136.2800m, singleQuoteData.Low);
             Assert.Equal(137.8600m, singleQuoteData.Price);
-            Assert.Equal(21877723, singleQuoteData.Volume);
-            Assert.Equal(DateTime.Parse("2019-08-30"), singleQuoteData.LastTradingDay);
-            Assert.Equal(138.1200m, singleQuoteData.PreviousClose);
-            Assert.Equal(-0.2600m, singleQuoteData.Change);
             Assert.Equal(-0.1882m, singleQuoteData.ChangePercent);
         }
 

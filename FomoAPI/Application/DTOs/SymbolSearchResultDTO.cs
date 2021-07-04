@@ -34,7 +34,7 @@ namespace FomoAPI.Application.DTOs
             ExchangeId = symbol.ExchangeId;
             ExchangeName = symbol.ExchangeName;
             FullName = searchResult.FullName;
-            Match = searchResult.Match;
+            Match = searchResult.Rank;
             Ticker = searchResult.Ticker;
             SymbolId = symbol.Id;
         }

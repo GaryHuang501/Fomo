@@ -39,6 +39,11 @@ namespace FomoAPIIntegrationTests
             get { return _testAppSettingsConfig.GetSection("AlphaVantageLive").Get<AlphaVantageOptions>(); }
         }
 
+        public FinnHubOptions FinnHubOptions
+        {
+            get { return _testAppSettingsConfig.GetSection("FinnHub").Get<FinnHubOptions>(); }
+        }
+
         public EventBusOptions EventBusOptions
         {
             get { return _testAppSettingsConfig.GetSection("EventBus").Get<EventBusOptions>(); }

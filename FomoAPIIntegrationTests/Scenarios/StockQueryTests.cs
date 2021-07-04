@@ -294,14 +294,8 @@ namespace FomoAPIIntegrationTests.Scenarios
         {
             Assert.Equal(expectedSymbolId, dataDto.SymbolId);
             Assert.NotNull(dataDto.Data);
-            Assert.True(dataDto.Data.Low >= 0);
-            Assert.True(dataDto.Data.High >= 0);
-            Assert.True(dataDto.Data.Open >= 0);
-            Assert.True(dataDto.Data.Volume >= 0);
             Assert.True(dataDto.Data.Price >= 0);
-            Assert.True(dataDto.Data.PreviousClose >= 0);
             Assert.True(dataDto.Data.LastUpdated > new DateTime());
-            Assert.True(dataDto.Data.LastTradingDay > new DateTime());
         }
 
 

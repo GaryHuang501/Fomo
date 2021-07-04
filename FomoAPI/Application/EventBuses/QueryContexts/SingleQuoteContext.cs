@@ -1,6 +1,6 @@
 ﻿using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Repositories;

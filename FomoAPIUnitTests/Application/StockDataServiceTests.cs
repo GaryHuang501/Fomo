@@ -47,16 +47,10 @@ namespace FomoAPIUnitTests.Application
             _singleQuoteData = new SingleQuoteData(
                     symbolId: 1,
                     ticker: "MSFT",
-                    high: 1,
-                    low: 2,
-                    open: 3,
-                    previousClose: 4,
-                    volume: 5,
-                    change: 6,
                     price: 7,
+                    change: 0.7m,
                     changePercent: 0.9m,
-                    lastUpdated: DateTime.UtcNow,
-                    lastTradingDay: DateTime.UtcNow
+                    lastUpdated: DateTime.UtcNow
                 );
         }
 

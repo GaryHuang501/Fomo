@@ -1,7 +1,7 @@
 ﻿using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Stores;
 using FomoAPI.Domain.Stocks;
-using FomoAPI.Infrastructure.Clients.AlphaVantage;
+using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
 using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Infrastructure.Stocks;
 using System;

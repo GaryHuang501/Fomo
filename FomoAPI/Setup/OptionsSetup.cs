@@ -14,7 +14,11 @@ namespace FomoAPI.Setup
             services.AddOptions<AlphaVantageOptions>()
                     .Bind(config.GetSection("AlphaVantage"))
                     .ValidateDataAnnotations();
-            
+
+            services.AddOptions<FinnHubOptions>()
+                    .Bind(config.GetSection("FinnHub"))
+                    .ValidateDataAnnotations();
+
             services.AddOptions<AccountsOptions>()
                     .Bind(config.GetSection("Accounts"))
                     .ValidateDataAnnotations();

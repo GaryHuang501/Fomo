@@ -8,41 +8,22 @@ namespace FomoAPI.Infrastructure.Stocks
     /// </summary>
     public class UpsertSingleQuoteData
     {
-        public decimal High { get; private set; }
-
-        public decimal Low { get; private set; }
-
-        public decimal Open { get; private set; }
-
-        public decimal PreviousClose { get; private set; }
-
         public decimal Change { get; private set; }
 
         public decimal ChangePercent { get; private set; }
 
         public decimal Price { get; private set; }
 
-        public long Volume { get; private set; }
-
         public DateTime LastUpdated { get; private set; }
-
-        public DateTime LastTradingDay { get; private set; }
 
         public int SymbolId { get; private set; }
 
         public UpsertSingleQuoteData(int symbolId, SingleQuoteData data)
         {
             SymbolId = symbolId;
-            High = data.High;
-            Low = data.Low;
-            Open = data.Open;
             Price = data.Price;
-            Volume = data.Volume;
-            PreviousClose = data.PreviousClose;
-            Change = data.Change;
             ChangePercent = data.ChangePercent;
             LastUpdated = data.LastUpdated;
-            LastTradingDay = data.LastTradingDay;
         }
     }
 }
