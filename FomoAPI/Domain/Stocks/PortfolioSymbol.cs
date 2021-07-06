@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace FomoAPI.Domain.Stocks
 {
-    public class PortfolioSymbol : IEntity
+    public class PortfolioSymbol : IEntity, IModelValidateable
     {
         public int Id { get; private set; }
 
@@ -33,6 +33,15 @@ namespace FomoAPI.Domain.Stocks
             Delisted = delisted;
             SortOrder = sortOrder;
             AveragePrice = averagePrice;
+        }
+
+        public bool IsValid()
+        {
+            var validator = new PortfolioSymbolValidator();
+
+            var result = validator.Validate(this);
+
+            return result.IsValid;
         }
     }
 }

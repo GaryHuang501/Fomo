@@ -19,12 +19,20 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
 
         public IEnumerable<BoardValue> Values { get; private set; }
 
-        [JsonConstructor]
         public Board(BoardColumns columns, IEnumerable<BoardValue> values)
         {
             Header = columns.Header;
             ColumnHeaderName = columns.ColumnHeaderName;
             ColumnHeaderValue = columns.ColumnHeaderValue;
+            Values = values;
+        }
+
+        [JsonConstructor]
+        public Board(string header, string columnHeaderName, string columnHeaderValue, IEnumerable<BoardValue> values)
+        {
+            Header = header;
+            ColumnHeaderName = columnHeaderName;
+            ColumnHeaderValue = columnHeaderValue;
             Values = values;
         }
     }

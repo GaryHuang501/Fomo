@@ -55,6 +55,13 @@ namespace FomoAPI.Infrastructure.Repositories
 
 
         /// <summary>
+        /// Get the portfolio Symbol.
+        /// </summary>
+        /// <param name="portfolioSymbolId">Id of portfolio symbol to fetch</param>
+        /// <returns>PortfolioSymbol. Null if does not exist.</returns>
+        Task<PortfolioSymbol> GetPortfolioSymbol(int portfolioSymbolId);
+
+        /// <summary>
         /// Delete symbol from portfolio
         /// </summary>
         /// <param name="portfolioId">Id of portfolio to delete symbol from</param>
@@ -62,20 +69,19 @@ namespace FomoAPI.Infrastructure.Repositories
         Task DeletePortfolioSymbol(int portfolioSymbolID);
 
         /// <summary>
-        /// Rename portfolio to given name
+        /// Updates the portfoliosymbol with the given resource.
         /// </summary>
-        /// <param name="portfolioId">Id of portfolio to rename</param>
-        /// <param name="newName">New name for the portfolio</param>
-        /// <returns>If portfolio was successfully updated</returns>
-        Task<bool> RenamePortfolio(int portfolioId, string newName);
+        /// <param name="portfolioSymbol">New <see cref="PortfolioSymbol"></see> to update to.</param>
+        /// <returns>True if update was successful.</returns>
+        Task<bool> UpdatePortfolioSymbol(PortfolioSymbol portfolioSymbol);
+
 
         /// <summary>
-        /// Update portfolio symbol average price
+        /// Updates the portfolio with the given resource.
         /// </summary>
-        /// <param name="portfolioSymbolId">Id of portfolio symbol to update.</param>
-        /// <param name="averagePrice">New average price value.</param>
-        /// <returns>If the given portfolio symbol was updated.</returns>
-        Task<bool> UpdateAveragePrice(int portfolSymbolId, decimal averagePrice);
+        /// <param name="portfolio">New <see cref="Portfolio"></see> to update to.</param>
+        /// <returns>True if update was successful.</returns>
+        Task<bool> UpdatePortfolio(Portfolio portfolio);
 
         /// <summary>
         /// Reorder the given portfolio symbol and update  ort order of other PortfolioSymbol in portfolio

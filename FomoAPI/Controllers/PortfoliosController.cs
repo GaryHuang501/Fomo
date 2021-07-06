@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FomoAPI.Application.Commands.Portfolio;
+using FomoAPI.Application.Patches;
 using FomoAPI.Controllers.Authorization;
 using FomoAPI.Domain.Stocks;
 using FomoAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +32,7 @@ namespace FomoAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPortfolio(int id)
+        public async Task<ActionResult<Portfolio>> GetPortfolio(int id)
         {
             var portfolio = await _portfolioRepository.GetPortfolio(id);
 
@@ -60,22 +62,6 @@ namespace FomoAPI.Controllers
             }
 
             return Ok(ids);
-        }
-
-        [HttpPatch("{id}/rename")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize(PolicyTypes.PortfolioOwner)]
-        public async Task<IActionResult> RenameAsync(int id, [FromBody] RenamePortfolioCommand renamePortfolioCommand)
-        {
-            var success = await _portfolioRepository.RenamePortfolio(id, renamePortfolioCommand.Name);
-
-            if (!success)
-            {
-                return NotFound("Portfolio does not exist");
-            }
-
-            return Ok();
         }
 
         [HttpPost]
@@ -112,8 +98,67 @@ namespace FomoAPI.Controllers
             return Ok(portfolioSymbol);
         }
 
-        [HttpPatch("{id}/portfolioSymbols/sortOrder")]
+        [HttpPatch("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(PolicyTypes.PortfolioOwner)]
+        public async Task<IActionResult> UpdatePortfolio(int id, [FromBody] JsonPatchDocument<Portfolio> patches)
+        {
+
+            var portfolio = await _portfolioRepository.GetPortfolio(id);
+
+            if (portfolio == null)
+            {
+                return NotFound("Portfolio does not exist");
+            }
+
+            var updatedPortfolio = patches.CopyTo(portfolio);
+
+            if (!updatedPortfolio.IsValid())
+            {
+                return BadRequest("Patch updates values are invalid.");
+            }
+
+            var success = await _portfolioRepository.UpdatePortfolio(updatedPortfolio);
+
+            if (!success)
+            {
+                return NotFound("Portfolio was not successfully updated");
+            }
+
+            return Ok();
+        }
+
+        [HttpPatch("{id}/portfolioSymbols/{portfolioSymbolid}")]
+        [Authorize(PolicyTypes.PortfolioOwner)]
+        public async Task<IActionResult> UpdatePortfolioSymbol(int id, int portfolioSymbolid, [FromBody] JsonPatchDocument<PortfolioSymbol> patches)
+        {
+            var portfolioSymbol = await _portfolioRepository.GetPortfolioSymbol(portfolioSymbolid);
+
+            if (portfolioSymbol == null)
+            {
+                return NotFound("Portfolio does not exist");
+            }
+
+            var updatedPortfolioSymbol = patches.CopyTo(portfolioSymbol);
+
+            if (!updatedPortfolioSymbol.IsValid())
+            {
+                return BadRequest("Patches updates values are invalid.");
+            }
+
+            var success = await _portfolioRepository.UpdatePortfolioSymbol(updatedPortfolioSymbol);
+
+            if (!success)
+            {
+                return NotFound("PortfolioSymbol was not updated");
+            }
+
+            return Ok();
+        }
+
+        [HttpPatch("{id}/portfolioSymbols/sortOrder")]
+        [Authorize(PolicyTypes.PortfolioOwner)]  
         public async Task<IActionResult> ReorderPortfolioSymbol(int id, [FromBody] ReorderPortfolioCommand reorderPortfolioCommand)
         {
             var success = await _portfolioRepository.ReorderPortfolioSymbol(id, reorderPortfolioCommand.PortfolioSymbolIdToSortOrder);
@@ -124,25 +169,6 @@ namespace FomoAPI.Controllers
             }
             return Ok();
         }
-
-        [HttpPatch("{id}/portfolioSymbols/{portfolioSymbolid}/averagePrice")]
-        [Authorize(PolicyTypes.PortfolioOwner)]
-        public async Task<IActionResult> UpdateAveragePrice(int portfolioSymbolId, [FromBody] UpdateAveragePriceCommand updateAveragePriceCommand)
-        {
-            if(updateAveragePriceCommand.AveragePrice < 0)
-            {
-                return BadRequest("Average Price cannot be less than 0");
-            }
-
-            var success = await _portfolioRepository.UpdateAveragePrice(portfolioSymbolId, updateAveragePriceCommand.AveragePrice);
-
-            if (!success)
-            {
-                return NotFound("PortfolioSymbol was not found.");
-            }
-            return Ok();
-        }
-
 
         [HttpDelete("{id}/portfolioSymbols/{portfolioSymbolid}")]
         [Authorize(PolicyTypes.PortfolioOwner)]

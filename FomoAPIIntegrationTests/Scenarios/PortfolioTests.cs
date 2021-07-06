@@ -209,9 +209,12 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             // Rename Portfolio
             var newName = "newname!";
-            var renamePayload = new { name = newName }.ToJsonPayload();
+            var renamePayload = new []
+            {
+              new { op = "replace", path = "/Name", value = newName }
+            }.ToJsonPayload();
 
-            var renameResponse = await _client.PatchAsync(ApiPath.Portfolio(portfolio.Id) + "/rename", renamePayload);
+            var renameResponse = await _client.PatchAsync(ApiPath.Portfolio(portfolio.Id), renamePayload);
             renameResponse.EnsureSuccessStatusCode();
 
             // Grab Portfolio and verify renamed
@@ -318,12 +321,17 @@ namespace FomoAPIIntegrationTests.Scenarios
             addJPMResponse.EnsureSuccessStatusCode();
             var jpmPortfolioSymbol = await addJPMResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
-            var newAvgPricePayload = new
+            var newAvgPricePayload = new[]
             {
-                AveragePrice = 1.24m
+                new 
+                {
+                    value = 1.24m,
+                    path = "/averagePrice",
+                    op = "replace"
+                }
             }.ToJsonPayload();
 
-            var updateAveragePriceResponse = await _client.PatchAsync(ApiPath.PortfolioSymbolsAveragePrice(portfolio.Id, jpmPortfolioSymbol.Id), newAvgPricePayload);
+            var updateAveragePriceResponse = await _client.PatchAsync(ApiPath.PortfolioSymbols(portfolio.Id, jpmPortfolioSymbol.Id), newAvgPricePayload);
 
             updateAveragePriceResponse.EnsureSuccessStatusCode();
 

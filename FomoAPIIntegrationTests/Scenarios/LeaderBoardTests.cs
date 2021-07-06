@@ -73,10 +73,10 @@ namespace FomoAPIIntegrationTests.Scenarios
             var leaderBoardResponse = await _client.GetAsync(ApiPath.LeaderBoard(100));
             var leaderBoardViewModel = await leaderBoardResponse.Content.ReadAsAsync<LeaderBoardViewModel>();
 
-            Assert.Equal("Worst Performing User", leaderBoardViewModel.WorstPerformers.Header);
-            Assert.Equal("Best Performing User", leaderBoardViewModel.BestPerformers.Header);
-            Assert.Equal("Most Bearish Stock", leaderBoardViewModel.MostBearish.Header);
-            Assert.Equal("Most Bullish Stock", leaderBoardViewModel.MostBullish.Header);
+            Assert.Equal("Worst Performing Users", leaderBoardViewModel.WorstPerformers.Header);
+            Assert.Equal("Best Performing Users", leaderBoardViewModel.BestPerformers.Header);
+            Assert.Equal("Most Bearish Stocks", leaderBoardViewModel.MostBearish.Header);
+            Assert.Equal("Most Bullish Stocks", leaderBoardViewModel.MostBullish.Header);
         }
 
         [Fact]
@@ -376,9 +376,9 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             PortfolioSymbol portfolioSymbol = await addResponse.Content.ReadAsAsync<PortfolioSymbol>();
 
-            var httpMessage = new HttpRequestMessage(HttpMethod.Patch, ApiPath.PortfolioSymbolsAveragePrice(testUser.PortfolioId, portfolioSymbol.Id));
+            var httpMessage = new HttpRequestMessage(HttpMethod.Patch, ApiPath.PortfolioSymbols(testUser.PortfolioId, portfolioSymbol.Id));
             httpMessage.Headers.Add(TestAuthHandler.CustomUserIdHeader, testUser.UserId.ToString());
-            httpMessage.Content = (new { AveragePrice = averagePrice }).ToJsonPayload();
+            httpMessage.Content = (new object[] { new { op = "replace", path = "/averagePrice", value = averagePrice } }).ToJsonPayload();
 
             var saveResponse = await _client.SendAsync(httpMessage);
             saveResponse.EnsureSuccessStatusCode();

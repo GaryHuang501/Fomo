@@ -82,7 +82,13 @@ namespace FomoAPI.Infrastructure.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var portfolioSymbol = await connection.QueryAsync<PortfolioSymbol>(sql, new { portfolioId, symbolId});
+                var portfolioSymbol = await connection.QueryAsync<PortfolioSymbol>(sql, 
+                    new 
+                        { 
+                            portfolioId, 
+                            symbolId
+                        });
+
                 return portfolioSymbol.SingleOrDefault();
             }
         }
@@ -131,33 +137,42 @@ namespace FomoAPI.Infrastructure.Repositories
         }
 
 
-        public async Task<bool> RenamePortfolio(int portfolioId, string newName)
+        public async Task<bool> UpdatePortfolio(Portfolio portfolio)
         {
             var sql = @"UPDATE Portfolio
                         SET
-                            Name = @newName
+                            Name = @name
                         WHERE 
                             Id = @portfolioId;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsUpdated = await connection.ExecuteAsync(sql, new { portfolioId, newName });
+                var rowsUpdated = await connection.ExecuteAsync(sql,
+                    new { 
+                        name = portfolio.Name,
+                        dateModified = DateTime.UtcNow, 
+                        portfolioId = portfolio.Id 
+                    });
 
                 return rowsUpdated > 0;
             }
         }
 
-        public async Task<bool> UpdateAveragePrice(int portfolioSymbolId, decimal averagePrice)
+        public async Task<bool> UpdatePortfolioSymbol(PortfolioSymbol portfolioSymbol)
         {
             var sql = @"UPDATE PortfolioSymbol
                         SET
-                            AveragePrice = @averagePrice
+                            averagePrice = @averagePrice
                         WHERE 
                             Id = @portfolioSymbolId;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsUpdated = await connection.ExecuteAsync(sql, new { portfolioSymbolId, averagePrice });
+                var rowsUpdated = await connection.ExecuteAsync(sql, 
+                    new { 
+                        averagePrice = portfolioSymbol.AveragePrice, 
+                        portfolioSymbolId = portfolioSymbol.Id
+                    });
 
                 return rowsUpdated > 0;
             }
@@ -278,6 +293,25 @@ namespace FomoAPI.Infrastructure.Repositories
             }
 
             return portfolio;
+        }
+
+        public async Task<PortfolioSymbol> GetPortfolioSymbol(int portfolioSymbolId)
+        {
+            var getSql = @"
+                                    SELECT
+                                        PortfolioSymbol.Id,
+                                        PortfolioSymbol.SymbolId,
+                                        PortfolioSymbol.AveragePrice,
+                                        PortfolioSymbol.SortOrder
+                                    FROM
+                                        PortfolioSymbol
+                                    WHERE
+                                        PortfolioSymbol.Id = @portfolioSymbolId;";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QuerySingleAsync<PortfolioSymbol>(getSql, new { portfolioSymbolId });
+            }
         }
 
         public async Task<IEnumerable<int>> GetPortfolioIds(Guid userId)
