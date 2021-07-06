@@ -49,8 +49,6 @@ export default function PortfolioStockListener(props) {
     }
   }, [portfolioSymbol, lastUpdated, notifyStockDataChanged, stockRef]);
 
-  const symbolId = portfolioSymbol.symbolId;
-
   return (null);
 }
 

@@ -26,14 +26,14 @@ export const addPortfolioStock = createAsyncThunk('portfolio/addPortfolioStock',
 export const updateAvergePricePortfolioStock =  createAsyncThunk('portfolio/updateAvgPricePortfolioStock', async (payload, thunkApi) => {
 
     const portfolio = selectSelectedPortfolio(thunkApi.getState());
-    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/${payload.portfolioSymbolId}/averagePrice`;
-    await axios.patch(endPointUrl, { averagePrice: payload.averagePrice});
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolio.id}/portfolioSymbols/${payload.portfolioSymbolId}`;
+    await axios.patch(endPointUrl, [{ op: "replace", path: "/averagePrice", value: payload.averagePrice}]);
 
     const portfolioSymbol = portfolio.portfolioSymbols.find(s => s.id === payload.portfolioSymbolId);
 
     thunkApi.dispatch(sendHistory(`Updated average price of ${portfolioSymbol.ticker} to ${payload.averagePrice}`));
 
-    return {portfolioId: portfolio.id, portfolioSymbolId: payload.portfolioSymbolId, averagePrice: payload.averagePrice};
+    return {portfolioId: portfolio.id, portfolioSymbolId: payload.portfolioSymbolId, averagePrice: parseFloat(payload.averagePrice)};
 });
 
 export const removePortfolioStock =  createAsyncThunk('portfolio/removePortfolioStock', async (payload, thunkApi) => {

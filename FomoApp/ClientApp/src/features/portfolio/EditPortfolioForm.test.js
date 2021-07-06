@@ -32,7 +32,7 @@ it("updates average price when submitted", async () => {
 
     const portfolioSymbol = { id: 1, symbolId: 1, ticker: 'abc', averagePrice: 1.00, return: 1 };
 
-    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolioId}/portfolioSymbols/${portfolioSymbol.id}/averagePrice`
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolioId}/portfolioSymbols/${portfolioSymbol.id}`
 
     mock.onPatch(endPointUrl)
         .reply(200, {});
@@ -79,7 +79,7 @@ it("updates average price when submitted", async () => {
     fireEvent.click(submit);
 
     await Promise.resolve();
-    await waitFor( () => expect(spy).toHaveBeenCalledWith(endPointUrl, {averagePrice: "2.50"}));
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(endPointUrl, [{ op: "replace", path: "/averagePrice", value: 2.50}]));
 
     expect(submitCalled).toBe(true);
 

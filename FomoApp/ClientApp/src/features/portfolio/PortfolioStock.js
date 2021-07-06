@@ -14,7 +14,7 @@ import VoteColumn from './VoteColumn';
     The row in the portfolio table that represents a stock in the portfolio.
 */
 export const PortfolioStock = (props) => {
-
+    
     const { portfolioId, portfolioSymbol } = props;
     const dispatch = useDispatch();
      
