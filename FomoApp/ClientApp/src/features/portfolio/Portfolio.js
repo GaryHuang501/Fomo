@@ -28,7 +28,7 @@ export const Portfolio = function (props) {
             <th className="portfolio-column portfolio-header-column" role="columnheader">Avg $</th>
             <th className="portfolio-column portfolio-header-column" role="columnheader">ROI</th>
             <th className="portfolio-column portfolio-header-column" role="columnheader">Votes</th>
-            <th className="portfolio-column portfolio-header-column portfolio-row-options-header" role="columnheader"><i className="fas fa-ellipsis-v"></i></th>
+            <th className="portfolio-column portfolio-header-column portfolio-row-options-header" role="columnheader">{ isMyUserPage ? <i className="fas fa-ellipsis-v"/> : null}</th>
         </tr>
       </thead>
       <tbody>
