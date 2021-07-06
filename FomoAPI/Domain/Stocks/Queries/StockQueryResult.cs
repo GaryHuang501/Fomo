@@ -2,7 +2,7 @@
 
 namespace FomoAPI.Domain.Stocks.Queries
 {
-    public abstract class StockQueryResult
+    public abstract record StockQueryResult
     {
         public string Ticker { get; private set; }
 

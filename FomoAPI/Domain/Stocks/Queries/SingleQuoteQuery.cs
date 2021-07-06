@@ -10,7 +10,7 @@ namespace FomoAPI.Domain.Stocks.Queries
     /// <summary>
     /// Query to fetch <see cref="SingleQuoteData"/>for a stock.
     /// </summary>
-    public class SingleQuoteQuery : StockQuery
+    public record SingleQuoteQuery : StockQuery
     {
         public SingleQuoteQuery(int symbolId)
             : base(symbolId, QueryFunctionType.SingleQuote)

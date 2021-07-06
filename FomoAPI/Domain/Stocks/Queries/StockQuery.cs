@@ -9,7 +9,7 @@ namespace FomoAPI.Domain.Stocks.Queries
     /// Base query class representing a users query to fetch a certain type of data for a stock.
     /// </summary>
     /// <remarks>This will be added to the queue to be be executed against the stock provider.</remarks>
-    public abstract class StockQuery
+    public abstract record StockQuery
     {
         public QueryFunctionType FunctionType { get; }
 
@@ -32,9 +32,9 @@ namespace FomoAPI.Domain.Stocks.Queries
         /// <remarks>Uses the visitor pattern generating the context.</remarks>
         public abstract IQueryContext CreateContext(IQueryContextFactory contextFactory);
 
-        public override bool Equals(object obj)
+        public virtual bool Equals(StockQuery other)
         {
-            var otherQuery = obj as StockQuery;
+            var otherQuery = other as StockQuery;
 
             return otherQuery != null
                 && otherQuery.SymbolId == SymbolId

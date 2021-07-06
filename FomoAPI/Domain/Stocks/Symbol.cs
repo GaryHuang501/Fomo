@@ -6,19 +6,19 @@ namespace FomoAPI.Domain.Stocks
     /// <summary>
     /// Represents a stock's info
     /// </summary>
-    public class Symbol : IEntity
+    public record Symbol : IEntity
     {
-        public int Id { get; private set; }
+        public int Id { get; init; }
 
-        public string Ticker { get; private set; }
+        public string Ticker { get; init; }
 
-        public string ExchangeName { get; private set; }
+        public string ExchangeName { get; init; }
 
-        public int ExchangeId { get; private set; }
+        public int ExchangeId { get; init; }
 
-        public string FullName { get; private set; }
+        public string FullName { get; init; }
 
-        public bool Delisted { get; private set; }
+        public bool Delisted { get; init; }
 
         [JsonConstructor]
         [ExplicitConstructor]

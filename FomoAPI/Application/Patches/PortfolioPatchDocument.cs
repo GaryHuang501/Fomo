@@ -29,15 +29,7 @@ namespace FomoAPI.Application.Patches
                 }
             }
 
-            var newPortfolio = new Portfolio
-                (
-                    id: portfolio.Id,
-                    userId: portfolio.UserId,
-                    name: newName,
-                    dateModified: portfolio.DateModified,
-                    dateCreated: portfolio.DateCreated,
-                    portfolioSymbols: portfolio.PortfolioSymbols.ToList()
-                );
+            var newPortfolio = portfolio with { Name = newName };
 
             return newPortfolio;
         }

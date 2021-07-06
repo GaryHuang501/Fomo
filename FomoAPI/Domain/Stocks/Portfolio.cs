@@ -10,19 +10,19 @@ namespace FomoAPI.Domain.Stocks
     /// <summary>
     /// User created portfolio containing the stock symbols they added.
     /// </summary>
-    public class Portfolio : IEntity, IModelValidateable
+    public record Portfolio : IEntity, IModelValidateable
     {
-        public int Id { get; private set; }
+        public int Id { get; init; }
 
-        public Guid UserId { get; private set; }
+        public Guid UserId { get; init; }
 
         public string Name { get;  set; }
 
-        public DateTime DateModified { get; private set; }
+        public DateTime DateModified { get; init; }
 
-        public DateTime DateCreated { get; private set; }
+        public DateTime DateCreated { get; init; }
 
-        public IEnumerable<PortfolioSymbol> PortfolioSymbols { get; private set; }
+        public IEnumerable<PortfolioSymbol> PortfolioSymbols { get; init; }
 
         [JsonConstructor]
         [ExplicitConstructor]

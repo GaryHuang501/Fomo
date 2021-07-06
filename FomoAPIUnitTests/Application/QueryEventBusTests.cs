@@ -21,7 +21,7 @@ namespace FomoAPIUnitTests.Application
         private readonly QueryQueue _queryQueue;
 
         private readonly Mock<IQueryContextFactory> _mockContextFactory;
-        private class TestQuery : StockQuery
+        private record TestQuery : StockQuery
         {
             public Mock<IQueryContext> MockQueryContext { get; private set; }
 

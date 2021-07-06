@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
-    public abstract class StockData
+    public abstract record StockData
     {
         public DateTime LastUpdated { get; protected set; }
     }

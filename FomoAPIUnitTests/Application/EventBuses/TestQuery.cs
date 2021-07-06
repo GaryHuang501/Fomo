@@ -6,7 +6,7 @@ using Moq;
 
 namespace FomoAPIUnitTests.Application.EventBuses
 {
-    public class TestQuery : StockQuery
+    public record TestQuery : StockQuery
     {
         public Mock<IQueryContext> _mockQueryContext;
 

@@ -5,7 +5,7 @@ using FomoAPI.Infrastructure.Enums;
 
 namespace FomoAPIUnitTests.Domain.Stocks.Queries
 {
-    public class TestQuery : StockQuery
+    public record TestQuery : StockQuery
     {
         public TestQuery(int symbolId, QueryFunctionType functionType) : base(symbolId, functionType)
         {

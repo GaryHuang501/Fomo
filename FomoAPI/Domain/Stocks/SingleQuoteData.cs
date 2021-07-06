@@ -8,17 +8,17 @@ namespace FomoAPI.Domain.Stocks
     /// <summary>
     /// Latest stock data for a given stock.
     /// </summary>
-    public class SingleQuoteData : StockData, IEntity
+    public record SingleQuoteData : StockData, IEntity
     {
-        public decimal ChangePercent { get; private set; }
+        public decimal ChangePercent { get; init; }
 
-        public decimal Price { get; private set; }
+        public decimal Price { get; init; }
 
-        public decimal Change { get; private set; }
+        public decimal Change { get; init; }
 
-        public string Ticker { get; private set; }
+        public string Ticker { get; init; }
 
-        public int SymbolId { get; private set; }
+        public int SymbolId { get; init; }
 
         [JsonConstructor]
         [ExplicitConstructor]

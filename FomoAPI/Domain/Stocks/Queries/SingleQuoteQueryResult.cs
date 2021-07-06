@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks.Queries
 {
-    public class SingleQuoteQueryResult : StockQueryResult
+    public record SingleQuoteQueryResult : StockQueryResult
     {
         public new SingleQuoteData Data { get; private set; }
 
