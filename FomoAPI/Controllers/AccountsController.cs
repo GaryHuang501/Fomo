@@ -196,15 +196,20 @@ namespace FomoAPI.Controllers
         private async Task<IdentityUser<Guid>> RegisterUser(ExternalLoginInfo loginInfo)
         {
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+            var firstName = loginInfo.Principal.FindFirstValue(ClaimTypes.GivenName);
+            var lastName = loginInfo.Principal.FindFirstValue(ClaimTypes.Surname);
 
-            var emailUserNamePart = email.Split('@')[0];
+            var nameFirstPart = !string.IsNullOrWhiteSpace(firstName) ? $"{firstName}." : string.Empty;
+            var nameLastPart = !string.IsNullOrWhiteSpace(lastName) ? lastName.First().ToString() : string.Empty;
+            // Username will be first name plus first character of last name for privacy.
+            var userName = (nameFirstPart + nameLastPart).Trim();
 
-            if (string.IsNullOrWhiteSpace(emailUserNamePart))
+            if (string.IsNullOrWhiteSpace(userName))
             {
                 throw new UserRegistrationException("Empty user name received from email");
             }
 
-            var user = new IdentityUser<Guid> { UserName = emailUserNamePart, Email = email };
+            var user = new IdentityUser<Guid> { UserName = userName, Email = email };
 
             var result = await _userManager.CreateAsync(user);
 
