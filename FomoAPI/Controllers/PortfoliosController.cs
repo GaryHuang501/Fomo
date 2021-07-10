@@ -19,9 +19,9 @@ namespace FomoAPI.Controllers
     [ApiController]
     public class PortfoliosController : ControllerBase
     {
-        private IPortfolioRepository _portfolioRepository;
+        private readonly IPortfolioRepository _portfolioRepository;
 
-        private ILogger<PortfoliosController> _logger;
+        private readonly ILogger<PortfoliosController> _logger;
 
         public PortfoliosController(IPortfolioRepository portfolioRepository, ILogger<PortfoliosController> logger)
         {

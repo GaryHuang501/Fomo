@@ -13,9 +13,9 @@ namespace FomoAPI.Controllers
     [Authorize]
     public class SingleQuoteDataController : ControllerBase
     {
-        private ILogger<SymbolsController> _logger;
+        private readonly ILogger<SymbolsController> _logger;
 
-        private IStockDataService _stockDataService;
+        private readonly IStockDataService _stockDataService;
 
         public SingleQuoteDataController(
                                  IStockDataService stockDataService,

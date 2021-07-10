@@ -24,6 +24,7 @@ namespace FomoAPI.Infrastructure.Clients.FinnHub
         private readonly FinnHubOptions _options;
 
         private readonly IHttpClientFactory _clientFactory;
+
         public FinnHubClient(IHttpClientFactory clientFactory, IOptionsMonitor<FinnHubOptions> optionsAccessor, ILogger<FinnHubClient> logger)
         {
             _clientFactory = clientFactory;

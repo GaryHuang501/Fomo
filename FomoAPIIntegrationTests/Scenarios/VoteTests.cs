@@ -26,13 +26,9 @@ namespace FomoAPIIntegrationTests.Scenarios
             webApiFactoryFixture.CreateServer(FomoApiFixture.WithNoHostedServices);
             _client = webApiFactoryFixture.GetClientNotAuth();
 
-            var mockDbOptions = new Mock<IOptionsMonitor<DbOptions>>();
-            mockDbOptions.Setup(x => x.CurrentValue).Returns(new DbOptions
-            {
-                ConnectionString = AppTestSettings.Instance.TestDBConnectionString
-            });
+            var mockDbOptions = AppTestSettings.Instance.GetDbOptionsMonitor();
 
-            _symbolRepo = new SymbolRepository(mockDbOptions.Object);
+            _symbolRepo = new SymbolRepository(mockDbOptions);
         }
 
         public async Task InitializeAsync()

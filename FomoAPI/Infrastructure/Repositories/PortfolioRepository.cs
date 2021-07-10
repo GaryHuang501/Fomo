@@ -14,7 +14,8 @@ namespace FomoAPI.Infrastructure.Repositories
     /// <inheritdoc cref="IPortfolioRepository"></inheritdoc>/>
     public class PortfolioRepository : IPortfolioRepository
     {
-        private string _connectionString;
+        private readonly string _connectionString;
+
         public PortfolioRepository(IOptionsMonitor<DbOptions> dbOptions)
         {
             _connectionString = dbOptions.CurrentValue.ConnectionString;

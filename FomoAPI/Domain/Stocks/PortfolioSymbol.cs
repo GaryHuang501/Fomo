@@ -5,21 +5,21 @@ namespace FomoAPI.Domain.Stocks
 {
     public record PortfolioSymbol : IEntity, IModelValidateable
     {
-        public int Id { get; init; }
+        public int Id { get; private set; }
 
-        public int SymbolId { get; init; }
+        public int SymbolId { get; private set; }
 
-        public string Ticker { get; init; }
+        public string Ticker { get; private set; }
 
-        public string ExchangeName { get; init; }
+        public string ExchangeName { get; private set; }
 
-        public string FullName { get; init; }
+        public string FullName { get; private set; }
 
-        public bool Delisted { get; init; }
+        public bool Delisted { get; private set; }
 
-        public decimal AveragePrice { get; init; }
+        public decimal AveragePrice { get; private set; }
 
-        public int SortOrder { get; init; }
+        public int SortOrder { get; private set; }
 
         [JsonConstructor]
         [ExplicitConstructor]

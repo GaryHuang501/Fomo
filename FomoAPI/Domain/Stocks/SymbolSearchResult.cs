@@ -11,11 +11,11 @@ namespace FomoAPI.Domain.Stocks
     /// </summary>
     public record SymbolSearchResult
     {
-        public string Ticker { get; init; }
+        public string Ticker { get; private set; }
 
-        public string FullName { get; init; }
+        public string FullName { get; private set; }
 
-        public int Rank { get; init; }
+        public int Rank { get; private set; }
 
         [JsonConstructor]
         public SymbolSearchResult(string ticker, string fullName, int rank)

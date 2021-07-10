@@ -56,5 +56,24 @@ namespace FomoAPIIntegrationTests
 
             return newUserId;
         }
+
+        public static async Task ClearUserData()
+        {
+            using (var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString))
+            {
+                await connection.ExecuteAsync("DELETE FROM Vote", null);
+                await connection.ExecuteAsync("DELETE FROM PortfolioSymbol", null);
+                await connection.ExecuteAsync("DELETE FROM Portfolio", null);
+                await connection.ExecuteAsync("DELETE FROM AspNetUsers", null);
+            }
+        }
+
+        public static async Task ClearStockData()
+        {
+            using (var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString))
+            {
+                await connection.ExecuteAsync("DELETE FROM SingleQuoteData", null);
+            }
+        }
     }
 }

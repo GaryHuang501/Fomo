@@ -15,9 +15,9 @@ namespace FomoAPI.Controllers
     public class SymbolsController : ControllerBase
     {
 
-        private ILogger<SymbolsController> _logger;
+        private readonly ILogger<SymbolsController> _logger;
 
-        private ISymbolSearchService _searchService;
+        private readonly ISymbolSearchService _searchService;
 
         public SymbolsController(
                                  ISymbolSearchService searchService, 

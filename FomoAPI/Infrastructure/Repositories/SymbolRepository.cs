@@ -12,7 +12,8 @@ namespace FomoAPI.Infrastructure.Repositories
     /// <inheritdoc cref="ISymbolRepository"></inheritdoc>/>
     public class SymbolRepository : ISymbolRepository
     {
-        private string _connectionString;
+        private readonly string _connectionString;
+
         public SymbolRepository(IOptionsMonitor<DbOptions> dbOptions)
         {
             _connectionString = dbOptions.CurrentValue.ConnectionString;
@@ -61,6 +62,7 @@ namespace FomoAPI.Infrastructure.Repositories
             using var connection = new SqlConnection(_connectionString);
             return await connection.QueryAsync<Symbol>(sql, new { SymbolIds = symbolIds });
         }
+
         public async Task<Symbol> GetSymbol(string ticker)
         {
             IEnumerable<Symbol> result = await GetSymbols(new string[] { ticker });

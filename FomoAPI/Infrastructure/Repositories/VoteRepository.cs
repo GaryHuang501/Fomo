@@ -14,7 +14,8 @@ namespace FomoAPI.Infrastructure.Repositories
     /// <inheritdoc cref="IVoteRepository"></inheritdoc>/>
     public class VoteRepository : IVoteRepository
     {
-        private string _connectionString;
+        private readonly string _connectionString;
+
         public VoteRepository(IOptionsMonitor<DbOptions> dbOptions)
         {
             _connectionString = dbOptions.CurrentValue.ConnectionString;

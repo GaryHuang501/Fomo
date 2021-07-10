@@ -27,6 +27,10 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("Database"))
                     .ValidateDataAnnotations();
 
+            services.AddOptions<PortfolioStocksUpdateOptions>()
+                    .Bind(config.GetSection("PortfolioStockUpdate"))
+                    .ValidateDataAnnotations();
+
             services.AddOptions<EventBusOptions>()
                     .Bind(config.GetSection("EventBus"))
                     .ValidateDataAnnotations();

@@ -14,7 +14,8 @@ namespace FomoAPI.Infrastructure.Repositories
     /// <inheritdoc cref="IStockDataRepository"></inheritdoc>/>
     public class StockDataRepository : IStockDataRepository
     {
-        private string _connectionString;
+        private readonly string _connectionString;
+
         public StockDataRepository(IOptionsMonitor<DbOptions> dbOptions)
         {
             _connectionString = dbOptions.CurrentValue.ConnectionString;

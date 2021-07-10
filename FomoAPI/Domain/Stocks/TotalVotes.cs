@@ -6,19 +6,19 @@ namespace FomoAPI.Domain.Stocks
 {
     public record TotalVotes
     {
-        public Guid UserId { get; init; }
+        public Guid UserId { get; private set; }
 
-        public int SymbolId { get; init; }
+        public int SymbolId { get; private set; }
 
         /// <summary>
         /// Gets the vote count.
         /// </summary>
-        public int Count { get; init; }
+        public int Count { get; private set; }
 
         /// <summary>
         /// Gets the vote direction for the current user id.
         /// </summary>
-        public VoteDirection MyVoteDirection { get; init; }
+        public VoteDirection MyVoteDirection { get; private set; }
    
         [ExplicitConstructor]
         [JsonConstructor]

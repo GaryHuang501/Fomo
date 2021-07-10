@@ -10,13 +10,13 @@ namespace FomoAPI.Domain.Stocks
     /// </summary>
     public record Vote
     {
-        public Guid UserId { get; init; }
+        public Guid UserId { get; private set; }
 
-        public int SymbolId { get; init; }
+        public int SymbolId { get; private set; }
 
-        public VoteDirection Direction { get; init; }
+        public VoteDirection Direction { get; private set; }
 
-        public DateTime LastUpdated { get; init; }
+        public DateTime LastUpdated { get; private set; }
 
         public Vote(Guid userId, int symbolId, VoteDirection direction, DateTime lastUpdated)
         {

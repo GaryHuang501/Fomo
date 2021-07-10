@@ -12,17 +12,17 @@ namespace FomoAPI.Domain.Stocks
     /// </summary>
     public record Portfolio : IEntity, IModelValidateable
     {
-        public int Id { get; init; }
+        public int Id { get; private set; }
 
-        public Guid UserId { get; init; }
+        public Guid UserId { get; private set; }
 
         public string Name { get;  set; }
 
-        public DateTime DateModified { get; init; }
+        public DateTime DateModified { get; private set; }
 
-        public DateTime DateCreated { get; init; }
+        public DateTime DateCreated { get; private set; }
 
-        public IEnumerable<PortfolioSymbol> PortfolioSymbols { get; init; }
+        public IEnumerable<PortfolioSymbol> PortfolioSymbols { get; private set; }
 
         [JsonConstructor]
         [ExplicitConstructor]

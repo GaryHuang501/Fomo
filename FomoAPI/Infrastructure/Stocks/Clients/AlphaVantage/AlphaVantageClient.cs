@@ -28,6 +28,7 @@ namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
         private readonly ILogger _logger;
 
         private readonly IHttpClientFactory _clientFactory;
+
         public AlphaVantageClient(IHttpClientFactory clientFactory, IOptionsMonitor<AlphaVantageOptions> alphaVantageOptionsAccessor, IAlphaVantageDataParserFactory parserFactory, ILogger<AlphaVantageClient> logger)
         {
             _clientFactory = clientFactory;

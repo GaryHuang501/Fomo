@@ -16,8 +16,8 @@ namespace FomoAPI.Controllers
     public class VotesController : ControllerBase
     {
 
-        private ILogger<VotesController> _logger;
-        private IVoteRepository _voteRepo;
+        private readonly ILogger<VotesController> _logger;
+        private readonly IVoteRepository _voteRepo;
 
         public VotesController(
                                  IVoteRepository voteRepo, 
