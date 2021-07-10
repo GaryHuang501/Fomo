@@ -32,6 +32,7 @@ export default function LeaderBoardPage() {
           { bestPerformers != null ? <LeaderBoard key={bestPerformers.header} board={bestPerformers} options={Options.bestPerformers}></LeaderBoard> : null }
           { worstPerformers != null ? <LeaderBoard key={worstPerformers.header} board={worstPerformers} options={Options.worstPerformers}></LeaderBoard> : null }
         </div>
+        <p id="leader-board-note">*Leaderboard values are updated periodically</p>
       </div>
     </main>
   );
