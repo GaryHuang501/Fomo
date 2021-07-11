@@ -81,7 +81,7 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
                     bool queryNeedsRefresh = queryResult != null && info.Query.FunctionType.IsExpired(queryResult.Data.LastUpdated, DateTime.UtcNow);
 
                     // Add 5 minutes incase data updates are delayed past market hours.
-                    bool isUpdatesAvailable = queryResult != null && queryResult.Data.LastUpdated <= _marketHours.TodayEndDateUTC().AddMinutes(5);
+                    bool isUpdatesAvailable = queryResult != null && queryResult.Data.LastUpdated <= _marketHours.TodayEndDateUTC().AddMinutes(StockUpdateTimeBufferRoom.Minutes);
 
                     if (queryNeedsRefresh && isUpdatesAvailable)
                     {
