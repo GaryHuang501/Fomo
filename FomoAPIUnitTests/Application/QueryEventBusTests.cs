@@ -1,6 +1,7 @@
 ﻿using FomoAPI.Application.EventBuses;
 using FomoAPI.Application.EventBuses.QueryContexts;
 using FomoAPI.Application.EventBuses.QueuePriorityRules;
+using FomoAPI.Domain.Stocks;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,9 @@ namespace FomoAPIUnitTests.Application
         private readonly QueryQueue _queryQueue;
 
         private readonly Mock<IQueryContextFactory> _mockContextFactory;
+
+        private readonly Mock<IMarketHours> _mockMarketHours;
+
         private record TestQuery : StockQuery
         {
             public Mock<IQueryContext> MockQueryContext { get; private set; }
@@ -52,9 +56,15 @@ namespace FomoAPIUnitTests.Application
 
             _mockContextFactory = new Mock<IQueryContextFactory>();
 
+            _mockMarketHours = new Mock<IMarketHours>();
+
+            // Make it some time way in the future, so data is considered stale.
+            _mockMarketHours.Setup(h => h.TodayEndDateUTC()).Returns(new DateTime(2100, 1, 1));
+
             var priorityRule = new QuerySubscriptionCountRule(
                     contextFactory: _mockContextFactory.Object,
                     _querySubscriptions,
+                    _mockMarketHours.Object,
                     (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object
                 );
 

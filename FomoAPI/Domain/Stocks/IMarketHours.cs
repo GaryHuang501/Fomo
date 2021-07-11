@@ -16,5 +16,9 @@ namespace FomoAPI.Domain.Stocks
         int EndMinutesUTC { get; }
 
         bool IsMarketHours(DateTime date);
+
+        DateTime TodayStartDateUTC();
+
+        DateTime TodayEndDateUTC();
     }
 }

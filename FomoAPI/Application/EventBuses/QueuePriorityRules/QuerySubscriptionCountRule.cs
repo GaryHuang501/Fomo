@@ -1,5 +1,6 @@
 ﻿using FomoAPI.Application.EventBuses.QueryContexts;
 using FomoAPI.Application.Stores;
+using FomoAPI.Domain.Stocks;
 using FomoAPI.Domain.Stocks.Queries;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,11 +23,14 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
 
         private readonly ILogger<QuerySubscriptionCountRule> _logger;
 
-        public QuerySubscriptionCountRule(IQueryContextFactory contextFactory, QuerySubscriptions querySubscriptions, ILogger<QuerySubscriptionCountRule> logger)
+        private readonly IMarketHours _marketHours;
+
+        public QuerySubscriptionCountRule(IQueryContextFactory contextFactory, QuerySubscriptions querySubscriptions, IMarketHours marketHours, ILogger<QuerySubscriptionCountRule> logger)
         {
             _contextFactory = contextFactory;
             _querySubscriptions = querySubscriptions;
             _logger = logger;
+            _marketHours = marketHours;
         }
 
         /// <summary>
@@ -66,12 +70,25 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
 
                 StockQueryResult queryResult = await queryContext.GetCachedQueryResult(info.Query.SymbolId);
 
-                bool queryNeedsRefresh = queryResult == null || info.Query.FunctionType.IsExpired(queryResult.Data.LastUpdated, DateTime.UtcNow);
+                bool notInCache = queryResult == null;
 
-                if (queryNeedsRefresh)
+                if (notInCache)
                 {
                     results.Add(info, queryResult);
                 }
+                else
+                {
+                    bool queryNeedsRefresh = queryResult != null && info.Query.FunctionType.IsExpired(queryResult.Data.LastUpdated, DateTime.UtcNow);
+
+                    // Add 5 minutes incase data updates are delayed past market hours.
+                    bool isUpdatesAvailable = queryResult != null && queryResult.Data.LastUpdated <= _marketHours.TodayEndDateUTC().AddMinutes(5);
+
+                    if (queryNeedsRefresh && isUpdatesAvailable)
+                    {
+                        results.Add(info, queryResult);
+                    }
+                }
+
             }
 
             return results;

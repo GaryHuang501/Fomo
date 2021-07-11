@@ -24,8 +24,23 @@ namespace FomoAPI.Domain.Stocks
             var timeOfDay = date.TimeOfDay;
             var startOfDay = new TimeSpan(StartHoursUTC, StartMinutesUTC, 0);
             var endOfDay = new TimeSpan(EndHoursUTC, EndMinutesUTC, 0);
+            var isWeekend = date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday;
 
-            return timeOfDay >= startOfDay && timeOfDay <= endOfDay;
+            return timeOfDay >= startOfDay && timeOfDay <= endOfDay && !isWeekend;
+        }
+
+        public DateTime TodayEndDateUTC()
+        {
+            var today = DateTime.UtcNow;
+
+            return new DateTime(today.Year, today.Month, today.Day, EndHoursUTC, EndMinutesUTC, 0);
+        }
+
+        public DateTime TodayStartDateUTC()
+        {
+            var today = DateTime.UtcNow;
+
+            return new DateTime(today.Year, today.Month, today.Day, StartHoursUTC, StartMinutesUTC, 0);
         }
     }
 }

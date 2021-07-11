@@ -23,8 +23,46 @@ namespace FomoAPIUnitTests.Domain.Stocks
         {
             var marketHours = new NasdaqMarketHours();
 
-            var testDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hours, minutes, 0);
+            var testDate = new DateTime(2021, 7, 9, hours, minutes, 0);
             Assert.Equal(expectedIsWithinHours, marketHours.IsMarketHours(testDate));
+        }
+
+        [Fact]
+        public void IsMarketHours_ShouldReturnFalse_WhenWithinUTCHoursAndSaturday()
+        {
+            var marketHours = new NasdaqMarketHours();
+
+            var testDate = new DateTime(2021, 7, 10, 15, 0, 0);
+            Assert.False(marketHours.IsMarketHours(testDate));
+        }
+
+        [Fact]
+        public void IsMarketHours_ShouldReturnFalse_WhenWithinUTCHoursAndSunday()
+        {
+            var marketHours = new NasdaqMarketHours();
+
+            var testDate = new DateTime(2021, 7, 11, 15, 0, 0);
+            Assert.False(marketHours.IsMarketHours(testDate));
+        }
+
+        [Fact]
+        public void TodayEndDateUTC_ShouldReturnTodaysEndDateInUTC()
+        {
+            var marketHours = new NasdaqMarketHours();
+
+            var now = DateTime.UtcNow;
+            var expected = new DateTime(now.Year, now.Month, now.Day, 20, 0, 0);
+            Assert.Equal(expected, marketHours.TodayEndDateUTC());
+        }
+
+        [Fact]
+        public void TodayEndDateUTC_ShouldReturnTodaysStartDateInUTC()
+        {
+            var marketHours = new NasdaqMarketHours();
+
+            var now = DateTime.UtcNow;
+            var expected = new DateTime(now.Year, now.Month, now.Day, 13, 30, 0);
+            Assert.Equal(expected, marketHours.TodayStartDateUTC());
         }
     }
 }
