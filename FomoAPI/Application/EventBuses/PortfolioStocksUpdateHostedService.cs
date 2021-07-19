@@ -62,9 +62,11 @@ namespace FomoAPI.Application.EventBuses
 
         private async Task UpdateStocks()
         {
-            // Only need to update stocks before market closed, since the price will no longer change for the day.
-            // Add 5 minutes incase of slow data updates.
+            // Only need to update stocks with data last updated before market closed, since the price will no longer change for the day.
+            // When the market closes, UTC will still be on the same day.
+            
             var maxUpdateDate = _marketHours.TodayEndDateUTC().AddMinutes(StockUpdateTimeBufferRoom.Minutes);
+
             var symbolIdsForUpdate = await _portfolioStocksUpdateQuery.Get(_options.BatchSize, maxUpdateDate);
 
             _logger.LogInformation($"{nameof(PortfolioStocksUpdateHostedService)} updating {symbolIdsForUpdate.Count()} stocks");

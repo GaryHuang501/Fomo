@@ -2,7 +2,6 @@ import './App.css';
 
 import React, { useEffect } from 'react';
 import {
-  Redirect,
   Route,
   BrowserRouter as Router,
   Switch,
@@ -10,12 +9,13 @@ import {
 import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState } from './features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
+import FaqPage  from './features/faq/FaqPage';
 import { FirebaseManager } from './app/FirebaseManager';
 import  LeaderBoardPage  from './features/leaderboard/LeaderBoardPage';
 import { LoginModal } from './features/login/LoginModal';
 import MembersPage  from './features/members/MembersPage';
 import { NavHeader } from './app/NavHeader';
-import  PortfolioPage  from './features/portfolio/PortfolioPage';
+import PortfolioPage  from './features/portfolio/PortfolioPage';
 import { axiosSetup } from './app/AxiosSetup';
 import { firebaseSetup } from './app/FirebaseSetup';
 
@@ -53,8 +53,7 @@ function App() {
             <Route exact path="/portfolio/:urlUserId" component={PortfolioPage}/>
             <Route exact path="/Leaderboard" component={LeaderBoardPage} />
             <Route exact path="/Friends" component={MembersPage} />
-            <Route exact path="/Faq" component={MembersPage} />
-            <Redirect to="/" />
+            <Route exact path="/Faq" component={FaqPage} />
           </Switch> : null}
     </Router>
   );
