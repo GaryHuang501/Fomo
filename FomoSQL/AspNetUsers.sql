@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[AspNetUsers](
 	[Id] [uniqueidentifier] NOT NULL,
-	[UserName] [nvarchar](256) NULL,
-	[NormalizedUserName] [nvarchar](256) NULL,
-	[Email] [nvarchar](256) NULL,
-	[NormalizedEmail] [nvarchar](256) NULL,
+	[UserName] [nvarchar](256) UNIQUE NULL,
+	[NormalizedUserName] [nvarchar](256) UNIQUE NULL,
+	[Email] [nvarchar](256) UNIQUE NULL,
+	[NormalizedEmail] [nvarchar](256) UNIQUE NULL,
 	[EmailConfirmed] [bit] NOT NULL,
 	[PasswordHash] [nvarchar](max) NULL,
 	[SecurityStamp] [nvarchar](max) NULL,
