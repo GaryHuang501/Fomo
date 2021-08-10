@@ -20,12 +20,13 @@ namespace FomoAPI.Controllers
     public class PortfoliosController : ControllerBase
     {
         private readonly IPortfolioRepository _portfolioRepository;
-
+        private readonly PortfolioValidator _validator;
         private readonly ILogger<PortfoliosController> _logger;
 
-        public PortfoliosController(IPortfolioRepository portfolioRepository, ILogger<PortfoliosController> logger)
+        public PortfoliosController(IPortfolioRepository portfolioRepository, PortfolioValidator validator, ILogger<PortfoliosController> logger)
         {
             _portfolioRepository = portfolioRepository;
+            _validator = validator;
             _logger = logger;
         }
 
@@ -82,22 +83,6 @@ namespace FomoAPI.Controllers
             return Ok();
         }
 
-        [HttpPost("{id}/portfolioSymbols")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize(PolicyTypes.PortfolioOwner)]
-        public async Task<ActionResult<PortfolioSymbol>> AddPortfolioSymbol(int id, [FromBody] AddPortfolioSymbolCommand addPortfolioSymbolCommand)
-        {          
-           var portfolioSymbol = await _portfolioRepository.AddPortfolioSymbol(id, addPortfolioSymbolCommand.SymbolId);
-
-            if (portfolioSymbol == null)
-            {
-                return BadRequest("Symbol does not exist or already exists in portfolio");
-            }
-
-            return Ok(portfolioSymbol);
-        }
-
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -114,9 +99,12 @@ namespace FomoAPI.Controllers
 
             var updatedPortfolio = patches.CopyTo(portfolio);
 
-            if (!updatedPortfolio.IsValid())
+
+            var validationResult = await _validator.ValidateAsync(portfolio);
+
+            if (!validationResult.IsValid)
             {
-                return BadRequest("Patch updates values are invalid.");
+                return BadRequest($"Patches updates values are invalid: {validationResult}");
             }
 
             var success = await _portfolioRepository.UpdatePortfolio(updatedPortfolio);
@@ -125,56 +113,6 @@ namespace FomoAPI.Controllers
             {
                 return NotFound("Portfolio was not successfully updated");
             }
-
-            return Ok();
-        }
-
-        [HttpPatch("{id}/portfolioSymbols/{portfolioSymbolid}")]
-        [Authorize(PolicyTypes.PortfolioOwner)]
-        public async Task<IActionResult> UpdatePortfolioSymbol(int id, int portfolioSymbolid, [FromBody] JsonPatchDocument<PortfolioSymbol> patches)
-        {
-            var portfolioSymbol = await _portfolioRepository.GetPortfolioSymbol(portfolioSymbolid);
-
-            if (portfolioSymbol == null)
-            {
-                return NotFound("Portfolio does not exist");
-            }
-
-            var updatedPortfolioSymbol = patches.CopyTo(portfolioSymbol);
-
-            if (!updatedPortfolioSymbol.IsValid())
-            {
-                return BadRequest("Patches updates values are invalid.");
-            }
-
-            var success = await _portfolioRepository.UpdatePortfolioSymbol(updatedPortfolioSymbol);
-
-            if (!success)
-            {
-                return NotFound("PortfolioSymbol was not updated");
-            }
-
-            return Ok();
-        }
-
-        [HttpPatch("{id}/portfolioSymbols/sortOrder")]
-        [Authorize(PolicyTypes.PortfolioOwner)]  
-        public async Task<IActionResult> ReorderPortfolioSymbol(int id, [FromBody] ReorderPortfolioCommand reorderPortfolioCommand)
-        {
-            var success = await _portfolioRepository.ReorderPortfolioSymbol(id, reorderPortfolioCommand.PortfolioSymbolIdToSortOrder);
-
-            if (!success)
-            {
-                return NotFound("Portfolio or PortfolioSymbol was not found.");
-            }
-            return Ok();
-        }
-
-        [HttpDelete("{id}/portfolioSymbols/{portfolioSymbolid}")]
-        [Authorize(PolicyTypes.PortfolioOwner)]
-        public async Task<IActionResult> DeletePortfolioSymbol(int portfolioSymbolid)
-        {
-            await _portfolioRepository.DeletePortfolioSymbol(portfolioSymbolid);
 
             return Ok();
         }

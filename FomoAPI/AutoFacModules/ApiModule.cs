@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Hosting;
 using FomoAPI.Infrastructure.Clients.FinnHub;
 using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers;
+using FomoAPI.Domain.Login;
 
 namespace FomoAPI.AutoFacModules
 {
@@ -45,6 +46,10 @@ namespace FomoAPI.AutoFacModules
             builder.RegisterType<StockDataService>().As<IStockDataService>().InstancePerLifetimeScope();
             builder.RegisterType<StockNotificationCenter>().As<IStockNotificationCenter>().InstancePerLifetimeScope();
             builder.RegisterType<SymbolSearchService>().As<ISymbolSearchService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<UserValidator>().As<UserValidator>().InstancePerLifetimeScope(); 
+            builder.RegisterType<PortfolioSymbolValidator>().As<PortfolioSymbolValidator>().InstancePerLifetimeScope();
+            builder.RegisterType<PortfolioValidator>().As<PortfolioValidator>().InstancePerLifetimeScope();
         }
     }
 }

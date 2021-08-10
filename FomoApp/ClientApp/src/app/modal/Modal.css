@@ -27,4 +27,5 @@
     text-align: right;
     color: grey;
     cursor: pointer;
+    user-select: none;
 }

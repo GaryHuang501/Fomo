@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace FomoAPI.Domain.Stocks
 {
-    public class PortfolioSymbolValidator : AbstractValidator<PortfolioSymbol>
+    public class PortfolioValidator : AbstractValidator<Portfolio>
     {
-        public PortfolioSymbolValidator()
+        public PortfolioValidator()
         {
-            RuleFor(ps => ps.AveragePrice).GreaterThan(0);
         }
     }
 }

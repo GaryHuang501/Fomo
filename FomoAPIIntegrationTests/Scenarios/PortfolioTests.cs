@@ -343,7 +343,41 @@ namespace FomoAPIIntegrationTests.Scenarios
             var jpm = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "JPM");
 
             Assert.Equal(1.24m, jpm.AveragePrice);
- 
+        }
+
+        [Fact]
+        public async Task ShouldFail_UpdateAveragePricePortfolioSymbol_WhenZero()
+        {
+            // Create Portfolio
+            var createPortfolioResponse = await _client.PostAsync(ApiPath.Portfolio(), new { name = string.Empty }.ToJsonPayload());
+            createPortfolioResponse.EnsureSuccessStatusCode();
+
+            var portfolio = await createPortfolioResponse.Content.ReadAsAsync<Portfolio>();
+
+            Assert.True(portfolio.Id > 0);
+
+            // Search for symbols by keyword
+            SymbolSearchResultDTO jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
+
+            // Add symbols to Portfolio
+            var addJPMResponse = await _client.PostAsync(ApiPath.PortfolioSymbols(portfolio.Id), new { SymbolId = jpmSymbol.SymbolId }.ToJsonPayload());
+            addJPMResponse.EnsureSuccessStatusCode();
+            var jpmPortfolioSymbol = await addJPMResponse.Content.ReadAsAsync<PortfolioSymbol>();
+
+            var newAvgPricePayload = new[]
+            {
+                new
+                {
+                    value = 0,
+                    path = "/averagePrice",
+                    op = "replace"
+                }
+            }.ToJsonPayload();
+
+            var updateAveragePriceResponse = await _client.PatchAsync(ApiPath.PortfolioSymbols(portfolio.Id, jpmPortfolioSymbol.Id), newAvgPricePayload);
+
+            Assert.Equal(HttpStatusCode.BadRequest, updateAveragePriceResponse.StatusCode);
+            Assert.Contains("Average Price", (await updateAveragePriceResponse.Content.ReadAsStringAsync()));
         }
 
         private async Task<SymbolSearchResultDTO> FetchSymbol(string ticker, ExchangeType exchange)

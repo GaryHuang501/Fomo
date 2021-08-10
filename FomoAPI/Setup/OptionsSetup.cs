@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Domain.Login;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +52,9 @@ namespace FomoAPI.Setup
                     .Bind(config.GetSection("StockSearchCache"))
                     .ValidateDataAnnotations();
 
+            services.AddOptions<UserValidationOptions>()
+                    .Bind(config.GetSection("Validation:Users"))
+                    .ValidateDataAnnotations();
         }
     }
 }

@@ -27,7 +27,7 @@ export default function Modal(props) {
 
             onCancelCallBack();
         }
-
+        
         modalRoot.appendChild(container);
         document.addEventListener("mousedown", closeWhenClickOutside);
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Controllers.Authorization
@@ -20,12 +22,11 @@ namespace FomoAPI.Controllers.Authorization
                 return Task.CompletedTask;
             }
 
-            if (!_httpContextAccessor.HttpContext.Request.RouteValues.ContainsKey("id"))
+
+            if(!TryGetPortfolioIdFromPath(out string portfolioId))
             {
                 return Task.CompletedTask;
             }
-
-            var portfolioId = _httpContextAccessor.HttpContext.Request.RouteValues["id"].ToString();
 
             if (portfolioId == context.User.GetPortfolioId().ToString())
             {
@@ -33,6 +34,27 @@ namespace FomoAPI.Controllers.Authorization
             }
 
             return Task.CompletedTask;
+        }
+
+        private bool TryGetPortfolioIdFromPath(out string portfolioId)
+        {
+            portfolioId = null;
+
+            var url = _httpContextAccessor.HttpContext.Request.Path.Value;
+
+            var parts = url.Split("/");
+            var portfolioIndex = Array.FindIndex(parts, p => p.Equals("portfolios", System.StringComparison.OrdinalIgnoreCase)) ;
+            var portfolioIndexId = portfolioIndex + 1;
+            bool portfolioIdExists = portfolioIndexId <= parts.Length;
+
+            if (portfolioIndex < 0 || !portfolioIdExists)
+            {
+                return false;
+            }
+
+            portfolioId = parts[portfolioIndexId];
+
+            return true;
         }
     }
 }

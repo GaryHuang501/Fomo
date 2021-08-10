@@ -35,7 +35,3 @@
 #portfolio tr:last-child .portfolio-row-options-field-move-down{
     visibility:hidden
 }
-
-#portfolio-row-options-edit-modal-container{
-    position: fixed;
-}

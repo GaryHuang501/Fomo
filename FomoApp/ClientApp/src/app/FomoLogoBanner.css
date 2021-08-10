@@ -1,0 +1,17 @@
+#fomo-logo-banner {
+    background-color: limegreen;
+    grid-column: col-start 1 / span  16;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(16, [col-start] 1fr);
+  }
+  
+  #fomo-logo-banner-title {
+    grid-row: 1;
+    grid-column: col-start 3 / span 16;
+    color: white;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-left: 1rem;
+  }
+  

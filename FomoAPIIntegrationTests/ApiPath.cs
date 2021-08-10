@@ -8,6 +8,8 @@ namespace FomoAPIIntegrationTests
 {
     public class ApiPath
     {
+        public static string Account(string id = null) => $"api/Accounts/{id}";
+
         public static string LeaderBoard(int limit) => $"api/LeaderBoard/?limit={limit}";
 
         public static string MembersData(int limit, int offset) => $"api/Members/?limit={limit}&offset={offset}";

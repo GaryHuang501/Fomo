@@ -6,7 +6,7 @@ import { selectStockData, selectVoteData } from '../stocks/stocksSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
 import EditPortfolioForm  from './EditPortfolioForm';
-import Modal from '../../app/Modal';
+import Modal from '../../app/modal/Modal';
 import PercentageColumn from './PercentageColumn';
 import VoteColumn from './VoteColumn';
 
@@ -91,9 +91,9 @@ export const PortfolioStock = (props) => {
                 {
                     !showOptions ? null :
                     <div className="portfolio-row-options">
-                        <span className="portfolio-row-options-edit-modal-container">
+                        <span>
                             {showEditPortfolioModal 
-                                ? <Modal onCancel={onCloseEdit}><EditPortfolioForm onSubmit={onCloseEdit} portfolioSymbolId={portfolioSymbol.id}/></Modal> 
+                                ? <Modal onCancel={onCloseEdit}><EditPortfolioForm onSubmit={onCloseEdit} portfolioSymbolId={portfolioSymbol.id} ticker={portfolioSymbol.ticker}/></Modal> 
                                 : null
                             }
                         </span>

@@ -1,25 +1,5 @@
-#header-title {
-    grid-row: 1;
-    grid-column: col-start 3 / span 16;
-    color: white;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    padding-left: 1rem;
-  }
-  
   #mobile-header-nav-menu{
     display: none;
-  }
-
-  #header-logout {
-    grid-column: col-start 13 / span 1;
-    grid-row: 2;
-    height: 4rem;
-    line-height: 4rem;
-    text-align: center;
-    min-width: 10rem;
-    color: white;
-    cursor: pointer;
   }
 
   #header-logout a{
@@ -38,6 +18,24 @@
     display: inherit;
     height: 100%;
     width: 100%;
+  }
+
+  #header-logout {
+    grid-column: col-start 13 / span 1;
+  }
+
+  #header-user-settings{
+    grid-column: col-start 12 / span 1;
+  }
+
+  .header-button{
+    grid-row: 2;
+    height: 4rem;
+    line-height: 4rem;
+    text-align: center;
+    min-width: 5rem;
+    color: white;
+    cursor: pointer;
   }
 
   .nav-header-item {

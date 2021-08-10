@@ -25,7 +25,8 @@ namespace FomoAPI
                         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                               .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true)
                               .AddJsonFile("authentication.json", optional: false, reloadOnChange: true)
-                              .AddJsonFile("firebase.json", optional: false, reloadOnChange: true);
+                              .AddJsonFile("firebase.json", optional: false, reloadOnChange: true)
+                              .AddJsonFile("validation.json", optional: false, reloadOnChange: true);
 
                         if (hostingContext.HostingEnvironment.IsDevelopment())
                         {

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomoAPI.Domain.Stocks
+namespace FomoAPI.Application.Commands.User
 {
-    public interface IModelValidateable
+    public class NewUserCommand
     {
-        bool IsValid();
+        public string Name { get; set; }
     }
 }

@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 */
 export default function EditPortfolioForm(props){
 
+    const ticker = props.ticker;
     const dispatch = useDispatch();
     const [averagePrice, setAveragePrice] = useState(0);
     const [showError, setShowError] = useState(false);
@@ -32,12 +33,11 @@ export default function EditPortfolioForm(props){
 
     return (    
         <div className='edit-portfolio-form'>
-            <h3>RKT</h3>
-            <label htmlFor="input-portfolio-avg-price">Set avg Price: </label>
-            <input type='number' className="input-portfolio-avg-price" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/>
+            <h3>{ticker}</h3>
+            <label htmlFor="input-portfolio-avg-price">Set avg Price: </label><br></br>
+            <input type='number' className="input-portfolio-avg-price" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
             { showError ? <p className='input-portfolio-avg-price-error'>Value must be positive</p> : <br></br>}
-            <br></br>
-            <input type="submit" value="Submit" onClick={onSubmit}></input>
+            <input className='edit-portfolio-form-submit' type="submit" value="Submit" onClick={onSubmit}></input>
         </div>
     );
 }

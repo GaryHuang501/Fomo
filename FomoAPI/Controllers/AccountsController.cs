@@ -13,6 +13,8 @@ using System.Linq;
 using FomoAPI.Controllers.Authorization;
 using Microsoft.Extensions.Options;
 using FomoAPI.Application.ConfigurationOptions;
+using FomoAPI.Domain.Login;
+using FomoAPI.Application.Commands.User;
 
 namespace FomoAPI.Controllers
 {
@@ -24,17 +26,20 @@ namespace FomoAPI.Controllers
         private readonly UserManager<IdentityUser<Guid>> _userManager;
         private readonly IPortfolioRepository _portfolioRepo;
         private readonly IClientAuthFactory _clientAuthFactory;
+        private readonly UserValidator _validator;
         private readonly IOptionsMonitor<AccountsOptions> _accountsOptions;
 
         public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
                                   UserManager<IdentityUser<Guid>> userManager,
                                   IPortfolioRepository portfolioRepo,
                                   IClientAuthFactory clientAuthFactory,
+                                  UserValidator validator,
                                   IOptionsMonitor<AccountsOptions> accountsOptions)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _clientAuthFactory = clientAuthFactory;
+            _validator = validator;
             _portfolioRepo = portfolioRepo;
             _accountsOptions = accountsOptions;
         }
@@ -58,20 +63,54 @@ namespace FomoAPI.Controllers
         /// Gets user info for selected user.
         /// </summary>
         /// <returns>Returns <see cref="LoginInfoDTO"/>if authorized</returns>
-        [HttpGet("{userId}")]
+        [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<UserDTO>> GetAccount(string userId)
+        public async Task<ActionResult<UserDTO>> GetAccount(string id)
         {
-            if (!Guid.TryParse(userId, out Guid selectedUserGuid))
+            if (!Guid.TryParse(id, out Guid selectedUserGuid))
             {
                 return BadRequest("UserId must be a valid Guid");
             }
 
-            IdentityUser<Guid> selectedUser = await _userManager.FindByIdAsync(userId);
+            IdentityUser<Guid> selectedUser = await _userManager.FindByIdAsync(id);
 
             var userDTO = new UserDTO(selectedUser.Id, selectedUser.UserName);
 
             return Ok(userDTO);
+        }
+
+        /// <summary>
+        /// Update User profile
+        /// </summary>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<ActionResult<UserDTO>> UpdateAccount(UserDTO userToUpdate)
+        {
+            if(userToUpdate.Id != User.GetUserId())
+            {
+                return Forbid();
+            }
+
+            IdentityUser<Guid> myUser = await _userManager.FindByIdAsync(userToUpdate.Id.ToString());
+            myUser.UserName = userToUpdate.Name;
+
+            var validationResult = await _validator.ValidateAsync(myUser);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ToString());
+            }
+
+            var result = await _userManager.SetUserNameAsync(myUser, userToUpdate.Name);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.First());
+            }
+
+            var updatedUser = await _userManager.FindByIdAsync(userToUpdate.Id.ToString());
+
+            return Ok(new UserDTO(updatedUser.Id, updatedUser.UserName));
         }
 
         /// <summary>
@@ -140,82 +179,57 @@ namespace FomoAPI.Controllers
         {
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
-            if (loginInfo != null)
+            if (loginInfo == null)
             {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
 
-                var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                bool success = false;
+            var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
 
-                if (user == null)
+            if (user == null)
+            {
+                return Redirect(_accountsOptions.CurrentValue.RegistrationPage);
+            }
+            else
+            {
+                if (!await SignInUser(loginInfo, user))
                 {
-                    user = await RegisterUser(loginInfo);
-                    await _signInManager.SignInAsync(user, false);
-                    success = true;
-                }
-                else
-                {
-                    var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, true);
-                    success = result.Succeeded;
-                }
-
-                if (!(await VerifyClaims(user)))
-                {
-                    await _signInManager.RefreshSignInAsync(user);
-                }
-
-                if (!(await _clientAuthFactory.VerifyUser(user.Id)))
-                {
-                    await _clientAuthFactory.CreateUser(user.Id, user.UserName, user.Email);
-                }
-
-                if (success)
-                {
-                    return Redirect(returnUrl);
+                    return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
 
-            return StatusCode(StatusCodes.Status500InternalServerError);
 
+            return Redirect(returnUrl);      
         }
 
-        private async Task<bool> VerifyClaims(IdentityUser<Guid> user)
-        {
-            var claims = await _userManager.GetClaimsAsync(user);
-            bool isVerified = true;
 
-            if(claims.FirstOrDefault(c => c.Type == FomoClaimTypes.PortfolioId) == null)
+        [AllowAnonymous]
+        [HttpPost("Register")]
+        public async Task<IActionResult> RegisterUser([FromBody] NewUserCommand newUserCommand)
+        {
+            var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (loginInfo == null)
             {
-                var portfolioIds = await _portfolioRepo.GetPortfolioIds(user.Id);
-                await _userManager.AddClaimAsync(user, new Claim(FomoClaimTypes.PortfolioId, portfolioIds.First().ToString()));
-                isVerified = false;
+                return StatusCode(StatusCodes.Status403Forbidden, "Unauthorized: Please register from main page login.");
             }
 
-            return isVerified;
-        }
-
-        private async Task<IdentityUser<Guid>> RegisterUser(ExternalLoginInfo loginInfo)
-        {
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-            var firstName = loginInfo.Principal.FindFirstValue(ClaimTypes.GivenName);
-            var lastName = loginInfo.Principal.FindFirstValue(ClaimTypes.Surname);
 
-            var nameFirstPart = !string.IsNullOrWhiteSpace(firstName) ? $"{firstName}." : string.Empty;
-            var nameLastPart = !string.IsNullOrWhiteSpace(lastName) ? lastName.First().ToString() : string.Empty;
-            // Username will be first name plus first character of last name for privacy.
-            var userName = (nameFirstPart + nameLastPart).Trim();
+            var user = new IdentityUser<Guid> { UserName = newUserCommand.Name, Email = email };
 
-            if (string.IsNullOrWhiteSpace(userName))
+            var validationResult = await _validator.ValidateAsync(user);
+
+            if (!validationResult.IsValid)
             {
-                throw new UserRegistrationException("Empty user name received from email");
+                return BadRequest(validationResult.ToString());
             }
-
-            var user = new IdentityUser<Guid> { UserName = userName, Email = email };
 
             var result = await _userManager.CreateAsync(user);
 
             if (!result.Succeeded)
             {
-                throw new UserRegistrationException("Unable to register user");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to register user");
             }
 
             var portfolio = await _portfolioRepo.CreatePortfolio(user.Id, "default");
@@ -226,10 +240,44 @@ namespace FomoAPI.Controllers
 
             if (!result.Succeeded)
             {
-                throw new UserRegistrationException("Failed to add external info to user");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to add external info to user");
             }
 
-            return user;
+            await SignInUser(loginInfo, user);
+
+            return Ok();
+        }
+
+        private async Task<bool> SignInUser(ExternalLoginInfo loginInfo, IdentityUser<Guid> user)
+        {
+            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, true);
+
+            if (!(await VerifyClaims(user)))
+            {
+                await _signInManager.RefreshSignInAsync(user);
+            }
+
+            if (!(await _clientAuthFactory.VerifyUser(user.Id)))
+            {
+                await _clientAuthFactory.CreateUser(user.Id, user.UserName, user.Email);
+            }
+
+            return result.Succeeded;
+        }
+
+        private async Task<bool> VerifyClaims(IdentityUser<Guid> user)
+        {
+            var claims = await _userManager.GetClaimsAsync(user);
+            bool isVerified = true;
+
+            if (claims.FirstOrDefault(c => c.Type == FomoClaimTypes.PortfolioId) == null)
+            {
+                var portfolioIds = await _portfolioRepo.GetPortfolioIds(user.Id);
+                await _userManager.AddClaimAsync(user, new Claim(FomoClaimTypes.PortfolioId, portfolioIds.First().ToString()));
+                isVerified = false;
+            }
+
+            return isVerified;
         }
     }
 }

@@ -10,5 +10,11 @@ namespace FomoAPI.Application.ConfigurationOptions
     {
         [Required]
         public DemoUser DemoUser { get; set; }
+
+        [Required]
+        public string RegistrationPage { get; set; }
+
+        [Required]
+        public string MainPage { get; set; }
     }
 }

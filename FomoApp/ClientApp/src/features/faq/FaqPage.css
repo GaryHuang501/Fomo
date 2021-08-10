@@ -28,9 +28,8 @@
 
 #faq-questions{
     text-align: left;
-    white-space: nowrap;
     padding: 1rem;
-    flex-grow: 1;
+    flex-shrink: 0;
 }
 
 #faq-questions ul{
@@ -41,7 +40,6 @@
     padding: 2rem;
     text-align: left;
     flex-grow: 1;
-    overflow-wrap: break-word;
 }
 
 #faq-portfolio-options-image{

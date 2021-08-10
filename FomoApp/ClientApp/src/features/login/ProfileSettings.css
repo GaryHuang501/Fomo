@@ -1,0 +1,12 @@
+#user-profile-settings-submit{
+    margin: 1rem 0 1rem 0;
+}
+
+#user-profile-settings-input-container{
+    margin: 2rem 0 2rem 0;
+}
+
+.input-user-profile-settings-name-error{
+    color: red;
+    word-wrap: break-word;
+}

@@ -38,11 +38,9 @@ namespace FomoAPIIntegrationTests
                 userId = AppTestSettings.Instance.DefaultUserID.ToString();
             }
 
-            string portfolioId = "0";
-
-            if(Request.RouteValues["controller"].ToString().ToLower() == "portfolios" && Request.RouteValues.ContainsKey("id"))
+            if (!TryGetPortfolioId(out string portfolioId))
             {
-                portfolioId = Request.RouteValues["id"].ToString();
+                portfolioId = "0";
             }
 
             var claims = new[]
@@ -59,6 +57,45 @@ namespace FomoAPIIntegrationTests
             var result = AuthenticateResult.Success(ticket);
 
             return Task.FromResult(result);
+        }
+
+        private bool TryGetPortfolioId(out string portfolioId)
+        {
+            portfolioId = null;
+
+            if (Request.RouteValues["controller"] == null)
+            {
+                return false;
+            }
+
+            string controllerName = Request.RouteValues["controller"].ToString();
+            string[] validControllers = new string[]
+            {
+                "Portfolios",
+                "PortfolioSymbols"
+            };
+
+            if (!validControllers.Any(c => c.ToLower() == controllerName.ToLower()))
+            {
+                return false;
+            }
+
+            string[] validIdProperties = new string[]
+            {
+                "id",
+                "portfolioId"
+            };
+
+            foreach(var idProp in validIdProperties)
+            {
+                if (Request.RouteValues.ContainsKey(idProp))
+                {
+                    portfolioId = Request.RouteValues[idProp].ToString(); ;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

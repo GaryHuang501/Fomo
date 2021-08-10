@@ -10,7 +10,7 @@ namespace FomoAPI.Domain.Stocks
     /// <summary>
     /// User created portfolio containing the stock symbols they added.
     /// </summary>
-    public record Portfolio : IEntity, IModelValidateable
+    public record Portfolio : IEntity
     {
         public int Id { get; private set; }
 
@@ -34,11 +34,6 @@ namespace FomoAPI.Domain.Stocks
             DateModified = dateModified;
             DateCreated = dateCreated;
             PortfolioSymbols = portfolioSymbols ?? new List<PortfolioSymbol>();
-        }
-
-        public bool IsValid()
-        {
-            return true;
         }
     }
 }

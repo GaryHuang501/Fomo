@@ -78,8 +78,7 @@ it("updates average price when submitted", async () => {
     fireEvent.change(averagePriceInput, { target: { value: 2.50 }} );
     fireEvent.click(submit);
 
-    await Promise.resolve();
-    await waitFor( () => expect(spy).toHaveBeenCalledWith(endPointUrl, [{ op: "replace", path: "/averagePrice", value: 2.50}]));
+    await waitFor( () => expect(spy).toHaveBeenCalledWith(endPointUrl, [{ op: "replace", path: "/averagePrice", value: "2.50"}]));
 
     expect(submitCalled).toBe(true);
 

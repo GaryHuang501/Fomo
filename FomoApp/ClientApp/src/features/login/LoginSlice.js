@@ -18,6 +18,18 @@ export const getAccountForId = createAsyncThunk('login/getAccount/id', async (id
     return response.data;
 });
 
+export const updateAccount = createAsyncThunk('login/updateAccount/id', async (account, thunkApi) => {
+
+    try{
+        const response = await axios.put(`${process.env.REACT_APP_API_URL}/accounts/${account.id}`, account)
+
+        return response.data;
+
+    }catch(error){
+        return thunkApi.rejectWithValue(error.response.data);
+    }
+});
+
 
 function revokeCredentials(state){
     state.isAuthenticated = false;
@@ -34,7 +46,8 @@ export const loginSlice = createSlice({
     isFirebaseAuthenticated: false,
     customClientToken: null,
     selectedUser: null,
-    myUser: null
+    myUser: null,
+    updateError: null,
   },
   reducers: {
       setAuthenticated: state => {
@@ -80,6 +93,24 @@ export const loginSlice = createSlice({
     [getClientCustomToken.rejected]: (state, action) => {
         state.status = 'failed'
         state.isFirebaseAuthenticated = false;
+    },
+    [updateAccount.fulfilled]: (state, action) => {
+        state.updateStatus = 'succeeded'
+        state.updateError = null;
+
+        if(state.myUser.id === state.selectedUser.id){
+            state.selectedUser = action.payload;
+        }
+
+        state.myUser = action.payload;
+    },
+    [updateAccount.pending]: (state, action) => {
+        state.updateStatus = 'loading';
+        state.updateError = null;
+    },
+    [updateAccount.rejected]: (state, action) => {
+        state.updateStatus = 'failed'
+        state.updateError = action.payload;
     }
   }
 });
@@ -97,5 +128,9 @@ export const selectUser = state => state.login.selectedUser;
 export const selectMyUser = state => state.login.myUser;
 
 export const selectIsMyUserPage = state => (state.login.selectedUser && state.login.myUser) && (state.login.selectedUser.id === state.login.myUser.id);
+
+export const selectUpdateStatus = state => state.login.updateStatus;
+
+export const selectUpdateError = state => state.login.updateError;
 
 export default loginSlice.reducer;
