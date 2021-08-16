@@ -17,6 +17,7 @@ ReactDOM.render(
       <Router>
         <Switch>
           <Route exact path="/" component={App}/>
+          <Route exact path="/portfolio/:urlUserId" component={App}/>
           <Route exact path="/Register" component={RegistrationPage}/>
           <Redirect to='/' />
         </Switch>

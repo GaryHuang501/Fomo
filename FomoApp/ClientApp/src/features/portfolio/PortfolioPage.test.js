@@ -68,7 +68,7 @@ it("renders portfolio for my user when visting page for myuser without id set in
 
     await waitFor(() => expect(screen.getByRole("table")).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText("VOO")).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByText("myUser's Portfolio")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("myUser")).toBeInTheDocument());
 });
 
 it("renders portfolio selected user portfolio when selected user in url", async () => {
@@ -110,7 +110,7 @@ it("renders portfolio selected user portfolio when selected user in url", async 
 
     await waitFor(() => expect(screen.getByRole("table")).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText("VOO")).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByText("selectedUser's Portfolio")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("selectedUser")).toBeInTheDocument());
 });
 
 it("renders stock search bar when current portfolio belongs to current user", async () => {
