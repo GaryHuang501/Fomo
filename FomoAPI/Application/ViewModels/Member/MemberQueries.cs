@@ -27,8 +27,7 @@ namespace FomoAPI.Application.ViewModels.Member
 
                            SELECT 
                                 Id,
-                                UserName Name,
-                                Email
+                                UserName Name
                            FROM
                                 AspNetUsers
                            ORDER BY

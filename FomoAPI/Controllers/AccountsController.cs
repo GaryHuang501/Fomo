@@ -15,9 +15,13 @@ using Microsoft.Extensions.Options;
 using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Domain.Login;
 using FomoAPI.Application.Commands.User;
+using System.ComponentModel.DataAnnotations;
 
 namespace FomoAPI.Controllers
 {
+    /// <summary>
+    /// Registering new users, logging in and fetching user  data.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
@@ -47,9 +51,11 @@ namespace FomoAPI.Controllers
         /// <summary>
         /// Gets user info for current logged in user.
         /// </summary>
-        /// <returns>Returns <see cref="UserDTO"/>if authorized</returns>
+        /// <response code="200">Returns user account.</response>
         [HttpGet("")]
         [Authorize]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+        [Produces("application/json")]
         public async Task<ActionResult<UserDTO>> GetAccount()
         {
             IdentityUser<Guid> myUser = await _userManager.GetUserAsync(User);
@@ -62,9 +68,12 @@ namespace FomoAPI.Controllers
         /// <summary>
         /// Gets user info for selected user.
         /// </summary>
-        /// <returns>Returns <see cref="LoginInfoDTO"/>if authorized</returns>
+        /// <response code="200">Returns user account.</response>
         [HttpGet("{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+        [Produces("application/json")]
         public async Task<ActionResult<UserDTO>> GetAccount(string id)
         {
             if (!Guid.TryParse(id, out Guid selectedUserGuid))
@@ -80,11 +89,18 @@ namespace FomoAPI.Controllers
         }
 
         /// <summary>
-        /// Update User profile
+        /// Update User profile.
         /// </summary>
+        /// <response code="200">Returns updated user account.</response>
+        /// <response code="400">Update failed to validate.</response>
+        /// <response code="403">Forbiddden from updating other user accounts.</response>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<ActionResult<UserDTO>> UpdateAccount(UserDTO userToUpdate)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public async Task<ActionResult<UserDTO>> UpdateAccount([FromBody, Required] UserDTO userToUpdate)
         {
             if(userToUpdate.Id != User.GetUserId())
             {
@@ -116,9 +132,11 @@ namespace FomoAPI.Controllers
         /// <summary>
         /// Gets client custom token to access third party API such as firebase.
         /// </summary>
-        /// <returns>Client Token.</returns>
-        [HttpGet("ClientCustomToken")]
+        /// <response code="200">Returns client token as string.</response>
         [Authorize]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [HttpGet("ClientCustomToken")]
+        [Produces("text/plain")]
         public async Task<ActionResult<string>> GetClientCustomToken()
         {
             var claims = new UserClaims(User);
@@ -131,19 +149,25 @@ namespace FomoAPI.Controllers
         /// </summary>
         /// <param name="provider">Provider to login to</param>
         /// <param name="returnUrl">Return URL after logging in</param>
-        /// <returns></returns>
-        [HttpGet("Login")]
+        /// <response code="200">Returns challenge result of login.</response>
         [AllowAnonymous]
-        public IActionResult Login(string provider, string returnUrl)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("login")]
+        public IActionResult Login([FromQuery, Required] string provider, [FromQuery, Required] string returnUrl)
         {
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, "/api/accounts/ExternalLoginCallback?returnurl=" + returnUrl);
             return new ChallengeResult(provider, properties);
         }
 
-
+        /// <summary>
+        /// Login into demo account 
+        /// </summary>
+        /// <response code="200">Returns updated user account.</response>
+        /// <response code="401">Invalid Demo credentials</response>
         [HttpGet("Login/Demo")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginDemo([FromQuery]string returnUrl)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> LoginDemo([FromQuery, Required] string returnUrl)
         {
             var demoUser = _accountsOptions.CurrentValue.DemoUser;
             var signInResult = await _signInManager.PasswordSignInAsync(demoUser.UserName, demoUser.Password, false, false);
@@ -159,8 +183,9 @@ namespace FomoAPI.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        /// <returns></returns>
+        /// <response code="200">User is logged out.</response>
         [HttpGet("Logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout(string returnUrl)
         {
             await _signInManager.SignOutAsync();
@@ -175,7 +200,10 @@ namespace FomoAPI.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("ExternalLoginCallback")]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl)
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExternalLoginCallback([FromQuery, Required] string returnUrl)
         {
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
@@ -202,9 +230,20 @@ namespace FomoAPI.Controllers
             return Redirect(returnUrl);      
         }
 
-
+        /// <summary>
+        /// Registers new user
+        /// </summary>
+        /// <param name="newUserCommand">Info to create new user.</param>
+        /// <response code="200">User successfully created.</response>
+        /// <response code="400">Validation failed when creating new user..</response>
+        /// <response code="403">Invalid credentials.</response>
+        /// <response code="500">Failed to register.</response>
         [AllowAnonymous]
         [HttpPost("Register")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterUser([FromBody] NewUserCommand newUserCommand)
         {
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();

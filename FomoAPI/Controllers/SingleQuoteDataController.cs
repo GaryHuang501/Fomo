@@ -3,11 +3,15 @@ using System.Threading.Tasks;
 using FomoAPI.Application.DTOs;
 using FomoAPI.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace FomoAPI.Controllers
 {
+    /// <summary>
+    /// Manages the single quote data for stocks.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -26,10 +30,12 @@ namespace FomoAPI.Controllers
         }
 
         /// <summary>
-        /// Get single quote data for the given symbol ids.
+        /// Gets the single quote data for the given symbol ids.
         /// </summary>
-        /// <param name="sids">Symbol Ids to get the data for. Short hand notation to reduce query size.</param>
-        /// <returns><see cref="IEnumerable{T}"/> of the Single Quote Data for the symbols.</returns>
+        /// <param name="sids">Ids of symbols to fetch data for.</param>
+        /// <response code="200">Returns collection of single quote data.</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Produces("application/json")]
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteData([FromQuery] int[] sids)
         {

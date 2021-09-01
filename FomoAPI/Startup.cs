@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using FomoAPI.Controllers.Authorization;
+using Microsoft.OpenApi.Models;
+using System.IO;
+using FomoAPI.Application.Swagger.OperationFilters;
 
 namespace FomoAPI
 {
@@ -37,8 +40,27 @@ namespace FomoAPI
                     .AddCustomAuthentications(Configuration)
                     .AddCustomCORS(DevelopmentCorsPolicyName)
                     .AddCustomAntiForgery()
-                    .AddCustomHttpClients(Configuration);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                    .AddCustomHttpClients(Configuration)
+                    .AddSwaggerGen(c =>
+                   {
+                       c.SwaggerDoc("v1",
+                            new OpenApiInfo
+                            {
+                                Title = "FOMO API V1",
+                                Version = "V1"
+                            }
+                         );
+
+                       c.OperationFilter<AuthResponsesOperationFilter>();
+                       var filePath = Path.Combine(System.AppContext.BaseDirectory, "FomoAPI.xml");
+                       c.IncludeXmlComments(filePath);
+                   });
+
+            services.AddSwaggerGenNewtonsoftSupport();
+
+
+            services.AddMvc()
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                     .AddApplicationPart(typeof(Startup).Assembly)
                     .AddNewtonsoftJson();
         }
@@ -60,6 +82,12 @@ namespace FomoAPI
             app.UseCors(DevelopmentCorsPolicyName);
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FOMO API V1");
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -174,5 +202,7 @@ namespace FomoAPI
 
             return services;
         }
+
+
     }
 }

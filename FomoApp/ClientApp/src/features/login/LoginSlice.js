@@ -8,17 +8,17 @@ export const getClientCustomToken = createAsyncThunk('login/firebase-authenticat
 
 });
 
-export const getAccount = createAsyncThunk('login/getAccount', async () => {
+export const getAccount = createAsyncThunk('accounts/getAccount', async () => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts`)
     return response.data;
 });
 
-export const getAccountForId = createAsyncThunk('login/getAccount/id', async (id) => {
+export const getAccountForId = createAsyncThunk('accounts/getAccount/id', async (id) => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/accounts/${id}`)
     return response.data;
 });
 
-export const updateAccount = createAsyncThunk('login/updateAccount/id', async (account, thunkApi) => {
+export const updateAccount = createAsyncThunk('accounts/updateAccount/id', async (account, thunkApi) => {
 
     try{
         const response = await axios.put(`${process.env.REACT_APP_API_URL}/accounts/${account.id}`, account)

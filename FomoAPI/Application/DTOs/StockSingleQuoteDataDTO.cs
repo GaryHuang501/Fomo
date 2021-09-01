@@ -8,10 +8,13 @@ using System.Threading.Tasks;
 namespace FomoAPI.Application.DTOs
 {
     /// <summary>
-    /// DTO for <see cref="Domain.Stocks.SingleQuoteData"/> to client
+    ///  Single quote data that represents a snapshot of the price of a stock at a given date.
     /// </summary>
     public class StockSingleQuoteDataDTO
     {
+        /// <summary>
+        /// ID of symbol the quote belongs to.
+        /// </summary>
         public int SymbolId { get; private set; }
 
         /// <summary>

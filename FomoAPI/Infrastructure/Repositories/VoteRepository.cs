@@ -21,7 +21,7 @@ namespace FomoAPI.Infrastructure.Repositories
             _connectionString = dbOptions.CurrentValue.ConnectionString;
         }
 
-        public async Task SaveVote(Vote vote)
+        public async Task<bool> SaveVote(Vote vote)
         {
             var sql = @"IF EXISTS( SELECT 1 FROM Vote WHERE SymbolId = @SymbolId AND UserId = @UserId)
                             BEGIN
@@ -44,7 +44,9 @@ namespace FomoAPI.Infrastructure.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.ExecuteAsync(sql, vote);
+                var affectedRows = await connection.ExecuteAsync(sql, vote);
+
+                return affectedRows > 0;
             }
         }
 

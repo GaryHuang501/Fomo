@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace FomoAPI.Application.Commands.Vote
 {
     /// <summary>
-    /// Command to create or update a vote for a stock symbol.
+    /// Command to vote on a stock symbol.
     /// </summary>
     public class VoteCommand
     {

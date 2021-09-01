@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace FomoAPI.Application.DTOs
 {
     /// <summary>
-    /// Stock search result DTO returned to the client
-    /// that has both the StockClient our own Domain IDs.
+    /// Stock search result containing top matching results.
     /// </summary>
     public class SymbolSearchResultDTO
     {

@@ -13,7 +13,8 @@ namespace FomoAPI.Domain.Stocks
         /// Save the vote for a given symbol and user.
         /// </summary>
         /// <param name="vote">The vote to save.</param>
-        Task SaveVote(Vote vote);
+        /// <returns>True if vote successfully added.</returns>
+        Task<bool> SaveVote(Vote vote);
 
         /// <summary>
         /// Gets a dictionary of <see cref="TotalVotes"/> keyed by the SymbolID.
