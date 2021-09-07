@@ -1,4 +1,4 @@
-#Fomo App Overview
+# **Fomo App Overview**
 
 Fomo App is a stock portfolio sharing website. The main goal of this app was to practice applying modern technologies. The front end uses React and the backend uses .NET Core and SQL Server. Firebase Real Time database is also used for both JSON data storage and for pushing messages or notifications to the clients.
 
