@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Autofac;
 using FomoApi.Infrastructure;
 using FomoAPI.Setup;
-using FomoAPI.AutoFacModules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +24,6 @@ namespace FomoAPI
         }
 
         public IConfiguration Configuration { get; }
-
-        public IContainer ApplicationContainer { get; private set; }
 
         private string DevelopmentCorsPolicyName = "DevelopmentCORS";
 
@@ -97,13 +92,6 @@ namespace FomoAPI
                     endpoints.MapRazorPages();
                 });
             });
-        }
-
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            builder.RegisterModule(new ApiModule());
-            builder.RegisterModule(new ExchangeSyncModule());
-            builder.RegisterModule(new EventBusModule());
         }
     }
 

@@ -27,9 +27,8 @@ namespace FomoAPIIntegrationTests.Fixtures
             _configureServices = configureServices;
         }
 
-        protected override IHostBuilder CreateHostBuilder()
+        protected override IHost CreateHost(IHostBuilder builder)
         {
-            var builder = base.CreateHostBuilder();
 
             builder.ConfigureWebHost(webBuilder =>
                     {
@@ -51,7 +50,9 @@ namespace FomoAPIIntegrationTests.Fixtures
 
                     });
 
-            return builder;
+            var host = base.CreateHost(builder);
+
+            return host;
         }
     }
 }

@@ -1,27 +1,13 @@
-﻿using System.IO;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
 
-namespace FomoApi
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .Build();
+var startup = new FomoApp.Startup(builder.Configuration);
 
-            return WebHost.CreateDefaultBuilder(args)
-              .UseConfiguration(config)
-              .UseStartup<Startup>();
-        }
+startup.ConfigureServices(builder.Services);
 
-    }
-}
+var app = builder.Build();
+
+startup.Configure(app, app.Environment);
+
+app.Run();

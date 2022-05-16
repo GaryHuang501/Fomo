@@ -41,4 +41,7 @@
   <ItemGroup>
     <Folder Include="Docs\" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include ="FomoAPIIntegrationTests"/>
+  </ItemGroup>
 </Project>

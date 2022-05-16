@@ -17,7 +17,6 @@ namespace FomoAPIIntegrationTests
 
         public TestAuthHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
-            IPortfolioRepository portfolioRepository,
             ILoggerFactory logger, 
             UrlEncoder encoder,
             ISystemClock clock)
