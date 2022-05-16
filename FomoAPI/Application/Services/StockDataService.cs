@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FomoAPI.Application.Services
 {
-    /// <inheritdoc <see cref="IStockDataService"/>/>
+    /// <inheritdoc cref="IStockDataService"/>
     public class StockDataService : IStockDataService
     {
         private readonly IStockDataRepository _stockDataRepository;
@@ -44,7 +44,7 @@ namespace FomoAPI.Application.Services
         /// If does not exist in the database it will return no data.
         /// Returns empty 
         /// </summary>
-        /// <param name="ticker"></param>
+        /// <param name="symbolId">Id for the symbol.</param>
         /// <returns>The <see cref="StockSingleQuoteDataDTO"/></returns>
         public async Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId)
         {

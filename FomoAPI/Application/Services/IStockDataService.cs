@@ -13,7 +13,7 @@ namespace FomoAPI.Application.Services
         /// <summary>
         /// Retrieves the single quote DTO containing fetch result and data for a stock
         /// </summary>
-        /// <param name="ticker">Ticker for the stock.</param>
+        /// <param name="symbolId">Id for the symbol.</param>
         /// <returns>The stock data <see cref="StockSingleQuoteDataDTO"/>.</returns>
         Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId);
 
