@@ -60,7 +60,6 @@ namespace FomoAPI
 
 
             services.AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                     .AddApplicationPart(typeof(Startup).Assembly)
                     .AddNewtonsoftJson();
         }

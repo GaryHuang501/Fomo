@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
 using FomoAPI.Domain.Stocks.Queries;
+using System.Collections;
 
 namespace FomoAPI.Application.EventBuses
 {
