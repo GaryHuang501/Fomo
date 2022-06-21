@@ -1,7 +1,10 @@
 ﻿using Dapper;
 using FomoAPI.Application.DTOs;
+using FomoAPI.Application.EventBuses;
+using FomoAPI.Application.Stores;
 using FomoAPI.Infrastructure.Enums;
 using FomoAPIIntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,43 +22,40 @@ namespace FomoAPIIntegrationTests.Scenarios
     /// <remarks>
     /// Calls mocked Alphavantage API through postman.
     /// </remarks>
-    public class StockQueryTests : IClassFixture<ExchangeSyncSetupFixture>, IClassFixture<DBFixture>, IAsyncLifetime
+    public class StockQueryTests : IClassFixture<ExchangeSyncSetupFixture>, IClassFixture<DBFixture>, IClassFixture<FomoApiFixture>, IAsyncLifetime
     {
         private readonly DBFixture _dbFixture;
         private HttpClient _client;
         private FomoApiFixture _fomoApiFixture;
 
-        public StockQueryTests(DBFixture dbFixture)
+        public StockQueryTests(DBFixture dbFixture, FomoApiFixture fomoApiFixture)
         {
             _dbFixture = dbFixture;
+            _fomoApiFixture = fomoApiFixture;
+            _fomoApiFixture.CreateServer(null);
+            _client = _fomoApiFixture.GetClientNotAuth();
         }
 
         public async Task InitializeAsync()
         {
-            await RestartServer();
             await ClearSingleQuoteData();
+            await ResetCache();
         }
 
         public Task DisposeAsync()
         {
-            _fomoApiFixture.Dispose();
-            GC.Collect();
-
             return Task.CompletedTask;
         }
 
-        private async Task RestartServer()
+        private async Task ResetCache()
         {
-            if (_fomoApiFixture != null && !_fomoApiFixture.Disposed)
-            {
-                _fomoApiFixture.Dispose();
-                GC.Collect();
-            }
+            var eventBus = _fomoApiFixture.FomoApiFactory.Services.GetService<IQueryEventBus>();
+            var subscriptions = _fomoApiFixture.FomoApiFactory.Services.GetService<QuerySubscriptions>();
+            var cache = _fomoApiFixture.FomoApiFactory.Services.GetService<SingleQuoteCache>();
 
-            _fomoApiFixture = new FomoApiFixture();
-            _fomoApiFixture.CreateServer(null);
-            _client = _fomoApiFixture.GetClientNotAuth();
-            await Task.Delay(2 * AppTestSettings.Instance.EventBusOptions.RefreshIntervalMS); // To let interval query interval finish.
+            subscriptions.ClearAll();
+            await eventBus.Reset();
+            cache.Clear();
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         }
 
         [Fact]
-        public async Task GetSingleQuoteData_ShouldReturnDataFromCacheAndDB_WhenItExists()
+        public async Task GetSingleQuoteData_ShouldReturnDataFromCacheInsteadOfDB_WhenItExists()
         {
             // First call should return no data since it does not exist.
             SymbolSearchResultDTO searchResult = await SearchSymbol("TSLA", ExchangeType.NASDAQ);
@@ -128,9 +128,9 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             AssertSingleQuote(dataDto, searchResult.SymbolId);
 
-            // Next update the LastUpdated date of the single quote data entry in the database.
-            // however when this single quote data is fetched it the date should not match since
-            // the database is updated but not cache, which is where it will be fetched from.
+            // Next, update the LastUpdated date of the single quote data entry in the database.
+            // When this single quote data is fetched the date should not match since
+            // the database is updated but not the cache, which is where it will be fetched from.
             var modifiedDate = new DateTime(2000, 1, 1); ;
             await _dbFixture.Connection.ExecuteAsync($"UPDATE SingleQuoteData SET LastUpdated = '{modifiedDate}'");
 
@@ -139,10 +139,10 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             var cacheDataDto = cacheDataDtos[0];
             AssertSingleQuote(cacheDataDto, searchResult.SymbolId);
-            Assert.NotEqual(cacheDataDto.LastUpdated.Value.ToString("yyyy-mm-dd"), modifiedDate.ToString("yyyy-mm-dd"));
+            Assert.NotEqual(cacheDataDto.LastUpdated.Value.ToString("yyyy-MM-dd"), modifiedDate.ToString("yyyy-MM-dd"));
 
             // Restarting server will clear cache so we should get the updated DB value.
-            await RestartServer();
+            await ResetCache();
 
             var dbDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
             Assert.Single(dataDtos);
@@ -150,13 +150,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             var dbDto = dbDtos[0];
             AssertSingleQuote(dbDto, searchResult.SymbolId);
 
-            Assert.Equal(dbDto.LastUpdated.Value.ToString("yyyy-mm-dd"), modifiedDate.ToString("yyyy-mm-dd"));
-
-            // Update the DB entry again. Getting the data should get the cache version so it will be unaffected.
-            await _dbFixture.Connection.ExecuteAsync($"UPDATE SingleQuoteData SET LastUpdated = '2001-01-01'");
-            var secondCachedDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
-            var secondCachedDto = secondCachedDtos[0];
-            Assert.Equal(dbDto.LastUpdated, secondCachedDto.LastUpdated);
+            Assert.Equal(dbDto.LastUpdated.Value.ToString("yyyy-MM-dd"), modifiedDate.ToString("yyyy-MM-dd"));
         }
 
         [Fact]
@@ -191,7 +185,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             //reset the server so it will update the cache with the stale value.
             // System should detect the stale data and trigger an update.
-            await RestartServer();
+            await ResetCache();
 
             var dbDataDtos = await GetSingleQuoteData(new int[] { searchResult.SymbolId });
             var dbDataDto = dbDataDtos[0];
@@ -212,7 +206,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         [Fact]
         public async Task GetSingleQuoteData_ShouldQueueQuery_ForEachStock()
         {
-            // First call should return no data since it does not exist.
+            // First call should return no data since it does not exist and is not cached.
             SymbolSearchResultDTO tslaSearchResult = await SearchSymbol("TSLA", ExchangeType.NASDAQ);
             SymbolSearchResultDTO jpmSearchResult = await SearchSymbol("JPM", ExchangeType.NYSE);
             SymbolSearchResultDTO shopSearchResult = await SearchSymbol("SHOP", ExchangeType.NASDAQ);
@@ -251,9 +245,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             SymbolSearchResultDTO tslaSearchResult = await SearchSymbol("TSLA", ExchangeType.NASDAQ);
             SymbolSearchResultDTO jpmSearchResult = await SearchSymbol("JPM", ExchangeType.NYSE);
             SymbolSearchResultDTO shopSearchResult = await SearchSymbol("SHOP", ExchangeType.NASDAQ);
-            SymbolSearchResultDTO faceBookSearchResult = await SearchSymbol("FB", ExchangeType.NASDAQ);
-
-
+            SymbolSearchResultDTO faceBookSearchResult = await SearchSymbol("META", ExchangeType.NASDAQ);
 
             var symbolIdsToGet = new int[]
                                         {

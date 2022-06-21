@@ -70,6 +70,7 @@ namespace FomoAPI.Application.EventBuses
         {
             // Should wait until items are dequeued so they are not lost.
             await _queryEnqueueLock.WaitAsync();
+
             try
             {
                 int queriesRanCurrentInterval = _queryQueue.GetCurrentIntervalQueriesRanCount();

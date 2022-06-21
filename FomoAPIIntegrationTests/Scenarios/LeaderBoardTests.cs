@@ -87,25 +87,25 @@ namespace FomoAPIIntegrationTests.Scenarios
             TestUser testUser3 = await CreateTestUserWithPortfolio();
 
             SymbolSearchResultDTO jpmStock = await FetchSymbol("JPM", ExchangeType.NYSE);
-            SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            SymbolSearchResultDTO metaStock = await FetchSymbol("META", ExchangeType.NASDAQ);
             SymbolSearchResultDTO tslaStock = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
             SymbolSearchResultDTO msftStock = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // User 1 votes
             await SubmitVoteForUser(new VoteCommand { SymbolId = jpmStock.SymbolId, Direction = VoteDirection.UpVote }, testUser1.UserId);
-            await SubmitVoteForUser(new VoteCommand { SymbolId = fbStock.SymbolId, Direction = VoteDirection.UpVote }, testUser1.UserId);
+            await SubmitVoteForUser(new VoteCommand { SymbolId = metaStock.SymbolId, Direction = VoteDirection.UpVote }, testUser1.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = tslaStock.SymbolId, Direction = VoteDirection.DownVote }, testUser1.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = msftStock.SymbolId, Direction = VoteDirection.DownVote }, testUser1.UserId);
 
             // User 2 votes
             await SubmitVoteForUser(new VoteCommand { SymbolId = jpmStock.SymbolId, Direction = VoteDirection.UpVote }, testUser2.UserId);
-            await SubmitVoteForUser(new VoteCommand { SymbolId = fbStock.SymbolId, Direction = VoteDirection.DownVote }, testUser2.UserId);
+            await SubmitVoteForUser(new VoteCommand { SymbolId = metaStock.SymbolId, Direction = VoteDirection.DownVote }, testUser2.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = tslaStock.SymbolId, Direction = VoteDirection.DownVote }, testUser2.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = msftStock.SymbolId, Direction = VoteDirection.DownVote }, testUser2.UserId);
 
             // User 2 votes
             await SubmitVoteForUser(new VoteCommand { SymbolId = jpmStock.SymbolId, Direction = VoteDirection.UpVote }, testUser3.UserId);
-            await SubmitVoteForUser(new VoteCommand { SymbolId = fbStock.SymbolId, Direction = VoteDirection.None }, testUser3.UserId);
+            await SubmitVoteForUser(new VoteCommand { SymbolId = metaStock.SymbolId, Direction = VoteDirection.None }, testUser3.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = tslaStock.SymbolId, Direction = VoteDirection.DownVote }, testUser3.UserId);
             await SubmitVoteForUser(new VoteCommand { SymbolId = msftStock.SymbolId, Direction = VoteDirection.UpVote }, testUser3.UserId);
 
@@ -122,8 +122,8 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.Equal("JPM", mostBullishRank1.Name);
             Assert.Equal("3", mostBullishRank1.Value);
 
-            Assert.Equal(fbStock.SymbolId.ToString(), mostBullishRank2.Id);
-            Assert.Equal("FB", mostBullishRank2.Name);
+            Assert.Equal(metaStock.SymbolId.ToString(), mostBullishRank2.Id);
+            Assert.Equal("META", mostBullishRank2.Name);
             Assert.Equal("0", mostBullishRank2.Value);
 
             Assert.Equal(msftStock.SymbolId.ToString(), mostBullishRank3.Id);
@@ -148,8 +148,8 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.Equal("MSFT", mostBearishRank2.Name);
             Assert.Equal("-1", mostBearishRank2.Value);
 
-            Assert.Equal(fbStock.SymbolId.ToString(), mostBearishRank3.Id);
-            Assert.Equal("FB", mostBearishRank3.Name);
+            Assert.Equal(metaStock.SymbolId.ToString(), mostBearishRank3.Id);
+            Assert.Equal("META", mostBearishRank3.Name);
             Assert.Equal("0", mostBearishRank3.Value);
 
             Assert.Equal(jpmStock.SymbolId.ToString(), mostBearishRank4.Id);
@@ -165,13 +165,13 @@ namespace FomoAPIIntegrationTests.Scenarios
             TestUser testUser3 = await CreateTestUserWithPortfolio();
 
             SymbolSearchResultDTO jpmStock = await FetchSymbol("JPM", ExchangeType.NYSE);
-            SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            SymbolSearchResultDTO metaStock = await FetchSymbol("META", ExchangeType.NASDAQ);
             SymbolSearchResultDTO tslaStock = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
             SymbolSearchResultDTO msftStock = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
             var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
-            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
+            var fbData = new SingleQuoteData(metaStock.SymbolId, metaStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
             var tslaData = new SingleQuoteData(tslaStock.SymbolId, tslaStock.Ticker, 888.88m, 0, 0, DateTime.UtcNow);
             var msftData = new SingleQuoteData(msftStock.SymbolId, msftStock.Ticker, 225, 0, 0, DateTime.UtcNow);
 
@@ -182,16 +182,16 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             // Add symbols User 1 
             await AddSymbolToPortfolioWithAvgPrice(testUser1, jpmStock.SymbolId, 100.25m); 
-            await AddSymbolToPortfolioWithAvgPrice(testUser1, fbStock.SymbolId, 260.35m);
+            await AddSymbolToPortfolioWithAvgPrice(testUser1, metaStock.SymbolId, 260.35m);
             await AddSymbolToPortfolioWithAvgPrice(testUser1, msftStock.SymbolId, 175.50m);
 
             // Add symbols User 2
             await AddSymbolToPortfolioWithAvgPrice(testUser2, jpmStock.SymbolId, 5.00m);
-            await AddSymbolToPortfolioWithAvgPrice(testUser2, fbStock.SymbolId, 10.00m);
+            await AddSymbolToPortfolioWithAvgPrice(testUser2, metaStock.SymbolId, 10.00m);
 
             // Add Symbols Users 3 
             await AddSymbolToPortfolioWithAvgPrice(testUser3, jpmStock.SymbolId, 180.88m);
-            await AddSymbolToPortfolioWithAvgPrice(testUser3, fbStock.SymbolId, 400.00m);
+            await AddSymbolToPortfolioWithAvgPrice(testUser3, metaStock.SymbolId, 400.00m);
             await AddSymbolToPortfolioWithAvgPrice(testUser3, tslaStock.SymbolId, 1000m);
             await AddSymbolToPortfolioWithAvgPrice(testUser3, msftStock.SymbolId, 300.90m);
 
@@ -239,22 +239,22 @@ namespace FomoAPIIntegrationTests.Scenarios
             TestUser testUser2 = await CreateTestUserWithPortfolio();
 
             SymbolSearchResultDTO jpmStock = await FetchSymbol("JPM", ExchangeType.NYSE);
-            SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            SymbolSearchResultDTO metaStock = await FetchSymbol("META", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
             var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
-            var fbData = new SingleQuoteData(fbStock.SymbolId, fbStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
+            var fbData = new SingleQuoteData(metaStock.SymbolId, metaStock.Ticker, 333.33m, 0, 0, DateTime.UtcNow);
 
             await SetSingleQuoteData(new UpsertSingleQuoteData(jpmStock.SymbolId, jpmData));
             await SetSingleQuoteData(new UpsertSingleQuoteData(fbData.SymbolId, fbData));
 
             // Add symbols User 1 
             await AddSymbolToPortfolioWithAvgPrice(testUser1, jpmStock.SymbolId, 100);
-            await AddSymbolToPortfolio(testUser1, fbStock.SymbolId);
+            await AddSymbolToPortfolio(testUser1, metaStock.SymbolId);
 
             // Add symbols User 2
             await AddSymbolToPortfolio(testUser2, jpmStock.SymbolId);
-            await AddSymbolToPortfolio(testUser2, fbStock.SymbolId);
+            await AddSymbolToPortfolio(testUser2, metaStock.SymbolId);
 
             var leaderBoardResponse = await _client.GetAsync(ApiPath.LeaderBoard(2));
             LeaderBoardViewModel leaderBoardViewModel = await leaderBoardResponse.Content.ReadAsAsync<LeaderBoardViewModel>();
@@ -280,7 +280,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             TestUser testUser2 = await CreateTestUserWithPortfolio();
 
             SymbolSearchResultDTO jpmStock = await FetchSymbol("JPM", ExchangeType.NYSE);
-            SymbolSearchResultDTO fbStock = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            SymbolSearchResultDTO metaStock = await FetchSymbol("META", ExchangeType.NASDAQ);
 
             // Add singlequote stocks
             var jpmData = new SingleQuoteData(jpmStock.SymbolId, jpmStock.Ticker, 200, 0, 0, DateTime.UtcNow);
@@ -289,10 +289,10 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             // Add symbols User 1 
             await AddSymbolToPortfolioWithAvgPrice(testUser1, jpmStock.SymbolId, 100);
-            await AddSymbolToPortfolioWithAvgPrice(testUser1, fbStock.SymbolId, 200);
+            await AddSymbolToPortfolioWithAvgPrice(testUser1, metaStock.SymbolId, 200);
 
             // Add symbols User 2
-            await AddSymbolToPortfolioWithAvgPrice(testUser2, fbStock.SymbolId, 200);
+            await AddSymbolToPortfolioWithAvgPrice(testUser2, metaStock.SymbolId, 200);
 
             var leaderBoardResponse = await _client.GetAsync(ApiPath.LeaderBoard(2));
             LeaderBoardViewModel leaderBoardViewModel = await leaderBoardResponse.Content.ReadAsAsync<LeaderBoardViewModel>();

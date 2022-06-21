@@ -243,7 +243,7 @@ namespace FomoAPIIntegrationTests.Scenarios
             // Search for symbols by keyword
             SymbolSearchResultDTO tslaSymbol = await FetchSymbol("TSLA", ExchangeType.NASDAQ);
             SymbolSearchResultDTO jpmSymbol = await FetchSymbol("JPM", ExchangeType.NYSE);
-            SymbolSearchResultDTO fbSymbol = await FetchSymbol("FB", ExchangeType.NASDAQ);
+            SymbolSearchResultDTO fbSymbol = await FetchSymbol("META", ExchangeType.NASDAQ);
             SymbolSearchResultDTO msftSymbol = await FetchSymbol("MSFT", ExchangeType.NASDAQ);
 
             // Add symbols to Portfolio
@@ -293,7 +293,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             var tsla = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "TSLA");
             var jpm = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "JPM");
-            var fb = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "FB");
+            var fb = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "META");
             var msft = fetchedPortfolio.PortfolioSymbols.Single(s => s.Ticker == "MSFT");
 
             Assert.Equal(1, fb.SortOrder);

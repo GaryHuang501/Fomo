@@ -91,20 +91,13 @@ namespace FomoAPIUnitTests.Application
         [Fact]
         public async Task Should_ExecuteQueries()
         {
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2); 
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query3);
+            queries.ForEach(q => _querySubscriptions.AddSubscriber(q));
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once));
 
             Assert.Equal(0, _querySubscriptions.Count);
         }
@@ -112,19 +105,13 @@ namespace FomoAPIUnitTests.Application
         [Fact]
         public async Task Should_NotifyUpdatedQueries()
         {
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query3);
+            queries.ForEach(q => _querySubscriptions.AddSubscriber(q));
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once);
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.NotifyChangesClients(), Times.Once));
         }
 
         [Fact]
@@ -133,28 +120,26 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(2);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
 
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[1]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
-            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(queries[2]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
             //Executed queries get subscriber count cleared.
             Assert.Equal(1, _querySubscriptions.Count);
-            Assert.Equal(1, _querySubscriptions.GetSubscriberCount(query3));
+            Assert.Equal(1, _querySubscriptions.GetSubscriberCount(queries[2]));
         }
 
         [Fact]
@@ -163,28 +148,25 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(2);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
 
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[1]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
-            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(queries[2]);
 
             await _queryEventBus.ExecutePendingQueries(); 
             await _queryEventBus.ExecutePendingQueries();
             await _queryEventBus.ExecutePendingQueries();
             await _queryEventBus.ExecutePendingQueries();
 
-
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
         }
 
         [Fact]
@@ -193,42 +175,36 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(3);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3); 
-            var query4 = new TestQuery(4);
+            var queries = CreateQueries(4);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never); 
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[3].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
             // add twice to make sure it is prioritized over 4 for easier testing.
-            _querySubscriptions.AddSubscriber(query3);
-            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(queries[2]);
+            _querySubscriptions.AddSubscriber(queries[2]);
 
-            _querySubscriptions.AddSubscriber(query4);
+            _querySubscriptions.AddSubscriber(queries[3]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[3].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
             await WaitNextInterval();
             await _queryEventBus.Reset();
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once));
 
             Assert.Equal(0, _querySubscriptions.Count);
         }
@@ -239,32 +215,26 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(2);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
-            var query4 = new TestQuery(4);
+            var queries = CreateQueries(4);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[3].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
-            _querySubscriptions.AddSubscriber(query3);
-            _querySubscriptions.AddSubscriber(query4);
+            _querySubscriptions.AddSubscriber(queries[2]);
+            _querySubscriptions.AddSubscriber(queries[3]);
 
             await WaitNextInterval();
             await _queryEventBus.Reset();
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once));
 
             Assert.Equal(0, _querySubscriptions.Count);
         }
@@ -275,40 +245,38 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(1);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
 
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[1]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
-            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(queries[2]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
             await WaitNextInterval();
             await _queryEventBus.Reset();
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
 
             await WaitNextInterval();
             await _queryEventBus.Reset();
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
         }
 
         [Fact]
@@ -317,18 +285,16 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(2);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
+            var queries = CreateQueries(3);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query1);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[0]);
 
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query2);
+            _querySubscriptions.AddSubscriber(queries[1]);
+            _querySubscriptions.AddSubscriber(queries[1]);
 
-            _querySubscriptions.AddSubscriber(query3);
+            _querySubscriptions.AddSubscriber(queries[2]);
 
             var executionTasks = new List<Task>();
 
@@ -339,9 +305,9 @@ namespace FomoAPIUnitTests.Application
 
             await Task.WhenAll(executionTasks);
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
+            queries[0].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[1].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries[2].MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Never);
             Assert.Equal(1, _querySubscriptions.Count);
         }
 
@@ -351,19 +317,9 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(50);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
-            var query4 = new TestQuery(4);
-            var query5 = new TestQuery(5);
-            var query6 = new TestQuery(6);
+            var queries = CreateQueries(6);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query3);
-            _querySubscriptions.AddSubscriber(query4);
-            _querySubscriptions.AddSubscriber(query5);
-            _querySubscriptions.AddSubscriber(query6);
+            queries.ForEach(q => _querySubscriptions.AddSubscriber(q));
 
             var executionTasks = new List<Task>();
 
@@ -381,12 +337,7 @@ namespace FomoAPIUnitTests.Application
 
             await Task.WhenAll(executionTasks);
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query5.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query6.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once));
 
             Assert.Equal(0, _querySubscriptions.Count);
         }
@@ -398,16 +349,12 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(100);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
-            var query4 = new TestQuery(4);
-            var query5 = new TestQuery(5); 
-            var query6 = new TestQuery(6);
+            var queries = CreateQueries(6);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
-            query2.MockQueryContext.Setup(c => c.GetCachedQueryResult(query2.SymbolId)).Throws(new Exception("Force exception"));
+            _querySubscriptions.AddSubscriber(queries[0]);
+            _querySubscriptions.AddSubscriber(queries[1]);
+
+            queries[1].MockQueryContext.Setup(c => c.GetCachedQueryResult(queries[1].SymbolId)).Throws(new Exception("Force exception"));
 
             try
             {
@@ -417,26 +364,20 @@ namespace FomoAPIUnitTests.Application
             {
             }
 
-            query2.MockQueryContext.Setup(c => c.GetCachedQueryResult(query2.SymbolId)).Returns(Task.FromResult<StockQueryResult>(null));
+            queries[1].MockQueryContext.Setup(c => c.GetCachedQueryResult(queries[1].SymbolId)).Returns(Task.FromResult<StockQueryResult>(null));
             await _queryEventBus.ExecutePendingQueries();
 
-            _querySubscriptions.AddSubscriber(query3);
-            _querySubscriptions.AddSubscriber(query4);
-
-            await _queryEventBus.ExecutePendingQueries();
-
-            _querySubscriptions.AddSubscriber(query5);
-            _querySubscriptions.AddSubscriber(query6);
-
+            _querySubscriptions.AddSubscriber(queries[2]);
+            _querySubscriptions.AddSubscriber(queries[3]);
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query5.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query6.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            _querySubscriptions.AddSubscriber(queries[4]);
+            _querySubscriptions.AddSubscriber(queries[5]);
+
+            await _queryEventBus.ExecutePendingQueries();
+
+            queries.ForEach(q => q.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once));
         }
 
         [Fact]
@@ -445,27 +386,27 @@ namespace FomoAPIUnitTests.Application
             await _queryEventBus.SetMaxQueryPerIntervalThreshold(5);
             await _queryEventBus.Reset();
 
-            var query1 = new TestQuery(1);
-            var query2 = new TestQuery(2);
-            var query3 = new TestQuery(3);
-            var query4 = new TestQuery(4);
-            var query5 = new TestQuery(5);
+            var queries = CreateQueries(5);
 
-            _querySubscriptions.AddSubscriber(query1);
-            _querySubscriptions.AddSubscriber(query2);
-            _querySubscriptions.AddSubscriber(query3);
-            _querySubscriptions.AddSubscriber(query4);
-            _querySubscriptions.AddSubscriber(query5);
+            queries.ForEach(q => _querySubscriptions.AddSubscriber(q));
 
-            query2.MockQueryContext.Setup(c => c.SaveQueryResultToStore()).Throws(new Exception("Force exception"));
+            queries[1].MockQueryContext.Setup(c => c.SaveQueryResultToStore()).Throws(new Exception("Force exception"));
 
             await _queryEventBus.ExecutePendingQueries();
 
-            query1.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query2.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query3.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query4.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
-            query5.MockQueryContext.Verify(c => c.SaveQueryResultToStore(), Times.Once);
+            queries.ForEach(q => q.MockQueryContext.Verify( c => c.SaveQueryResultToStore(), Times.Once));
+        }
+
+        private List<TestQuery> CreateQueries(int num)
+        {
+            var queries = new List<TestQuery>();
+
+            for(var i = 0; i < num; i++)
+            {
+                queries.Add(new TestQuery(num + 1));
+            }
+
+            return queries;
         }
 
         private async Task WaitNextInterval()

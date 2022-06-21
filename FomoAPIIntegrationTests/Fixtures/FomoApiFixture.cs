@@ -1,4 +1,5 @@
 ﻿using FomoAPI.Application.Exchanges;
+using FomoAPI.Application.Stores;
 using FomoAPI.Infrastructure.ConfigurationOptions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace FomoAPIIntegrationTests.Fixtures
     {
         private HttpClient _httpClientNoAuth;
 
-        private FomoApiApplicationFactory _fomoApiFactory;
+        public FomoApiApplicationFactory FomoApiFactory { get; private set; }
 
         public bool Disposed { get; private set; }
 
@@ -38,9 +39,9 @@ namespace FomoAPIIntegrationTests.Fixtures
 
         public bool CreateServer(Action<IServiceCollection> configureServices)
         {
-            if(_fomoApiFactory == null)
+            if(FomoApiFactory == null)
             {
-                _fomoApiFactory = new FomoApiApplicationFactory(configureServices);
+                FomoApiFactory = new FomoApiApplicationFactory(configureServices);
                 return true;
             }
 
@@ -51,7 +52,7 @@ namespace FomoAPIIntegrationTests.Fixtures
         {
             if(_httpClientNoAuth == null)
             {
-                _httpClientNoAuth = _fomoApiFactory.CreateClient(new WebApplicationFactoryClientOptions
+                _httpClientNoAuth = FomoApiFactory.CreateClient(new WebApplicationFactoryClientOptions
                 {
                     AllowAutoRedirect = false,
                 });
@@ -68,10 +69,10 @@ namespace FomoAPIIntegrationTests.Fixtures
                 _httpClientNoAuth = null;
             }
 
-            if (_fomoApiFactory != null)
+            if (FomoApiFactory != null)
             {
-                _fomoApiFactory.Dispose();
-                _fomoApiFactory = null;
+                FomoApiFactory.Dispose();
+                FomoApiFactory = null;
             }
 
             Disposed = true;

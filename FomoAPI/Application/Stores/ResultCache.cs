@@ -1,7 +1,6 @@
 ﻿using FomoAPI.Application.ConfigurationOptions;
 using Microsoft.Extensions.Caching.Memory;
 using System;
-using System.Collections.Concurrent;
 
 namespace FomoAPI.Application.Stores
 {
@@ -34,6 +33,11 @@ namespace FomoAPI.Application.Stores
             _cache.Dispose();
         }
 
+        public void Clear()
+        {
+            _cache.Compact(1.0);
+        }
+
         /// <summary>
         /// Inserts new item into cache if it does not exist. Otherwise update it.
         /// </summary>
@@ -55,10 +59,8 @@ namespace FomoAPI.Application.Stores
         /// <param name="result">The item to cache.</param>
         public void Add(TKey key, TResult result)
         {
-            // GetOrCreate is not thread-safe in the sense that the entry
-            // factory delegate will only be executed once.
-            // TODO: To improve performance we would want to lock by entry rather than  
-            // each add.
+            // GetOrCreate is not thread-safe in the sense that the entry factory delegate will only be executed once.
+            // TODO: To improve performance we would want to lock by entry rather than each add.
 
             lock (_addLock)
             {

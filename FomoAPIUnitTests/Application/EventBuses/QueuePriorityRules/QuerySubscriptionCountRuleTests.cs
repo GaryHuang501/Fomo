@@ -114,7 +114,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
 
             var alreadyUpdatedStockData = new SingleQuoteData(
                     symbolId: 1,
-                    ticker: "FB",
+                    ticker: "META",
                     price: 7,
                     change: 0.7m,
                     changePercent: 0.9m,
@@ -124,7 +124,7 @@ namespace FomoAPIUnitTests.Application.EventBuses.QueuePriorityRules
             _mockMarketHours.Setup(h => h.TodayEndDateUTC()).Returns(DateTime.UtcNow);
 
             _mockContext.Setup(c => c.GetCachedQueryResult(1)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("MSFT", staleStockData)));
-            _mockContext.Setup(c => c.GetCachedQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("FB", alreadyUpdatedStockData)));
+            _mockContext.Setup(c => c.GetCachedQueryResult(2)).Returns(Task.FromResult<StockQueryResult>(new SingleQuoteQueryResult("META", alreadyUpdatedStockData)));
 
             var priorityRule = new QuerySubscriptionCountRule(_mockContextFactory.Object, querySubscriptions, _mockMarketHours.Object, (new Mock<ILogger<QuerySubscriptionCountRule>>()).Object);
 

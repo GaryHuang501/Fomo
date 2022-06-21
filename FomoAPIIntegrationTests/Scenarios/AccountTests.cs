@@ -68,7 +68,6 @@ namespace FomoAPIIntegrationTests.Scenarios
         [Fact]
         public async Task Should_NotUpdateUser_WhenTryingToUpdateAnotherUser()
         {
-
             Guid userId = await TestUtil.CreateNewUser(AppTestSettings.Instance.TestDBConnectionString);
             Guid anotherUserId = Guid.NewGuid();
             var httpMessage = new HttpRequestMessage(HttpMethod.Put, ApiPath.Account(userId.ToString()));
