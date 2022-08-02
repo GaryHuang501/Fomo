@@ -11,7 +11,7 @@ namespace FomoAPI.Application.Queries
 {
     public class PortfolioStocksUpdateQuery : IPortfolioStocksUpdateQuery
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public PortfolioStocksUpdateQuery(IOptionsMonitor<DbOptions> dbOptions)
         {
@@ -37,10 +37,8 @@ namespace FomoAPI.Application.Queries
                                 SingleQuoteData.LastUpdated <= @maxDate
                             ORDER BY SingleQuoteData.LastUpdated;";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                return await connection.QueryAsync<int>(sql, new { top, maxDate });
-            }
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<int>(sql, new { top, maxDate });
         }
 
     }

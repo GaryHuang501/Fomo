@@ -17,7 +17,9 @@ namespace FomoAPI.Application.Swagger.OperationFilters
                 .OfType<AuthorizeAttribute>();
 
             if (authAttributes.Any())
+            {
                 operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
+            }
         }
     }
 }

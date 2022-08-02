@@ -50,7 +50,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Get the ids of the portfolios the user owns.
         /// </summary>
         /// <param name="userId">User Guid ID</param>
-        /// <returns>IEnumerable<int> containing the portfolio ids.</returns>
+        /// <returns><see cref="IEnumerable{Int32}"/> containing the portfolio ids.</returns>
         Task<IEnumerable<int>> GetPortfolioIds(Guid userId);
 
 
@@ -64,8 +64,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// <summary>
         /// Delete symbol from portfolio
         /// </summary>
-        /// <param name="portfolioId">Id of portfolio to delete symbol from</param>
-        /// <param name="symbolId">Id of symbol to delete</param>
+        /// <param name="portfolioSymbolID">Id of <see cref="PortfolioSymbol"/> to delete</param>
         Task DeletePortfolioSymbol(int portfolioSymbolID);
 
         /// <summary>
@@ -88,8 +87,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// to match new ordering.
         /// </summary>
         /// <param name="portfolioId">Id of portfolio</param>
-        /// <param name="portfolioSymbolId">Id of reordered portfolioSymbol</param>
-        /// <param name="newSortOrder">New sort order</param>
+        /// <param name="portfolioSymbolIdToSortOrder"><see cref="IDictionary{Int32, Int32}"/> to map portfolio symbol id to sort order.</param>
         /// <returns>True if rows updated. Otherwise portfolio symbol was not found.</returns>
         Task<bool> ReorderPortfolioSymbol(int portfolioId, IDictionary<int, int> portfolioSymbolIdToSortOrder);
     }

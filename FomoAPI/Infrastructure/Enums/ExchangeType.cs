@@ -33,15 +33,14 @@ namespace FomoAPI.Infrastructure.Enums
 
         public static ExchangeType ToExchange(string name)
         {
-            switch (name)
+            return name switch
             {
-                case NasdaqName: return NASDAQ;
-                case NyseName: return NYSE;
-                case NyseArcaName: return NYSEARCA;
-                case NyseAmericanName: return NYSEAMERICAN;
-                default:
-                    return Unknown;
-            }
+                NasdaqName => NASDAQ,
+                NyseName => NYSE,
+                NyseArcaName => NYSEARCA,
+                NyseAmericanName => NYSEAMERICAN,
+                _ => Unknown,
+            };
         }
 
         public static ExchangeType ToExchange(int id)

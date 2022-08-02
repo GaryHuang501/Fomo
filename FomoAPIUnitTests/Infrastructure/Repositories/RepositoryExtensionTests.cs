@@ -139,7 +139,6 @@ namespace FomoAPIUnitTests.Infrastructure.Repositories
             Assert.Equal(typeof(int), dataTable.Columns[1].DataType);
             Assert.Equal(typeof(string), dataTable.Columns[2].DataType);
 
-
             for(var i = 0; i < testObjects.Count; i++)
             {
                 Assert.Equal(testObjects[i].DateTime1, dataTable.Rows[i][0]);

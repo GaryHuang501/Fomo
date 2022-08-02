@@ -33,10 +33,8 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         public async Task InitializeAsync()
         {
-            using (var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString))
-            {
-                await connection.ExecuteAsync("DELETE FROM Vote", null);
-            }
+            using var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString);
+            await connection.ExecuteAsync("DELETE FROM Vote", null);
         }
 
         public Task DisposeAsync()

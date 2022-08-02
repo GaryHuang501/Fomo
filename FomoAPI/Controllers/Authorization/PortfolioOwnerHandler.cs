@@ -8,7 +8,7 @@ namespace FomoAPI.Controllers.Authorization
 {
     public class PortfolioOwnerHandler : AuthorizationHandler<PortfolioOwnerRequirement>
     {
-        IHttpContextAccessor _httpContextAccessor;
+        readonly IHttpContextAccessor _httpContextAccessor;
 
         public PortfolioOwnerHandler(IHttpContextAccessor httpContextAccessor)
         {

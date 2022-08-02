@@ -14,7 +14,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Extension method to convert IDictionary to a datatable. KVP is flattened into a row.
         /// </summary>
         /// <typeparam name="K">Type of the Key</typeparam>
-        /// <typeparam name="T">Type of Value</typeparam>
+        /// <typeparam name="V">Type of Value</typeparam>
         /// <param name="dict">Dictionary to convert</param>
         /// <param name="keyName">Name of dictionary Key</param>
         /// <param name="columnName">Name of Column</param>

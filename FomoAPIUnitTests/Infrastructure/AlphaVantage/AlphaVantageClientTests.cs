@@ -23,8 +23,8 @@ namespace FomoAPIUnitTests.Infrastructure.AlphaVantage
     public class AlphaVantageClientTests
     {
         private Mock<IHttpClientFactory> _mockHttpFactory;
-        private Mock<IAlphaVantageDataParserFactory> _mockParserFactory;
-        private Mock<IAlphaVantageDataParser<SingleQuoteData>>_singleQuoteDataCsvParser;
+        private readonly Mock<IAlphaVantageDataParserFactory> _mockParserFactory;
+        private readonly Mock<IAlphaVantageDataParser<SingleQuoteData>>_singleQuoteDataCsvParser;
         private readonly Mock<ILogger<AlphaVantageClient>> _mockLogger;
         private readonly Mock<IOptionsMonitor<AlphaVantageOptions>> _mockAlphaVantageOptionsAccessor;
 

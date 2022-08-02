@@ -24,7 +24,7 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
         private string _authToken;
         private DateTime _lastRenewTime;
         private Timer _renewTokenTimer;
-        private SemaphoreSlim _semaphore;
+        private readonly SemaphoreSlim _semaphore;
         private GoogleCredential _googleCreds;
         private FirebaseApp _firebaseApp;
 
@@ -166,7 +166,8 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
                 Disabled = false,
                 Uid = userId.ToString(),           
             };
-            UserRecord userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
+
+            await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
         }
     }
 }

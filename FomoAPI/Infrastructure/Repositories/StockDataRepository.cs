@@ -75,12 +75,10 @@ namespace FomoAPI.Infrastructure.Repositories
                                 (@SymbolId, @Price, @Change, @ChangePercent, @LastUpdated);
                             END;";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                int affectedRows =  await connection.ExecuteAsync(sql, data);
+            using var connection = new SqlConnection(_connectionString);
+            int affectedRows = await connection.ExecuteAsync(sql, data);
 
-                return affectedRows == 1;
-            }        
+            return affectedRows == 1;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace FomoAPI.Application.Exchanges
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(ExchangeSyncHostedService)} is starting");
+            _logger.LogInformation("{Source} is Starting", nameof(ExchangeSyncHostedService));
 
             int minutesInterval = Math.Max(_exchangeSyncOptions.SyncIntervalMinutes, MinimumIntervalMinutes);
 
@@ -53,8 +53,7 @@ namespace FomoAPI.Application.Exchanges
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(ExchangeSyncHostedService)} is stopping");
-
+            _logger.LogInformation("{Source} is stopping", nameof(ExchangeSyncHostedService));
             _timer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;

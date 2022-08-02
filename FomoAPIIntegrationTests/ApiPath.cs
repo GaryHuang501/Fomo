@@ -36,7 +36,7 @@ namespace FomoAPIIntegrationTests
 
         private static string GetMultipleIdsQuery<T>(string key, T[] values)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             if (values.Length > 0)
             {

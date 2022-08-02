@@ -13,7 +13,7 @@ namespace FomoAPI.Application.ViewModels.Member
     /// <inheritdoc cref="IMemberQueries"/>
     public class MemberQueries : IMemberQueries
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public MemberQueries(IOptionsMonitor<DbOptions> dbOptions)
         {
@@ -38,16 +38,13 @@ namespace FomoAPI.Application.ViewModels.Member
             IEnumerable<MemberDTO> members;
             int total = 0;
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
 
-                using (var multi = await connection.QueryMultipleAsync(sql, new { limit, offset}))
-                {
-                    total = (await multi.ReadAsync<int>()).Single();
-                    members = (await multi.ReadAsync<MemberDTO>());
-                }
-            }
+            using var multi = await connection.QueryMultipleAsync(sql, new { limit, offset });
+            total = (await multi.ReadAsync<int>()).Single();
+            members = (await multi.ReadAsync<MemberDTO>());
+   
 
             return new MembersViewModel(members, total: total, limit: limit, offset: offset);
         }

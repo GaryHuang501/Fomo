@@ -16,10 +16,7 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
         private readonly IHttpClientFactory _clientFactory;
         private readonly IClientAuthFactory _authFactory;
         private readonly FireBaseOptions _firebaseOptions;
-        private static JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
-                                                                    {
-                                                                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                                                    };
+        private static readonly JsonSerializerSettings _serializerSettings = new() { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         public FireBaseDBClient(IHttpClientFactory clientFactory, IOptionsMonitor<FireBaseOptions> firebaseOptionsMonitor, IClientAuthFactory authFactory)
         {
@@ -51,8 +48,10 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
             string authorizedUri = await SetAuthTokenUrl(uri);
 
             var content = new StringContent(JsonConvert.SerializeObject(jsonObject, _serializerSettings));
-            var request = new HttpRequestMessage(HttpMethod.Put, authorizedUri);
-            request.Content = content;
+            var request = new HttpRequestMessage(HttpMethod.Put, authorizedUri)
+            {
+                Content = content
+            };
 
             HttpResponseMessage response = await client.SendAsync(request);
 

@@ -10,13 +10,13 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
     /// </summary>
     public class BoardColumns
     {
-        public static BoardColumns MostBullish = new BoardColumns("Most Bullish Stocks", "Ticker", "Votes");
+        public static BoardColumns MostBullish = new ("Most Bullish Stocks", "Ticker", "Votes");
 
-        public static BoardColumns MostBearish = new BoardColumns("Most Bearish Stocks", "Ticker", "Votes");
+        public static BoardColumns MostBearish = new ("Most Bearish Stocks", "Ticker", "Votes");
 
-        public static BoardColumns BestPerformer = new BoardColumns("Best Performing Users", "User", "ROI %");
+        public static BoardColumns BestPerformer = new ("Best Performing Users", "User", "ROI %");
 
-        public static BoardColumns WorstPerformer = new BoardColumns("Worst Performing Users", "User", "ROI %");
+        public static BoardColumns WorstPerformer = new ("Worst Performing Users", "User", "ROI %");
 
         public string Header { get; private set; }
 

@@ -52,7 +52,7 @@ namespace FomoAPI.Application.EventBuses
         /// <param name="query"></param>
         public void ClearQuery(StockQuery query)
         {
-            _pendingQueriesMap.TryRemove(query, out SubscriptionInfo subscriptionInfo);
+            _pendingQueriesMap.TryRemove(query, out _);
         }
 
         public void ClearAll()
@@ -75,7 +75,7 @@ namespace FomoAPI.Application.EventBuses
         /// <summary>
         /// Get all the <see cref="SubscriptionInfo"/> 
         /// </summary>
-        /// <returns>Returns all the <see cref="SubscriptionInfo"/> as a <see cref="IList"/></returns>
+        /// <returns><see cref="IList{SubscriptionInfo}"/></returns>
         /// <remarks>Using Enumerator to create the return list, improves performance by not locking. </remarks>
         public IList<SubscriptionInfo> GetSubscriptionInfos()
         {

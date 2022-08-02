@@ -1,8 +1,6 @@
 ﻿using FomoAPI.Domain.Stocks;
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Exchanges
 {
@@ -14,9 +12,9 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <summary>
         /// Creates the list of exchange sync changesets
         /// </summary>
-        /// <param name="existingSymbolsMap">Readonly Dictionary for existing <see cref="Symbol"/> with <see cref="SymbolKey"/> as key.<</param>
+        /// <param name="existingSymbolsMap">Readonly Dictionary for existing <see cref="Symbol"/> with <see cref="SymbolKey"/> as key.</param>
         /// <param name="downloadedSymbolsMap">Readonly Dictionary for downloaded <see cref="DownloadedSymbol"/> with <see cref="SymbolKey"/> as key.</param>
-        /// <returns>IEnumerable of <see cref="IExchangeSyncChangeset>"/></returns>
+        /// <returns><see cref="IEnumerable{IExchangeSyncChangeset}"/></returns>
         public IEnumerable<IExchangeSyncChangeset> Create(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap,
                                                           IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap);
     }

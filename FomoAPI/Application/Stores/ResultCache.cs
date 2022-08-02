@@ -15,7 +15,7 @@ namespace FomoAPI.Application.Stores
 
         protected readonly int _cacheExpiryTimeMinutes;
 
-        protected object _addLock = new object();
+        protected object _addLock = new ();
 
         public ResultCache(CacheOptions options)
         {

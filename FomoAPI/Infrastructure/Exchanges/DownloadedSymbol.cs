@@ -15,19 +15,19 @@ namespace FomoAPI.Infrastructure.Exchanges
 
         public int ExchangeId { get; private set; }
 
-        private string _fullName;
+        private readonly string _fullName;
 
         /// <summary>
         /// Gets the full name of the symbol
         /// </summary>
         /// <remarks>Truncates the full name for database to 400 characters.</remarks>
-        public string FullName => _fullName.Length <= 400 ? _fullName : _fullName.Substring(0, 400);
+        public string FullName => _fullName.Length <= 400 ? _fullName : _fullName[..400];
 
         public DownloadedSymbol(string ticker, int exchangeId, string fullName)
         {
             if (ticker.Length > 20)
             {
-                throw new ArgumentException(nameof(ticker), "Database only allows 20 characters for ticker");
+                throw new ArgumentException("Database only allows 20 characters for ticker", nameof(ticker));
             }
 
             Ticker = ticker;

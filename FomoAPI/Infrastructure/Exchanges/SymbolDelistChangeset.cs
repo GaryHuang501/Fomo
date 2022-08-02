@@ -8,8 +8,8 @@ namespace FomoAPI.Infrastructure.Exchanges
     public class SymbolDelistChangeset : IExchangeSyncChangeset
     {
         private List<int> _delistedSymbolIds;
-        private IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
-        private IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
+        private readonly IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
+        private readonly IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
 
         public SymbolDelistChangeset(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)
         {

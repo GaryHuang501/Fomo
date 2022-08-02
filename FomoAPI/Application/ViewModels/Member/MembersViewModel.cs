@@ -20,7 +20,6 @@ namespace FomoAPI.Application.ViewModels.Member
 
         public int Limit { get; private set; }
 
-
         public MembersViewModel(IEnumerable<MemberDTO> members, int total, int offset, int limit)
         {
             Total = total;

@@ -21,9 +21,8 @@ namespace FomoAPI.Infrastructure.Exchanges
 
         public override bool Equals(object b)
         {
-            SymbolKey other = b as SymbolKey;
             return
-                   (other != null) &&
+                   (b is SymbolKey other) &&
                    (ExchangeId == other.ExchangeId) &&
                    (Ticker == other.Ticker);
         }

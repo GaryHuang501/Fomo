@@ -12,10 +12,10 @@ namespace FomoAPIIntegrationTests.ContractTests
     {
         private readonly IExchangeClient _client;
 
-        private readonly SymbolKey MsftKey = new SymbolKey("MSFT", ExchangeType.NASDAQ.Id);
-        private readonly SymbolKey JpmKey = new SymbolKey("JPM", ExchangeType.NYSE.Id);
-        private readonly SymbolKey SpyKey = new SymbolKey("SPY", ExchangeType.NYSEARCA.Id);
-        private readonly SymbolKey ImoKey = new SymbolKey("IMO", ExchangeType.NYSEAMERICAN.Id);
+        private readonly SymbolKey MsftKey = new ("MSFT", ExchangeType.NASDAQ.Id);
+        private readonly SymbolKey JpmKey = new ("JPM", ExchangeType.NYSE.Id);
+        private readonly SymbolKey SpyKey = new("SPY", ExchangeType.NYSEARCA.Id);
+        private readonly SymbolKey ImoKey = new ("IMO", ExchangeType.NYSEAMERICAN.Id);
 
         private readonly ExchangeSyncSetting _exchangeSyncSetting;
 

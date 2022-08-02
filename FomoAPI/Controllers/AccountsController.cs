@@ -76,7 +76,7 @@ namespace FomoAPI.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDTO>> GetAccount(string id)
         {
-            if (!Guid.TryParse(id, out Guid selectedUserGuid))
+            if (!Guid.TryParse(id, out _))
             {
                 return BadRequest("UserId must be a valid Guid");
             }

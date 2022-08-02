@@ -19,7 +19,7 @@ namespace FomoAPI.Infrastructure.Repositories
     /// </summary>
     public class ExchangeSyncRepository : IExchangeSyncRepository
     {
-        private string _connectionString;
+        private readonly string _connectionString;
         private readonly int _defaultBulkCopyBatchSize;
 
         public ExchangeSyncRepository(IOptionsMonitor<DbOptions> dbOptions)
@@ -50,46 +50,44 @@ namespace FomoAPI.Infrastructure.Repositories
 
             var getSymbolCountSql = @"SELECT COUNT(*) FROM Symbol";
 
-            using (var connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            int startCount = await connection.ExecuteScalarAsync<int>(getSymbolCountSql);
+
+            // Begin bulk copy
+            using (var transaction = connection.BeginTransaction())
             {
-                await connection.OpenAsync();
-                int startCount = await connection.ExecuteScalarAsync<int>(getSymbolCountSql);
+                bool success = false;
 
-                // Begin bulk copy
-                using (var transaction = connection.BeginTransaction())
+                try
                 {
-                    bool success = false;
-
-                    try
+                    using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.Default, transaction))
                     {
-                        using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.Default, transaction))
+                        bulkCopy.DestinationTableName = "dbo.Symbol";
+                        bulkCopy.BatchSize = batchSize.Value;
+
+                        foreach (var col in columns)
                         {
-                            bulkCopy.DestinationTableName = "dbo.Symbol";
-                            bulkCopy.BatchSize = batchSize.Value;
-
-                            foreach(var col in columns)
-                            {
-                                bulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(col.ColumnName, col.ColumnName));
-                            }
-
-                            await bulkCopy.WriteToServerAsync(symbolDataTable);
+                            bulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(col.ColumnName, col.ColumnName));
                         }
-                        await transaction.CommitAsync();
-                        success = true;
+
+                        await bulkCopy.WriteToServerAsync(symbolDataTable);
                     }
-                    finally
+                    await transaction.CommitAsync();
+                    success = true;
+                }
+                finally
+                {
+                    if (!success)
                     {
-                        if (!success)
-                        {
-                            await transaction.RollbackAsync();
-                        }
+                        await transaction.RollbackAsync();
                     }
                 }
-
-                int endCount = await connection.ExecuteScalarAsync<int>(getSymbolCountSql);
-
-                return endCount - startCount;
             }
+
+            int endCount = await connection.ExecuteScalarAsync<int>(getSymbolCountSql);
+
+            return endCount - startCount;
         }
 
         public async Task<int> DelistSymbols(IEnumerable<int> symbolIds)
@@ -100,26 +98,22 @@ namespace FomoAPI.Infrastructure.Repositories
 
             var tvpParam = new { tvpSymbolID = idDataTable.AsTableValuedParameter(TableType.IntIdType) };
 
-            using (var connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var transaction = await connection.BeginTransactionAsync();
+            try
             {
-                await connection.OpenAsync();
+                var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
+                await transaction.CommitAsync();
 
-                using (var transaction = await connection.BeginTransactionAsync())
-                {
-                    try
-                    {
-                        var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
-                        await transaction.CommitAsync();
-
-                        return rowsUpdated;
-                    }
-                    catch (Exception)
-                    {
-                        await transaction.RollbackAsync();
-                        throw;
-                    }
-                }
-            }     
+                return rowsUpdated;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<int> UpdateSymbols(IEnumerable<UpdateSymbolAction> symbols)
@@ -134,25 +128,21 @@ namespace FomoAPI.Infrastructure.Repositories
 
             const string procedure = "dbo.UpdateSymbols";
 
-            using (var connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var transaction = await connection.BeginTransactionAsync();
+            try
             {
-                await connection.OpenAsync();
+                var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
+                await transaction.CommitAsync();
+                return rowsUpdated;
+            }
 
-                using (var transaction = await connection.BeginTransactionAsync()) 
-                {
-                    try
-                    {
-                        var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
-                        await transaction.CommitAsync();
-                        return rowsUpdated;
-                    }
-
-                    catch (Exception)
-                    {
-                        await transaction.RollbackAsync();
-                        throw;
-                    }
-                }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
 
@@ -186,16 +176,14 @@ namespace FomoAPI.Infrastructure.Repositories
 
         public async Task AddSyncHistory(string actionName, int symbolsChanged, string message, string error = null)
         {
-            error = error != null ? error.Substring(0, Math.Min(300, error.Length)) : null;
+            error = error?[..Math.Min(300, error.Length)];
 
             var insertSql = @"INSERT INTO ExchangeSyncHistory (ActionName, Message, SymbolsChanged, Error, DateCreated)
                               VALUES (@actionName, @message, @symbolsChanged, @error, GETDATE())";
 
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.ExecuteAsync(insertSql, new { actionName, message, symbolsChanged, error});
-            }
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(insertSql, new { actionName, message, symbolsChanged, error });
         }
 
         public async Task<ExchangeSyncSetting> GetSyncSettings()
@@ -213,23 +201,21 @@ namespace FomoAPI.Infrastructure.Repositories
                               FROM
                                 ExchangeSyncSetting";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var result = await connection.QuerySingleAsync(selectSql);
+            using var connection = new SqlConnection(_connectionString);
+            var result = await connection.QuerySingleAsync(selectSql);
 
-                return new ExchangeSyncSetting
-                {
-                    DisableSync = result.DisableSync,
-                    DisableThresholds = result.DisableThresholds,
-                    InsertThresholdPercent = result.InsertThresholdPercent,
-                    DeleteThresholdPercent = result.DeleteThresholdPercent,
-                    UpdateThresholdPercent = result.UpdateThresholdPercent,
-                    Delimiter = result.Delimiter,
-                    SuffixBlackList = result.SuffixBlackList.ToString().Split(","),
-                    Url = result.Url,
-                    ClientName = result.ClientName
-                };
-            }
+            return new ExchangeSyncSetting
+            {
+                DisableSync = result.DisableSync,
+                DisableThresholds = result.DisableThresholds,
+                InsertThresholdPercent = result.InsertThresholdPercent,
+                DeleteThresholdPercent = result.DeleteThresholdPercent,
+                UpdateThresholdPercent = result.UpdateThresholdPercent,
+                Delimiter = result.Delimiter,
+                SuffixBlackList = result.SuffixBlackList.ToString().Split(","),
+                Url = result.Url,
+                ClientName = result.ClientName
+            };
         }
     }
 }

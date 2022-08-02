@@ -88,7 +88,9 @@ namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage
         /// Run the given query against Alpha Vantage client.
         /// Adds the necessary headers such api key and from the query object
         /// </summary>
+        /// <param name="symbolId"></param>
         /// <param name="query">Query object used to generate the request</param>
+        /// <param name="parser"><see cref="IAlphaVantageDataParser{TData}"/> to parse the response data.</param>
         /// <returns></returns>
         private async Task<AlphaVantageQueryResult<TData>> GetQueryData<TData>(int symbolId, AlphaVantageQuery query, IAlphaVantageDataParser<TData> parser)
             where TData : StockData  

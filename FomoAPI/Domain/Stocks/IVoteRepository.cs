@@ -21,7 +21,7 @@ namespace FomoAPI.Domain.Stocks
         /// </summary>
         /// <param name="symbolIds">SymbolIds to get total votes for.</param>
         /// <param name="userId">Id of the user displaying their portfolio.</param>
-        /// <returns>The <see cref="IReadOnlyCollection{T}"/> of <see cref="TotalVotes"/> keyed by SymbolId and votes for the current user.</returns>
+        /// <returns>The <see cref="IReadOnlyDictionary{Int32, TotalVotes}"/> that maps symbol ids to the current user.</returns>
         Task<IReadOnlyDictionary<int, TotalVotes>> GetTotalVotes(ISet<int> symbolIds, Guid userId);
     }
 }

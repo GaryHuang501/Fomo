@@ -73,7 +73,6 @@ namespace FomoAPIIntegrationTests.Scenarios
             var bacQuote = new SingleQuoteData(bac.Id, "BAC", 1, 0, 0, endDate);
             await _stockRepo.UpsertSingleQuoteData(new FomoAPI.Infrastructure.Stocks.UpsertSingleQuoteData(bac.Id, bacQuote));
 
-
             var query = new PortfolioStocksUpdateQuery(AppTestSettings.Instance.GetDbOptionsMonitor());
 
             var symbolIDs = await query.Get(100, endDate);
@@ -119,7 +118,6 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             var bacQuote = new SingleQuoteData(bac.Id, "BAC", 1, 0, 0, endDate);
             await _stockRepo.UpsertSingleQuoteData(new FomoAPI.Infrastructure.Stocks.UpsertSingleQuoteData(bac.Id, bacQuote));
-
 
             var query = new PortfolioStocksUpdateQuery(AppTestSettings.Instance.GetDbOptionsMonitor());
 

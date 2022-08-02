@@ -26,6 +26,7 @@ namespace FomoAPI.Infrastructure.Clients
         /// Creates new fire base user
         /// </summary>
         /// <param name="userId">UserID to be used as Firebase UID.</param>
+        /// <param name="userName">Firebase User Name</param>
         /// <param name="email">Email Address</param>
         Task CreateUser(Guid userId, string userName, string email);
 

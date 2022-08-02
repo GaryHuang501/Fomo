@@ -16,10 +16,10 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
         private readonly NasdaqParser _parser;
         private readonly Mock<ILogger<NasdaqParser>> _mockLogger;
 
-        private readonly SymbolKey MsftKey = new SymbolKey("MSFT", ExchangeType.NASDAQ.Id);
-        private readonly SymbolKey BaKey = new SymbolKey("BA", ExchangeType.NYSE.Id);
-        private readonly SymbolKey VooKey = new SymbolKey("VOO", ExchangeType.NYSEARCA.Id);
-        private readonly SymbolKey ImoKey = new SymbolKey("IMO", ExchangeType.NYSEAMERICAN.Id);
+        private readonly SymbolKey MsftKey = new ("MSFT", ExchangeType.NASDAQ.Id);
+        private readonly SymbolKey BaKey = new ("BA", ExchangeType.NYSE.Id);
+        private readonly SymbolKey VooKey = new ("VOO", ExchangeType.NYSEARCA.Id);
+        private readonly SymbolKey ImoKey = new ("IMO", ExchangeType.NYSEAMERICAN.Id);
 
         public NasdaqParserTests()
         {
@@ -34,7 +34,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
             var data = @"Nasdaq Traded|Symbol|Security Name|Listing Exchange|Market Category|ETF|Round Lot Size|Test Issue|Financial Status|CQS Symbol|NASDAQ Symbol|NextShares
                          Y|MSFT|Microsoft Corporation|Q|Q|N|100|N|N||MSFT|N";
 
-            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]);
+            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>());
 
             Assert.Single(tickerToSymbol);
             Assert.True(tickerToSymbol.ContainsKey(MsftKey));
@@ -53,7 +53,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
                         Y|VOO|Vanguard S&P 500 ETF|P||Y|100|N||VOO|VOO|N
                         Y|IMO|Imperial Oil Limited|A| |N|100|N||IMO|IMO|N";
 
-            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]);
+            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>());
 
             Assert.Equal(4, tickerToSymbol.Count);
             Assert.True(tickerToSymbol.ContainsKey(BaKey)); 
@@ -121,7 +121,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
             var data = @"Nasdaq Traded|Symbol|Security Name|Listing Exchange
                          Y| MSFT |   Microsoft Corporation|  Q|Q|N|100|N|N||MSFT|N";
 
-            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]);
+            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>());
 
             Assert.Single(tickerToSymbol);
             Assert.True(tickerToSymbol.ContainsKey(new SymbolKey("MSFT", ExchangeType.NASDAQ.Id)));
@@ -137,7 +137,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
             var data = @"Symbol|Nasdaq Traded|Security Name|Market Category|ETF|Round Lot Size|Test Issue|Financial Status|CQS Symbol|NASDAQ Symbol|NextShares|Listing Exchange
                          MSFT|Y|Microsoft Corporation|Q|N|100|N|N||MSFT|N|Q";
 
-            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]);
+            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>());
 
             Assert.Single(tickerToSymbol);
             Assert.True(tickerToSymbol.ContainsKey(new SymbolKey("MSFT", ExchangeType.NASDAQ.Id)));
@@ -158,7 +158,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
 
             data = data.Replace(header, "");
 
-            await Assert.ThrowsAsync<FormatException>(async() => await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]));
+            await Assert.ThrowsAsync<FormatException>(async() => await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>()));
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
         {
             var data = @"Nasdaq Traded|Symbol|Security Name|Listing Exchange";
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>()));
         }
 
         [Fact]
@@ -176,7 +176,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
                         Y|BA|Boeing Company|N||
                         Y|FAKE|FAKE|X|Q|";
 
-            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", new string[0]);
+            var tickerToSymbol = await _parser.GetSymbolMap(ToStreamReader(data), "|", Array.Empty<string>());
 
             Assert.Single(tickerToSymbol);
             Assert.True(tickerToSymbol.ContainsKey(BaKey));
@@ -185,7 +185,7 @@ namespace FomoAPIUnitTests.Infrastructure.Exchanges
         private StreamReader ToStreamReader(string data)
         {
             byte[] byteArray = Encoding.UTF8.GetBytes(data);
-            MemoryStream stream = new MemoryStream(byteArray);
+            MemoryStream stream = new (byteArray);
             return new StreamReader(stream);
         }
 

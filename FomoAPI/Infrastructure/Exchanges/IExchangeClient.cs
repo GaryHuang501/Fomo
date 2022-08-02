@@ -13,7 +13,7 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <summary>
         /// Get all the listed traded symbols for for all major stock exchanges
         /// </summary>
-        /// <param name="syncSettings">The <see cref="ExchangeSyncSetting"/> containing sync settings.</ExchangeSyncSetting> </param>
+        /// <param name="syncSettings">The <see cref="ExchangeSyncSetting"/> containing sync settings.</param>
         /// <returns>IReadOnlyDictionary with <see cref="SymbolKey"/> as key and <see cref="DownloadedSymbol"/> for the value.</returns>
         Task<IReadOnlyDictionary<SymbolKey, DownloadedSymbol>> GetTradedSymbols(ExchangeSyncSetting syncSettings);
     }

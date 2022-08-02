@@ -25,7 +25,7 @@ namespace FomoAPI.Application.EventBuses.QueryContexts
         private readonly IStockNotificationCenter _notificationCenter;
         private readonly ILogger<SingleQuoteContext> _logger;
 
-        private SingleQuoteQuery _query;
+        private readonly SingleQuoteQuery _query;
 
         private SingleQuoteQueryResult _queryResult;
 

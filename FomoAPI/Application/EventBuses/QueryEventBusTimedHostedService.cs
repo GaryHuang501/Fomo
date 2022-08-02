@@ -28,8 +28,9 @@ namespace FomoAPI.Application.EventBuses
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is starting");
-            _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} will reset state and run any pending queries every {_eventBusOptions.RefreshIntervalMS} milliseconds");
+            _logger.LogInformation("{Source} is starting", nameof(QueryEventBusTimedHostedService));
+            _logger.LogInformation("{Source} will reset state and run any pending queries every {RefreshInterval} ms", nameof(QueryEventBusTimedHostedService), _eventBusOptions.RefreshIntervalMS);
+
             await RefreshEventBusState();
 
             ValidateOptions();
@@ -69,8 +70,8 @@ namespace FomoAPI.Application.EventBuses
         private async Task RefreshEventBusState()
         {
             _logger.LogInformation("Resetting Event Bus state");
-            _logger.LogInformation($"Max queries to run per interval is {_eventBusOptions.MaxQueriesPerInterval}");
-            _logger.LogInformation($"Queries ran last interval: {_queryEventBus.QueriesExecutedInterval}");
+            _logger.LogInformation("Max queries to run per interval is {RefreshInterval} ms", _eventBusOptions.MaxQueriesPerInterval);
+            _logger.LogInformation("Queries ran last interval: {RanCount}", _queryEventBus.QueriesExecutedInterval);
 
             try
             {
@@ -99,7 +100,7 @@ namespace FomoAPI.Application.EventBuses
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(QueryEventBusTimedHostedService)} is stopping");
+            _logger.LogInformation("{Source} is stopping", nameof(QueryEventBusTimedHostedService));
 
             _timerExecuteEventBus?.Change(Timeout.Infinite, 0);
             _timerRefreshEventBus?.Change(Timeout.Infinite, 0);

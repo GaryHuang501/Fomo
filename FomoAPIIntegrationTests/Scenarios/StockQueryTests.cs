@@ -25,8 +25,8 @@ namespace FomoAPIIntegrationTests.Scenarios
     public class StockQueryTests : IClassFixture<ExchangeSyncSetupFixture>, IClassFixture<DBFixture>, IClassFixture<FomoApiFixture>, IAsyncLifetime
     {
         private readonly DBFixture _dbFixture;
-        private HttpClient _client;
-        private FomoApiFixture _fomoApiFixture;
+        private readonly HttpClient _client;
+        private readonly FomoApiFixture _fomoApiFixture;
 
         public StockQueryTests(DBFixture dbFixture, FomoApiFixture fomoApiFixture)
         {
@@ -61,7 +61,7 @@ namespace FomoAPIIntegrationTests.Scenarios
         [Fact]
         public async Task GetSingleQuoteData_ShouldReturnNoData_WhenEmptySymbolIds()
         {
-            List<StockSingleQuoteDataDTO> data = await GetSingleQuoteData(new int[] { });
+            List<StockSingleQuoteDataDTO> data = await GetSingleQuoteData(Array.Empty<int>());
 
             Assert.Empty(data);
 
@@ -219,14 +219,14 @@ namespace FomoAPIIntegrationTests.Scenarios
                                         };
 
             List<StockSingleQuoteDataDTO> dataDtos = await GetSingleQuoteData(symbolIdsToGet);
-            Assert.Equal(3, dataDtos.Count());
+            Assert.Equal(3, dataDtos.Count);
 
             Assert.All(dataDtos, d => Assert.Null(d.Data));
 
             var startTime = DateTime.UtcNow;
 
             // Wait for query to execute until all populated
-            while (dataDtos.Count(d => d.Data == null) != 0)
+            while (dataDtos.Any(d => d.Data == null))
             {
                 await CheckTimeOut(startTime);
 
@@ -262,7 +262,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             List<StockSingleQuoteDataDTO> dataDtos = await GetSingleQuoteData(symbolIdsToGet);
 
-            Assert.Equal(4, dataDtos.Count());
+            Assert.Equal(4, dataDtos.Count);
 
             Assert.All(dataDtos, d => Assert.Null(d.Data));
 

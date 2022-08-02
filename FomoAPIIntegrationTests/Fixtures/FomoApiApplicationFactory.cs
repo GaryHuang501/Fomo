@@ -20,7 +20,7 @@ namespace FomoAPIIntegrationTests.Fixtures
     {
         public ITestOutputHelper Output { get; set; }
 
-        private Action<IServiceCollection> _configureServices;
+        private readonly Action<IServiceCollection> _configureServices;
 
         public FomoApiApplicationFactory(Action<IServiceCollection> configureServices)
         {

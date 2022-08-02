@@ -71,21 +71,19 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             SetupEventBusStub(options);
 
-            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
-            {
-                await hostedService.StartAsync(new CancellationToken());
-                await WaitForEvent(EventType.ExecutePendingQueriesAsync);
+            using var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object);
+            await hostedService.StartAsync(new CancellationToken());
+            await WaitForEvent(EventType.ExecutePendingQueriesAsync);
 
-                Assert.Equal(3, _eventList.Count);
+            Assert.Equal(3, _eventList.Count);
 
-                Assert.Collection(_eventList,
-                    event1 => Assert.Equal(EventType.SetMaxQueryPerInterval, event1),
-                    event2 => Assert.Equal(EventType.ResetQueryExecutedCounter, event2),
-                    event3 => Assert.Equal(EventType.ExecutePendingQueriesAsync, event3)
-                 );
+            Assert.Collection(_eventList,
+                event1 => Assert.Equal(EventType.SetMaxQueryPerInterval, event1),
+                event2 => Assert.Equal(EventType.ResetQueryExecutedCounter, event2),
+                event3 => Assert.Equal(EventType.ExecutePendingQueriesAsync, event3)
+             );
 
-                Assert.Equal(options.MaxQueriesPerInterval, _mockEventBusSetInterval);
-            }
+            Assert.Equal(options.MaxQueriesPerInterval, _mockEventBusSetInterval);
         }
 
         [Fact]
@@ -102,24 +100,22 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             SetupEventBusStub(options);
 
-            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
-            {
-                var stopwatch = new Stopwatch();
+            using var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object);
+            var stopwatch = new Stopwatch();
 
-                await hostedService.StartAsync(new CancellationToken());
-                await Task.Delay(waitMs);
+            await hostedService.StartAsync(new CancellationToken());
+            await Task.Delay(waitMs);
 
-                var approxNumExecuteQueryCalls = (waitMs / options.PollingIntervalMS);
-                var approxNumRefreshCalls = (waitMs / options.RefreshIntervalMS);
+            var approxNumExecuteQueryCalls = (waitMs / options.PollingIntervalMS);
+            var approxNumRefreshCalls = (waitMs / options.RefreshIntervalMS);
 
-                var actualNumExecuteCalls = _eventList.Count(e => e == EventType.ExecutePendingQueriesAsync);
-                var actualNumRefreshCalls = _eventList.Count(e => e == EventType.ResetQueryExecutedCounter);
+            var actualNumExecuteCalls = _eventList.Count(e => e == EventType.ExecutePendingQueriesAsync);
+            var actualNumRefreshCalls = _eventList.Count(e => e == EventType.ResetQueryExecutedCounter);
 
-                const int allowedDeviation = 3;
+            const int allowedDeviation = 3;
 
-                Assert.True(Math.Abs(actualNumExecuteCalls - approxNumExecuteQueryCalls) < allowedDeviation);
-                Assert.True(Math.Abs(actualNumRefreshCalls - approxNumRefreshCalls) < allowedDeviation);
-            }
+            Assert.True(Math.Abs(actualNumExecuteCalls - approxNumExecuteQueryCalls) < allowedDeviation);
+            Assert.True(Math.Abs(actualNumRefreshCalls - approxNumRefreshCalls) < allowedDeviation);
         }
 
         [Theory]
@@ -134,11 +130,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             SetupEventBusStub(options);
 
-            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
-            {
-                await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
-
-            }
+            using var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object);
+            await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
         }
 
         [Theory]
@@ -153,10 +146,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             SetupEventBusStub(options);
 
-            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
-            {
-                await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
-            }
+            using var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object);
+            await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
         }
 
         [Theory]
@@ -171,10 +162,8 @@ namespace FomoAPIUnitTests.Application.EventBuses
 
             SetupEventBusStub(options);
 
-            using (var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object))
-            {
-                await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
-            }
+            using var hostedService = new QueryEventBusTimedHostedService(_mockLogger.Object, _mockEventBus.Object, _mockEventBusOptionsAccessor.Object);
+            await Assert.ThrowsAsync<ArgumentException>(() => hostedService.StartAsync(new CancellationToken()));
         }
 
         private async Task WaitForEvent(EventType eventType, int timeOutMs = 5000)

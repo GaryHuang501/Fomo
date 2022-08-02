@@ -25,7 +25,7 @@ namespace FomoAPI
 
         public IConfiguration Configuration { get; }
 
-        private string DevelopmentCorsPolicyName = "DevelopmentCORS";
+        private readonly string DevelopmentCorsPolicyName = "DevelopmentCORS";
 
         public void ConfigureServices(IServiceCollection services)
         {

@@ -36,10 +36,10 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
         /// <summary>
         /// Get next set of queries needing to be updated, prioritized by subscriber count.
         /// </summary>
-        /// <returns>Prioritized Queries as <see cref="IEnumerable{T}"/> of type <see cref="StockQuery"/></returns>
+        /// <returns>Prioritized Queries as <see cref="IEnumerable{StockQuery}"/></returns>
         public async Task<IEnumerable<StockQuery>> GetPrioritizedQueries()
         {
-            _logger.LogTrace($"Begin Prioritizing Queries for {nameof(QuerySubscriptionCountRule)}");
+            _logger.LogTrace("Begin Prioritizing Queries");
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -51,7 +51,7 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
                                                                                  .OrderByDescending(s => s.SubscriberCount)
                                                                                  .Select(s => s.Query);
 
-            _logger.LogTrace($"{nameof(QuerySubscriptionCountRule)} took {stopWatch.ElapsedMilliseconds} ms to sort.");
+            _logger.LogTrace("Took {ElapsedMS} ms to sort queries.", stopWatch.ElapsedMilliseconds);
             return sortedQueries;
         }
 

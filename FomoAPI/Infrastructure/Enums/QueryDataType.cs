@@ -10,8 +10,8 @@ namespace FomoAPI.Infrastructure.Enums
     /// </summary>
     public class QueryDataType
     {
-        public readonly static QueryDataType Csv = new QueryDataType("csv");
-        public readonly static QueryDataType Json = new QueryDataType("json");
+        public readonly static QueryDataType Csv = new ("csv");
+        public readonly static QueryDataType Json = new ("json");
 
         public string Name { get; private set; }
 

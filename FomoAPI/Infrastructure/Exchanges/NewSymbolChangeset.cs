@@ -10,9 +10,9 @@ namespace FomoAPI.Infrastructure.Exchanges
     /// </summary>
     public class NewSymbolChangeset : IExchangeSyncChangeset
     {
-        private List<InsertSymbolAction> _newSymbols;
-        private IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
-        private IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
+        private readonly List<InsertSymbolAction> _newSymbols;
+        private readonly IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
+        private readonly IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
 
         public NewSymbolChangeset(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)
         {

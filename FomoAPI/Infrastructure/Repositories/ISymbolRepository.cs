@@ -16,7 +16,7 @@ namespace FomoAPI.Infrastructure.Repositories
         /// Get a list of symbols that match the given tickers
         /// </summary>
         /// <param name="tickers">Tickers to search for.</param>
-        /// <returns><see cref="IEnumerable"/> of <see cref="Symbol"/> for the matching tickers</returns>
+        /// <returns><see cref="IEnumerable{Symbol}"/> for the matching tickers</returns>
         Task<IEnumerable<Symbol>> GetSymbols(IEnumerable<string> tickers);
 
         /// <summary>
@@ -24,13 +24,13 @@ namespace FomoAPI.Infrastructure.Repositories
         /// </summary>
         /// <param name="ticker">Ticker to search for.</param>
         /// <returns>Matching <see cref="Symbol"/> for the given ticker. Otherwise null.</returns>
-        Task<Symbol> GetSymbol(string tickers);
+        Task<Symbol> GetSymbol(string ticker);
 
         /// <summary>
         /// Get a list of symbols that match the given symbol ids
         /// </summary>
         /// <param name="symbolIds">SymbolIds to search for.</param>
-        /// <returns><see cref="IEnumerable"/> of <see cref="Symbol"/> for the matching SymbolIds.
+        /// <returns><see cref="IEnumerable{Symbol}"/> of the matching SymbolIds.
         /// Empty IEnumerable will be returned if no results match."/></returns>
         Task<IEnumerable<Symbol>> GetSymbols(IEnumerable<int> symbolIds);
 

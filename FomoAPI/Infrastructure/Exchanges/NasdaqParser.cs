@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Infrastructure.Exchanges
@@ -26,7 +25,7 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <param name="reader">The stream reader containing the download data</param>
         /// <param name="delimiter">Delimiter for the file columns</param>
         /// <param name="suffixBlackList">Will remove the list suffixes and any characters after it.</param>
-        /// <returns>IDictionary<string, DownloadedSymbol> dictionary that maps the stock ticker to downloaded symbol data</returns>
+        /// <returns><see cref="IDictionary{SymbolKey, DownloadedSymbol}"/></returns>
         public async Task<IDictionary<SymbolKey, DownloadedSymbol>> GetSymbolMap(StreamReader reader, string delimiter, string[] suffixBlackList)
         {
             var tickerToSymbolMap = new Dictionary<SymbolKey, DownloadedSymbol>();
@@ -84,7 +83,7 @@ namespace FomoAPI.Infrastructure.Exchanges
 
                 if(index != -1)
                 {
-                    return fullName.Substring(0, index).Trim();
+                    return fullName[..index].Trim();
                 }
             }
 
@@ -111,14 +110,14 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <returns>Fomo Exchange Name. Null if it's an unsupported exchange.</returns>
         private ExchangeType ToExchangeType(string exchanageNameSymbol)
         {
-            switch (exchanageNameSymbol)
+            return exchanageNameSymbol switch
             {
-                case "Q": return ExchangeType.NASDAQ;
-                case "N": return ExchangeType.NYSE;
-                case "P": return ExchangeType.NYSEARCA;
-                case "A": return ExchangeType.NYSEAMERICAN;
-                default: return ExchangeType.Unknown;
-            }
+                "Q" => ExchangeType.NASDAQ,
+                "N" => ExchangeType.NYSE,
+                "P" => ExchangeType.NYSEARCA,
+                "A" => ExchangeType.NYSEAMERICAN,
+                _ => ExchangeType.Unknown,
+            };
         }
     }
 }

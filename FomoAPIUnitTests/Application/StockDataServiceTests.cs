@@ -24,7 +24,7 @@ namespace FomoAPIUnitTests.Application
         private readonly StockDataService _service;
         private readonly SingleQuoteData _singleQuoteData;
 
-        private Mock<IStockDataRepository> _stockDataRepository;
+        private readonly Mock<IStockDataRepository> _stockDataRepository;
 
         public StockDataServiceTests()
         {

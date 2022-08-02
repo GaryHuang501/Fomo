@@ -21,11 +21,11 @@ namespace FomoAPI.Infrastructure.Enums
         /// Enum concrete types. Daily, weekly, and monthly renew every day because
         /// the resulting data set will change at the end of the day.
         /// </summary>
-        public readonly static QueryFunctionType SingleQuote = new QueryFunctionType(SingleQuoteName, TimeSpan.FromMinutes(5));
-        public readonly static QueryFunctionType IntraDay = new QueryFunctionType(IntraDayName, TimeSpan.FromMinutes(5));
-        public readonly static QueryFunctionType Daily = new QueryFunctionType(DailyName, TimeSpan.FromMinutes(15));
-        public readonly static QueryFunctionType Weekly = new QueryFunctionType(WeeklyName, TimeSpan.FromMinutes(30));
-        public readonly static QueryFunctionType Monthly = new QueryFunctionType(MonthlyName, TimeSpan.FromMinutes(30));
+        public readonly static QueryFunctionType SingleQuote = new (SingleQuoteName, TimeSpan.FromMinutes(5));
+        public readonly static QueryFunctionType IntraDay = new (IntraDayName, TimeSpan.FromMinutes(5));
+        public readonly static QueryFunctionType Daily = new (DailyName, TimeSpan.FromMinutes(15));
+        public readonly static QueryFunctionType Weekly = new (WeeklyName, TimeSpan.FromMinutes(30));
+        public readonly static QueryFunctionType Monthly = new (MonthlyName, TimeSpan.FromMinutes(30));
 
         public string Name { get; private set; }
 

@@ -58,7 +58,7 @@ namespace FomoAPI.Application.DTOs
 
         public static StockSingleQuoteDataDTO CreateNoDataExists(int symbolId)
         {
-            return new StockSingleQuoteDataDTO(symbolId);
+            return new (symbolId);
         }
     }
 }

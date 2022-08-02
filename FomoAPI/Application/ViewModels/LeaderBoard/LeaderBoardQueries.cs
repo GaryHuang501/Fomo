@@ -13,7 +13,7 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
     /// </summary>
     public class LeaderBoardQueries : ILeaderBoardQueries
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public LeaderBoardQueries(IOptionsMonitor<DbOptions> dbOptions)
         {
@@ -71,11 +71,9 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
 
             sql = SetSortOrder(sql, sortDirection);
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
-                return boardValues;
-            }
+            using var connection = new SqlConnection(_connectionString);
+            var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
+            return boardValues;
         }
 
         private async Task<Board> GetBestPerformer(int top)
@@ -128,11 +126,9 @@ namespace FomoAPI.Application.ViewModels.LeaderBoard
 
             sql = SetSortOrder(sql, sortDirection);
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
-                return boardValues;
-            }
+            using var connection = new SqlConnection(_connectionString);
+            var boardValues = await connection.QueryAsync<BoardValue>(sql, new { Top = top });
+            return boardValues;
         }
 
         private string SetSortOrder(string sql, SortDirection sortDirection)

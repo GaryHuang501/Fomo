@@ -55,12 +55,10 @@ namespace FomoAPIIntegrationTests.Fixtures
                 }
 
                 var ftpClient = new FtpClient();
-                using (var downloadStream = ftpClient.DownloadFile(fileUrl, string.Empty, string.Empty))
+                using var downloadStream = ftpClient.DownloadFile(fileUrl, string.Empty, string.Empty);
+                using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                    {
-                        downloadStream.CopyTo(fileStream);
-                    }
+                    downloadStream.CopyTo(fileStream);
                 }
             }
 

@@ -342,7 +342,6 @@ namespace FomoAPIUnitTests.Application
             Assert.Equal(0, _querySubscriptions.Count);
         }
 
-
         [Fact]
         public async Task Should_BeAbleToExecuteNextQueryBatch_WhenErrorEnqueing_MultipleBatches()
         {

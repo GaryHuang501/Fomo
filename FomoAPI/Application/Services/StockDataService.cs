@@ -48,10 +48,9 @@ namespace FomoAPI.Application.Services
         /// <returns>The <see cref="StockSingleQuoteDataDTO"/></returns>
         public async Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId)
         {
-            SingleQuoteQueryResult queryResult;
             SingleQuoteData data;
 
-            if (_singleQuoteCache.TryGet(symbolId, out queryResult))
+            if (_singleQuoteCache.TryGet(symbolId, out SingleQuoteQueryResult queryResult))
             {
                 return new StockSingleQuoteDataDTO(symbolId, queryResult.Data);
             }

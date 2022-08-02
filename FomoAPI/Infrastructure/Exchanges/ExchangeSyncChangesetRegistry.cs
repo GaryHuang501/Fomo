@@ -11,8 +11,8 @@ namespace FomoAPI.Infrastructure.Exchanges
         /// <summary>
         /// Creates the list of exchange sync changesets
         /// </summary>
-        /// <param name="existingSymbolsMap">Readonly Dictionary for existing <see cref="Symbol"/> with <see cref="SymbolKey"/> as key.<</param>
-        /// <param name="downloadedSymbolsMap">Readonly Dictionary for downloaded <see cref="DownloadedSymbol"/> with <see cref="SymbolKey"/> as key.</param>
+        /// <param name="existingSymbolsMap">Existing symbols as <see cref="IReadOnlyDictionary{SymbolKey, Symbol}"/>.</param>
+        /// <param name="downloadedSymbolsMap">Downloaded symbols as <see cref="IReadOnlyDictionary{SymbolKey, Symbol}"/>.</param>
         /// <returns></returns>
         public IEnumerable<IExchangeSyncChangeset> Create(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, 
                                                           IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)

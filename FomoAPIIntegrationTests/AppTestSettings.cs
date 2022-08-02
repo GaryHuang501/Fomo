@@ -14,7 +14,7 @@ namespace FomoAPIIntegrationTests
     /// </summary>
     public class AppTestSettings
     {
-        private static readonly Lazy<AppTestSettings> _instance = new Lazy<AppTestSettings>(new AppTestSettings());
+        private static readonly Lazy<AppTestSettings> _instance = new(new AppTestSettings());
 
         public static AppTestSettings Instance { get { return _instance.Value; } }
 

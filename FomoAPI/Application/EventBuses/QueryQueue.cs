@@ -179,11 +179,13 @@ namespace FomoAPI.Application.EventBuses
         /// </summary>
         /// <param name="query">Query to add</param>
         /// <returns>True if query was added. False if query already exists and is not added</returns>
-        /// <remarks>Query cannot be enqueued again until it has been <see cref="Clear(StockQuery)"/> has been called.</remarks>
+        /// <remarks>Query cannot be enqueued again until it has been <see cref="ClearAll"/> has been called.</remarks>
         public bool Enqueue(StockQuery query)
         {
             lock (_lock)
             {
+
+
                 bool queryExists = _queryStatus.TryGetValue(query, out StatusInfo statusInfo);
 
                 if (!queryExists)

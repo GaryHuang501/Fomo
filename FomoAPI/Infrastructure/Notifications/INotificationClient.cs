@@ -10,7 +10,7 @@ namespace FomoAPI.Infrastructure.Notifications
         /// <summary>
         /// Notify users of changes.
         /// </summary>
-        /// <param name="Notification"><see cref="INotification"/> to publish.</param>
+        /// <param name="notifcation"><see cref="INotification"/> to publish</param>
         Task NotifyChanges(INotification notifcation);
     }
 }

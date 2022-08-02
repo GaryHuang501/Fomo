@@ -45,14 +45,12 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         public async Task InitializeAsync()
         {
-            using (var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString))
-            {
-                await connection.ExecuteAsync("DELETE FROM Vote", null);
-                await connection.ExecuteAsync("DELETE FROM PortfolioSymbol", null);
-                await connection.ExecuteAsync("DELETE FROM Portfolio", null);
-                await connection.ExecuteAsync("DELETE FROM SingleQuoteData", null);
-                await connection.ExecuteAsync("DELETE FROM AspNetUsers", null);
-            }
+            using var connection = new SqlConnection(AppTestSettings.Instance.TestDBConnectionString);
+            await connection.ExecuteAsync("DELETE FROM Vote", null);
+            await connection.ExecuteAsync("DELETE FROM PortfolioSymbol", null);
+            await connection.ExecuteAsync("DELETE FROM Portfolio", null);
+            await connection.ExecuteAsync("DELETE FROM SingleQuoteData", null);
+            await connection.ExecuteAsync("DELETE FROM AspNetUsers", null);
         }
 
         [Fact]

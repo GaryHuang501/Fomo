@@ -42,12 +42,10 @@ namespace FomoAPI.Infrastructure.Repositories
                                 (@SymbolId, @UserId, @Direction, @LastUpdated);
                             END;";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var affectedRows = await connection.ExecuteAsync(sql, vote);
+            using var connection = new SqlConnection(_connectionString);
+            var affectedRows = await connection.ExecuteAsync(sql, vote);
 
-                return affectedRows > 0;
-            }
+            return affectedRows > 0;
         }
 
         public async Task<IReadOnlyDictionary<int, TotalVotes>> GetTotalVotes(ISet<int> symbolIds, Guid userId)

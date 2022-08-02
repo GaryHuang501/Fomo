@@ -45,9 +45,9 @@ namespace FomoAPI.Application.EventBuses
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(PortfolioStocksUpdateHostedService)} is starting");
+            _logger.LogInformation("{Source} is starting", nameof(PortfolioStocksUpdateHostedService));
 
-            _timerExecute = new Timer(async state =>
+            _timerExecute = new(async state =>
             {
                 if (_marketHours.IsMarketHours(DateTime.UtcNow))
                 {
@@ -69,7 +69,7 @@ namespace FomoAPI.Application.EventBuses
 
             var symbolIdsForUpdate = await _portfolioStocksUpdateQuery.Get(_options.BatchSize, maxUpdateDate);
 
-            _logger.LogInformation($"{nameof(PortfolioStocksUpdateHostedService)} updating {symbolIdsForUpdate.Count()} stocks");
+            _logger.LogInformation("{Source} is Updating {Updatecount} stocks", nameof(PortfolioStocksUpdateHostedService), symbolIdsForUpdate.Count());
 
             foreach (var symbolId in symbolIdsForUpdate)
             {
@@ -79,7 +79,7 @@ namespace FomoAPI.Application.EventBuses
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"{nameof(PortfolioStocksUpdateHostedService)} is stopping");
+            _logger.LogInformation("{Source} is stopping", nameof(PortfolioStocksUpdateHostedService));
 
             _timerExecute?.Change(Timeout.Infinite, 0);
 

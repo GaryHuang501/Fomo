@@ -51,7 +51,6 @@ namespace FomoAPIUnitTests.Application.EventBuses
             mockQuery.Verify(q => q.Get(It.IsAny<int>(), It.IsAny<DateTime>()), Times.Never);
         }
 
-
         [Fact]
         public async Task ShouldUpdate_WhenCurrentTimeIsOutsideMarketHours()
         {

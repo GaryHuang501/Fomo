@@ -19,7 +19,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
         private SymbolRepository _symbolRepo;
 
-        private string _connectionString = AppTestSettings.Instance.TestDBConnectionString;
+        private readonly string _connectionString = AppTestSettings.Instance.TestDBConnectionString;
 
         public ExchangeSyncTests()
         {

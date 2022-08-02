@@ -11,9 +11,9 @@ namespace FomoAPI.Infrastructure.Exchanges
     /// </summary>
     public class SymbolDetailsChangeset : IExchangeSyncChangeset
     {
-        private List<UpdateSymbolAction> _changedSymbols;
-        private IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
-        private IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
+        private readonly List<UpdateSymbolAction> _changedSymbols;
+        private readonly IReadOnlyDictionary<SymbolKey, Symbol> _existingSymbolsMap;
+        private readonly IReadOnlyDictionary<SymbolKey, DownloadedSymbol> _downloadedSymbolsMap;
 
         public SymbolDetailsChangeset(IReadOnlyDictionary<SymbolKey, Symbol> existingSymbolsMap, IReadOnlyDictionary<SymbolKey, DownloadedSymbol> downloadedSymbolsMap)
         {
@@ -32,7 +32,6 @@ namespace FomoAPI.Infrastructure.Exchanges
                                     _existingSymbolsMap[symbolKey].Id,
                                     _downloadedSymbolsMap[symbolKey].FullName,
                                     _downloadedSymbolsMap[symbolKey].ExchangeId);
-
 
             _changedSymbols.Add(symbolForDb);
         }

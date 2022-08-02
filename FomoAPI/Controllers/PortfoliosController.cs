@@ -97,7 +97,6 @@ namespace FomoAPI.Controllers
             return Ok(newPortfolio);
         }
 
-
         /// <summary>
         /// Deletes the specified portfolio.
         /// </summary>

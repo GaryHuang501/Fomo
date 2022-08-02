@@ -31,6 +31,7 @@ namespace FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage.Parsers
         /// Parse the csv data to StockSingleQuotedataCsvParser.
         /// Will throw exception if any field is missing.
         /// </summary>
+        /// <param name="symbolId"></param>
         /// <param name="reader">Reader holding the response data</param>
         /// <returns></returns>
         public SingleQuoteData ParseCsv(int symbolId, StreamReader reader)

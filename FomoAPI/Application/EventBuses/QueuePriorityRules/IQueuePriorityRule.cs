@@ -12,7 +12,7 @@ namespace FomoAPI.Application.EventBuses.QueuePriorityRules
         /// <summary>
         /// Get next set of queries needing to be updated.
         /// </summary>
-        /// <returns>Prioritized Queries as <see cref="IEnumerable{T}"/> of type <see cref="StockQuery"/></returns>
+        /// <returns>Prioritized Queries as <see cref="IEnumerable{StockQuery}"/></returns>
         Task<IEnumerable<StockQuery>> GetPrioritizedQueries();
 
         /// <summary>

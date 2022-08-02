@@ -70,7 +70,6 @@ namespace FomoAPI.Infrastructure.Repositories
             return result.FirstOrDefault();
         }
 
-
         public async Task<Symbol> GetSymbol(int symbolId)
         {
             IEnumerable<Symbol> result = await GetSymbols(new int[] { symbolId });
