@@ -177,7 +177,7 @@ namespace FomoAPI
 
         public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration config)
         {
-            services.AddHttpClient(config["AlphaVantage:ClientName"], c => { });
+            services.AddHttpClient(config["Finnhub:ClientName"], c => { });
             services.AddHttpClient("Firebase:ClientName", c => { });
 
             return services;

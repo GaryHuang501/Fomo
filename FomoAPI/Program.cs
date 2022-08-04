@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using FomoAPI.AutoFacModules;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -29,6 +30,7 @@ else if (env.EnvironmentName == "Test")
     builder.Configuration.AddUserSecrets(testSecretsId);
 }
 
+builder.Services.AddHealthChecks();
 builder.Configuration.AddEnvironmentVariables();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
@@ -43,6 +45,7 @@ var startup = new FomoAPI.Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
+app.MapHealthChecks("/healthy");
 
 startup.Configure(app, app.Environment);
 
