@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { ChatInputBar } from './ChatInputBar';
 import React from 'react';
@@ -11,7 +11,7 @@ beforeEach(() => {
 afterEach(() => {
 });
 
-it("calls enter callback when enter is pressed", () => {
+it("calls enter callback when enter is pressed", async () => {
 
     let enterPressed = false;
 
@@ -27,7 +27,7 @@ it("calls enter callback when enter is pressed", () => {
 
     fireEvent.keyDown(textbox, { key: 'Enter', code: 'Enter' })
 
-    expect(enterPressed).toEqual(true);
+    await waitFor(() => expect(enterPressed).toEqual(true));
 });
 
 it("calls emoji callback when emoji picker is pressed", () => {

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 
 import { ChatMessageArea } from './ChatMessageArea';
 import React from 'react';
