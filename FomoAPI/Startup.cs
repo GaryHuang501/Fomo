@@ -149,7 +149,7 @@ namespace FomoAPI
                 options.AddPolicy(policyName,
                 builder =>
                 {
-                    builder.WithOrigins(configuration.GetValue<string>("MainPage"))
+                    builder.WithOrigins(configuration.GetValue<string>("Accounts:MainPage"))
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();

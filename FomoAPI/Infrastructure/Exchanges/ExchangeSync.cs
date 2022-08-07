@@ -26,6 +26,7 @@ namespace FomoAPI.Infrastructure.Exchanges
             try
             {
                 var syncSettings = await _syncRepository.GetSyncSettings();
+                await _syncRepository.AddSyncHistory("StartNewSync", 0, "Starting new Sync");
 
                 if (syncSettings.DisableSync) return;
 
@@ -63,6 +64,8 @@ namespace FomoAPI.Infrastructure.Exchanges
 
                     await changeset.SaveChangeset(_syncRepository);
                 }
+
+                await _syncRepository.AddSyncHistory("EndSync", 0, "Sync Finished");
 
             }
             catch (Exception ex)

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using FomoApp.Exceptions;
 using System;
 using FomoAPI.Infrastructure.Clients;
 using FomoAPI.Application.DTOs;
@@ -16,6 +15,7 @@ using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Domain.Login;
 using FomoAPI.Application.Commands.User;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
 
 namespace FomoAPI.Controllers
 {
@@ -31,6 +31,7 @@ namespace FomoAPI.Controllers
         private readonly IPortfolioRepository _portfolioRepo;
         private readonly IClientAuthFactory _clientAuthFactory;
         private readonly UserValidator _validator;
+        private readonly ILogger<AccountsController> _logger;
         private readonly IOptionsMonitor<AccountsOptions> _accountsOptions;
 
         public AccountsController(SignInManager<IdentityUser<Guid>> signInManager, 
@@ -38,12 +39,14 @@ namespace FomoAPI.Controllers
                                   IPortfolioRepository portfolioRepo,
                                   IClientAuthFactory clientAuthFactory,
                                   UserValidator validator,
+                                  ILogger<AccountsController> logger, 
                                   IOptionsMonitor<AccountsOptions> accountsOptions)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _clientAuthFactory = clientAuthFactory;
             _validator = validator;
+            _logger = logger;
             _portfolioRepo = portfolioRepo;
             _accountsOptions = accountsOptions;
         }
@@ -140,6 +143,7 @@ namespace FomoAPI.Controllers
         public async Task<ActionResult<string>> GetClientCustomToken()
         {
             var claims = new UserClaims(User);
+            _logger.LogInformation("Token request for Login for {userName}", User.GetUserId());
 
             return await _clientAuthFactory.CreateClientToken(Guid.Parse(claims.UserID), claims.Value);
         }
