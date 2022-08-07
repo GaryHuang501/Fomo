@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 
 import ChatBox from './ChatBox';
-import MockFireBaseDB from '../../mocks/MockFireBaseDB';
+import MockFirebaseDB from '../../mocks/MockFirebaseDB';
 import MockSnapshot from '../../mocks/MockSnapshot';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -10,8 +10,8 @@ import { render } from '../../test-util';
 
 beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = function() {};
-    MockFireBaseDB.ServerValue =  { TIMESTAMP : 1000 };
-    firebase.database = MockFireBaseDB;
+    MockFirebaseDB.ServerValue =  { TIMESTAMP : 1000 };
+    firebase.database = MockFirebaseDB;
 });
 
 afterEach(() => {

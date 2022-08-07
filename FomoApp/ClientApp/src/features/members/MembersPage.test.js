@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 
 import MembersPage from './MembersPage';
 import MockAdapter from 'axios-mock-adapter';
-import MockFireBaseDB from '../../mocks/MockFireBaseDB';
+import MockFirebaseDB from '../../mocks/MockFirebaseDB';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
@@ -19,8 +19,8 @@ let endPointUrl;
 beforeEach(() => {
   window.HTMLElement.prototype.scrollIntoView = function() {};
 
-  MockFireBaseDB.ServerValue =  { TIMESTAMP : 1000 };
-  firebase.database = MockFireBaseDB;
+  MockFirebaseDB.ServerValue =  { TIMESTAMP : 1000 };
+  firebase.database = MockFirebaseDB;
 
   mock = new MockAdapter(axios);
 

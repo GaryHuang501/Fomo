@@ -1,6 +1,6 @@
 import MockSnapshot from "./MockSnapshot";
 
-export default class MockFireBaseRef {
+export default class MockFirebaseRef {
     constructor(path) { 
         this.path = path;
 

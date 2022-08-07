@@ -9,7 +9,7 @@ import { ChatListener } from './ChatListener';
 import { ChatMessageArea } from './ChatMessageArea';
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
-import { userMessagesPath } from '../../app/FireBasePaths';
+import { userMessagesPath } from '../../app/FirebasePaths';
 
 /*
   Chatbox for reading and writing messages. 

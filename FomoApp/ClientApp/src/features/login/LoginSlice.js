@@ -56,7 +56,7 @@ export const loginSlice = createSlice({
       setUnauthenticated: state => {
         revokeCredentials(state);
       },
-      setFireBaseAuthenticated: state => {
+      setFirebaseAuthenticated: state => {
           state.isFirebaseAuthenticated = true;
       }
   },
@@ -115,7 +115,7 @@ export const loginSlice = createSlice({
   }
 });
 
-export const { setAuthenticated, setUnauthenticated, setFireBaseAuthenticated } = loginSlice.actions;
+export const { setAuthenticated, setUnauthenticated, setFirebaseAuthenticated } = loginSlice.actions;
 
 export const selectAuthenticatedState = state => state.login.isAuthenticated;
 

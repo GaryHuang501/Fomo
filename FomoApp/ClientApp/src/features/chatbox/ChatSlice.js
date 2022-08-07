@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { friendActivityPath, userMessagesPath } from '../../app/FireBasePaths';
+import { friendActivityPath, userMessagesPath } from '../../app/FirebasePaths';
 
 import ChatStatusType from './ChatStatusType';
 import MessageType  from './MessageType';

@@ -5,7 +5,7 @@ import 'firebase/analytics';
 import { screen, waitFor, within } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
-import MockFireBaseDB from '../../mocks/MockFireBaseDB';
+import MockFirebaseDB from '../../mocks/MockFirebaseDB';
 import MockSnapshot from '../../mocks/MockSnapshot';
 import PortfolioListener from './PortfolioListener';
 import { PortfolioStock } from './PortfolioStock';
@@ -14,14 +14,14 @@ import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import firebase from 'firebase/app';
 import { render } from '../../test-util';
-import { singleQuoteDataPath } from '../../app/FireBasePaths';
+import { singleQuoteDataPath } from '../../app/FirebasePaths';
 
 let mock;
 
 beforeEach(() => {
     jest.useFakeTimers();
 
-    firebase.database = MockFireBaseDB;
+    firebase.database = MockFirebaseDB;
     mock = new MockAdapter(axios);
 
     process.env = {

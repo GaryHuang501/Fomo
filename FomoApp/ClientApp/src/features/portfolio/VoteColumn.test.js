@@ -1,8 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import MockAdapter from 'axios-mock-adapter';
-import MockFireBaseDB from '../../mocks/MockFireBaseDB';
-import MockFireBaseRef from '../../mocks/MockFireBaseRef';
+import MockFirebaseDB from '../../mocks/MockFirebaseDB';
+import MockFirebaseRef from '../../mocks/MockFirebaseRef';
 import { PortfolioStock } from './PortfolioStock';
 import React from 'react';
 import VoteColumn from './VoteColumn';
@@ -17,8 +17,8 @@ const testUrl = "http://localhost";
 let mock;
 
 beforeEach(() => {
-  MockFireBaseDB.ServerValue =  { TIMESTAMP : 1000 };
-  firebase.database = MockFireBaseDB;
+  MockFirebaseDB.ServerValue =  { TIMESTAMP : 1000 };
+  firebase.database = MockFirebaseDB;
 
   mock = new MockAdapter(axios);
 

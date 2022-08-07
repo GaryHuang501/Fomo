@@ -1,7 +1,7 @@
 import 'firebase/auth';
 import 'firebase/database';
 
-import {getClientCustomToken, selectClientCustomToken, setFireBaseAuthenticated} from  '../features/login/LoginSlice';
+import {getClientCustomToken, selectClientCustomToken, setFirebaseAuthenticated} from  '../features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import firebase from 'firebase/app';
@@ -24,7 +24,7 @@ export const FirebaseManager = function() {
       if(clientToken){
         try{
           await firebase.auth().signInWithCustomToken(clientToken)
-          dispatch(setFireBaseAuthenticated());
+          dispatch(setFirebaseAuthenticated());
 
           // Token expires after 1 hour.
           refreshTokenInterval = setInterval(() => {

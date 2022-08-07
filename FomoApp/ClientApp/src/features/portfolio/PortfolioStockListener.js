@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import firebase from 'firebase/app';
 import { selectStockLastUpdated } from '../stocks/stocksSlice'
-import { singleQuoteDataPath } from '../../app/FireBasePaths';
+import { singleQuoteDataPath } from '../../app/FirebasePaths';
 import { useSelector } from 'react-redux';
 
 /*

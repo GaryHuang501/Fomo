@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { ChatListener } from './ChatListener';
 import { ChatMessageArea } from './ChatMessageArea';
-import { friendActivityPath } from '../../app/FireBasePaths';
+import { friendActivityPath } from '../../app/FirebasePaths';
 
 /*
   Read only message box to listen to history activity that uses chat components.

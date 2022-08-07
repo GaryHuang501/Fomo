@@ -1,25 +1,25 @@
-import MockFireBaseRef from './MockFireBaseRef';
+import MockFirebaseRef from './MockFirebaseRef';
 
-export default function MockFireBaseDB(){
+export default function MockFirebaseDB(){
 
-    if(MockFireBaseDB.refs == null){
-        MockFireBaseDB.refs = [];
+    if(MockFirebaseDB.refs == null){
+        MockFirebaseDB.refs = [];
     }
 
     this.ref = function(path) {
-        const ref = new MockFireBaseRef(path);
-        MockFireBaseDB.refs.push(ref);
+        const ref = new MockFirebaseRef(path);
+        MockFirebaseDB.refs.push(ref);
         return ref;
     }
 
-    this.refs = MockFireBaseDB.refs;
+    this.refs = MockFirebaseDB.refs;
 
     this.reset = function(){
-        for(const ref of MockFireBaseDB.refs){
+        for(const ref of MockFirebaseDB.refs){
             ref.reset();
         }
         
-        MockFireBaseDB.refs = [];
+        MockFirebaseDB.refs = [];
     }
 
     return {
