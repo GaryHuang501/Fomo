@@ -7,7 +7,7 @@ import FriendActivityBox from '../chatbox/FriendActivityBox'
 import { MembersList } from './MembersList';
 import { MembersListSeparator } from './MembersListSeparator';
 import React from 'react';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 /*
     Shows the list of members links to the their portfolio pages.

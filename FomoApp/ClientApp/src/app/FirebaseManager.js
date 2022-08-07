@@ -5,7 +5,7 @@ import {getClientCustomToken, selectClientCustomToken, setFirebaseAuthenticated}
 import { useDispatch, useSelector } from 'react-redux';
 
 import firebase from 'firebase/app';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 // Manages the login for firebase
 export const FirebaseManager = function() {

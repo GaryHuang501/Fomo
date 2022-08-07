@@ -1,7 +1,7 @@
 import './Modal.css';
 
 import React, { useRef } from 'react';
-import { useCallback, useEffect } from 'react/cjs/react.development';
+import { useCallback, useEffect } from 'react';
 
 import ReactDOM from 'react-dom';
 

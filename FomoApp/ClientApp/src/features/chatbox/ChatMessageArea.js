@@ -4,7 +4,7 @@ import React, { useMemo, useRef } from 'react';
 
 import { ChatMessage } from './ChatMessage';
 import { ChatMessageDateSeparator } from './ChatMessageDateSeparator';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 /*
   Represents the area that holds the chat messages for the selected portoflio.

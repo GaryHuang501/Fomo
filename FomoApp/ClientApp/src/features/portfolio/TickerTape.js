@@ -1,7 +1,7 @@
 import './TickerTape.css';
 
 import React from 'react';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 export const TickerTape = () => {
 

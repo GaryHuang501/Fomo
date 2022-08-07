@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LeaderBoard from './LeaderBoard';
 import Options from './LeaderBoardOptions';
 import React from 'react';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 export default function LeaderBoardPage() {
 

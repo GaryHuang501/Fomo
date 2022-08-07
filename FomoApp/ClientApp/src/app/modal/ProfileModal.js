@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Modal from './Modal';
 import ProfileSettings from '../../features/login/ProfileSettings';
-import { useEffect } from 'react/cjs/react.development';
+import { useEffect } from 'react';
 
 // Modal showing the profile settings
 export default function ProfileModal(props) {
