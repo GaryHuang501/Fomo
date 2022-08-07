@@ -33,7 +33,7 @@ namespace FomoAPI
             services.AddCustomDBContexts(Configuration)
                     .AddCustomOptions(Configuration)
                     .AddCustomAuthentications(Configuration)
-                    .AddCustomCORS(DevelopmentCorsPolicyName)
+                    .AddCustomCORS(Configuration, DevelopmentCorsPolicyName)
                     .AddCustomAntiForgery()
                     .AddCustomHttpClients(Configuration)
                     .AddSwaggerGen(c =>
@@ -142,14 +142,14 @@ namespace FomoAPI
             return services;
         }
 
-        public static IServiceCollection AddCustomCORS(this IServiceCollection services, string policyName)
+        public static IServiceCollection AddCustomCORS(this IServiceCollection services, IConfiguration configuration, string policyName)
         {
             services.AddCors(options =>
             {
                 options.AddPolicy(policyName,
                 builder =>
                 {
-                    builder.WithOrigins("https://localhost:3000")
+                    builder.WithOrigins(configuration.GetValue<string>("MainPage"))
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();
@@ -177,6 +177,7 @@ namespace FomoAPI
 
         public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration config)
         {
+            services.AddHttpClient(config["AlphaVantage:ClientName"], c => { });
             services.AddHttpClient(config["Finnhub:ClientName"], c => { });
             services.AddHttpClient("Firebase:ClientName", c => { });
 
