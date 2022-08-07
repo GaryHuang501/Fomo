@@ -3,8 +3,7 @@ import './App.css';
 import React, { useEffect } from 'react';
 import {
   Route,
-  BrowserRouter as Router,
-  Switch,
+  Routes,
 } from 'react-router-dom'
 import { getAccount, selectAuthenticatedState, selectFirebaseAuthenticatedState } from './features/login/LoginSlice';
 import { useDispatch, useSelector } from 'react-redux'
@@ -39,23 +38,24 @@ function App() {
     firebaseSetup();
     dispatch(getAccount());
   }, [dispatch]);
-
+  
   return (
-     <Router>
+    <React.Fragment>
          <div id='modal-root'></div>
         <NavHeader signOut={signOut}></NavHeader>
         { !isAuthenticated ? <LoginModal></LoginModal> : null }
         { isAuthenticated ? <FirebaseManager></FirebaseManager> : null } 
         { isFirebaseAuthenticated ?
-          <Switch>
-            <Route exact path="/" component={PortfolioPage}/>
-            <Route exact path="/portfolio" component={PortfolioPage}/>
-            <Route exact path="/portfolio/:urlUserId" component={PortfolioPage}/>
-            <Route exact path="/Leaderboard" component={LeaderBoardPage} />
-            <Route exact path="/Friends" component={MembersPage} />
-            <Route exact path="/Faq" component={FaqPage} />
-          </Switch> : null}
-    </Router>
+          <Routes>
+            <Route path="/" element={<PortfolioPage/>}/>
+            <Route path="portfolio" element={<PortfolioPage/>}/>
+            <Route path="portfolio/:urlUserId" element={<PortfolioPage/>}/>
+            <Route path="Leaderboard" element={<LeaderBoardPage/>} />
+            <Route path="Friends" element={<MembersPage/>} />
+            <Route path="Faq/*" element={<FaqPage/>} />
+            <Route path="*" element={<App/>}/>
+          </Routes> : null}
+    </React.Fragment>
   );
 }
 

@@ -1,5 +1,4 @@
 import './ChatBox.css';
-import 'emoji-mart/css/emoji-mart.css'
 
 import React, { useCallback, useState } from 'react';
 import { messageReceived, selectMessages, selectRefAlreadyExists, sendMessage } from './ChatSlice';
@@ -8,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ChatInputBar } from './ChatInputBar';
 import { ChatListener } from './ChatListener';
 import { ChatMessageArea } from './ChatMessageArea';
-import { Picker } from 'emoji-mart';
+import Picker from '@emoji-mart/react'
+import data from '@emoji-mart/data'
 import { userMessagesPath } from '../../app/FireBasePaths';
 
 /*
@@ -92,7 +92,7 @@ export default function ChatBox(props){
       <ChatMessageArea 
         chatMessages={chatMessages}>          
       </ChatMessageArea>
-      { showEmoji ? <div id='chatbox-emoji-picker'><Picker onSelect={onEmojiPicked}></Picker></div> : null }
+      { showEmoji ? <div id='chatbox-emoji-picker'><Picker data={data} onSelect={onEmojiPicked}></Picker></div> : null }
       <ChatInputBar 
         onSubmitPressed={submitMessage} 
         message={inputMessage}

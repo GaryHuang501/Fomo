@@ -41,6 +41,16 @@ export const TickerTape = () => {
     script.async = true;
     script.innerHTML = JSON.stringify(settings);
     document.getElementById('ticker-tape').appendChild(script);
+
+    return () => {
+
+      const tickerTape = document.getElementById('ticker-tape');
+
+      if(tickerTape)
+      {
+        tickerTape.removeChild(script);
+      }
+    }
   }, []);
 
   return (
