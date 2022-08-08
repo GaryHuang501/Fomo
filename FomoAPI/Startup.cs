@@ -34,7 +34,7 @@ namespace FomoAPI
                     .AddCustomOptions(Configuration)
                     .AddCustomAuthentications(Configuration)
                     .AddCustomCORS(Configuration, DevelopmentCorsPolicyName)
-                    .AddCustomAntiForgery()
+                    .AddCustomAntiForgery(Configuration)
                     .AddCustomHttpClients(Configuration)
                     .AddSwaggerGen(c =>
                    {
@@ -159,12 +159,12 @@ namespace FomoAPI
             return services;
         }
 
-        public static IServiceCollection AddCustomAntiForgery(this IServiceCollection services)
+        public static IServiceCollection AddCustomAntiForgery(this IServiceCollection services, IConfiguration config)
         {
             services.AddAntiforgery(options =>
             {
                 options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-                options.Cookie.Domain = "localhost";
+                options.Cookie.Domain = config["DomainName"];
                 options.Cookie.Name = "X-CSRF-TOKEN-COOKIENAME";
                 options.Cookie.Path = "Path";
                 options.FormFieldName = "AntiforgeryFieldname";
