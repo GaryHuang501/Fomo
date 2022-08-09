@@ -6,6 +6,7 @@ import { getAccountForId, selectMyUser, selectUser } from '../login/LoginSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 import ChatBox from '../chatbox/ChatBox';
+import { LoadingOverlay } from '../../app/loading/LoadingOverlay';
 import { Portfolio } from './Portfolio';
 import PortfolioListener from './PortfolioListener';
 import ShareProfileLink from "./ShareProfileLink";

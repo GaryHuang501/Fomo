@@ -3,6 +3,7 @@ import { selectMyUser, selectUpdateError, selectUpdateStatus, updateAccount } fr
 import { selectShowProfileModal, showProfileModal } from './ModalSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
+import { LoadingOverlay } from '../loading/LoadingOverlay';
 import Modal from './Modal';
 import ProfileSettings from '../../features/login/ProfileSettings';
 import { useEffect } from 'react';
@@ -31,12 +32,22 @@ export default function ProfileModal(props) {
             dispatch(showProfileModal(false));
             setSubmitted(false);
         }
+        else if(updateStatus === 'failed')
+        {
+            setSubmitted(false);
+        }
     }, [updateStatus, submitted, dispatch]);
 
     return (
         <React.Fragment>
             {showModal
-                ? <Modal onCancel={props.onClose}><ProfileSettings heading={myUser.name} onSubmit={onUpdateUser} myUser={myUser} apiErrors={apiErrors}/></Modal>
+                ?
+                <div>
+                 { submitted ? <LoadingOverlay/> : null }
+                 <Modal onCancel={props.onClose}>            
+                    <ProfileSettings heading={myUser.name} onSubmit={onUpdateUser} myUser={myUser} apiErrors={apiErrors}/>
+                  </Modal>
+                  </div>
                 : null
             }
         </React.Fragment>

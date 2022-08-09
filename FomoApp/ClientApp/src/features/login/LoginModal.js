@@ -1,6 +1,8 @@
 import './Login.css';
 
-import React from 'react';
+import React, { useState } from 'react';
+
+import { LoadingOverlay } from '../../app/loading/LoadingOverlay';
 import googleButton from '../../assets/login/btn_google_signin_dark_normal_web.png'
 
 /*
@@ -11,7 +13,10 @@ import googleButton from '../../assets/login/btn_google_signin_dark_normal_web.p
 */
 export const LoginModal = () => {
 
+    const [isLoading, setIsLoading] = useState(false);
+
     function signIn(e){
+        setIsLoading(true);
         const provider = e.currentTarget.dataset.column;
         window.location.href = `${process.env.REACT_APP_API_URL}/accounts/login?provider=${provider}&returnurl=${window.location.href}`;
     }
@@ -22,6 +27,7 @@ export const LoginModal = () => {
 
     return (
         <div id="login-modal" className='modal-backdrop'>
+            { isLoading ? <LoadingOverlay/> : null }
             <form id='login-modal-form' className='modal-form'>
                 <h3>Please Select a Login</h3>
                 <ul>

@@ -138,7 +138,6 @@ it("Should update my user profile when submitting", async () => {
 
 it("Should update not update selected user when not same as my user during submission", async () => {
 
-
     const initialState = {
         login: {
             selectedUser: {
@@ -183,7 +182,6 @@ it("Should update not update selected user when not same as my user during submi
 });
 
 it("Should show api error when update fails", async () => {
-
 
     const initialState = {
         login: {
