@@ -92,7 +92,7 @@ export default function ChatBox(props){
       <ChatMessageArea 
         chatMessages={chatMessages}>          
       </ChatMessageArea>
-      { showEmoji ? <div id='chatbox-emoji-picker'><Picker data={data} onSelect={onEmojiPicked}></Picker></div> : null }
+      { showEmoji ? <div id='chatbox-emoji-picker'><Picker data={data} onEmojiSelect={onEmojiPicked}></Picker></div> : null }
       <ChatInputBar 
         onSubmitPressed={submitMessage} 
         message={inputMessage}
