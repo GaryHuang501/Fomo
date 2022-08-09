@@ -100,14 +100,14 @@ namespace FomoAPI.Controllers
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [Produces("application/json")]
         public async Task<ActionResult<UserDTO>> UpdateAccount([FromBody, Required] UserDTO userToUpdate)
         {
             if(userToUpdate.Id != User.GetUserId())
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status401Unauthorized, "Unauthorized to update this account.");
             }
 
             IdentityUser<Guid> myUser = await _userManager.FindByIdAsync(userToUpdate.Id.ToString());
@@ -204,7 +204,7 @@ namespace FomoAPI.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("ExternalLoginCallback")]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery, Required] string returnUrl)
@@ -213,14 +213,27 @@ namespace FomoAPI.Controllers
 
             if (loginInfo == null)
             {
-                return StatusCode(StatusCodes.Status403Forbidden);
+                return StatusCode(StatusCodes.Status401Unauthorized);
             }
 
             var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
 
             if (user == null)
             {
-                return Redirect(_accountsOptions.CurrentValue.RegistrationPage);
+                var newUser = new IdentityUser<Guid>
+                {
+                    UserName = _accountsOptions.CurrentValue.DefaultName,
+                    Email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email)
+                };
+
+                var result = await RegisterUser(loginInfo, newUser);
+
+                if (!result.Success)
+                {
+                    return StatusCode(result.StatusCode, result.Error);
+                }
+
+                return Redirect($"{_accountsOptions.CurrentValue.RegistrationPage}/{newUser.Id}");
             }
             else
             {
@@ -234,48 +247,16 @@ namespace FomoAPI.Controllers
             return Redirect(returnUrl);      
         }
 
-        /// <summary>
-        /// Registers new user
-        /// </summary>
-        /// <param name="newUserCommand">Info to create new user.</param>
-        /// <response code="200">User successfully created.</response>
-        /// <response code="400">Validation failed when creating new user..</response>
-        /// <response code="403">Invalid credentials.</response>
-        /// <response code="500">Failed to register.</response>
-        [AllowAnonymous]
-        [HttpPost("Register")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> RegisterUser([FromBody] NewUserCommand newUserCommand)
+        private async Task<(bool Success, int StatusCode, string Error)> RegisterUser(ExternalLoginInfo loginInfo, IdentityUser<Guid> user)
         {
-            var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
-
-            if (loginInfo == null)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, "Unauthorized: Please register from main page login.");
-            }
-
-            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-
-            var user = new IdentityUser<Guid> { UserName = newUserCommand.Name, Email = email };
-
-            var validationResult = await _validator.ValidateAsync(user);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.ToString());
-            }
-
             var result = await _userManager.CreateAsync(user);
 
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to register user");
+                return (false, 500, "Unable to register user");
             }
 
-            var portfolio = await _portfolioRepo.CreatePortfolio(user.Id, "default");
+            var portfolio = await _portfolioRepo.CreatePortfolio(user.Id, _accountsOptions.CurrentValue.DefaultPortfolioName);
 
             await _userManager.AddClaimAsync(user, new Claim(FomoClaimTypes.PortfolioId, portfolio.Id.ToString()));
 
@@ -283,12 +264,12 @@ namespace FomoAPI.Controllers
 
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to add external info to user");
+                return (false, 500, "Failed to add external info to user");
             }
 
             await SignInUser(loginInfo, user);
 
-            return Ok();
+            return (true, 200, null);
         }
 
         private async Task<bool> SignInUser(ExternalLoginInfo loginInfo, IdentityUser<Guid> user)

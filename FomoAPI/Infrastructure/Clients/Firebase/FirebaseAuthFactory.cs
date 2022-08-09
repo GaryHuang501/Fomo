@@ -155,7 +155,7 @@ namespace FomoAPI.Infrastructure.Clients.Firebase
 
         public async Task CreateUser(Guid userId, string userName, string email)
         {
-            UserRecordArgs args = new UserRecordArgs()
+            UserRecordArgs args = new()
             {
                 Email = email,
                 EmailVerified = false,

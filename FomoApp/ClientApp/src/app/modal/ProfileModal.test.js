@@ -48,7 +48,7 @@ function TestSelectedUserSettingsComponent() {
         </div>)
 }
 
-it("Should not show modal when showProfile is false", async () => {
+it("Should not show modal when showProfile is false", () => {
 
     const initialState = {
         login: {

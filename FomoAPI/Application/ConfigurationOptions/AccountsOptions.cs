@@ -16,5 +16,12 @@ namespace FomoAPI.Application.ConfigurationOptions
 
         [Required]
         public string MainPage { get; set; }
+
+        [Required]
+        public string DefaultName { get; set; }
+
+        [Required]
+        public string DefaultPortfolioName { get; set; }
+
     }
 }

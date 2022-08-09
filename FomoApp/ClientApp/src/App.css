@@ -62,4 +62,9 @@
   color: white;
   border: none;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-input:hover{
+  background-color: darkblue;
 }

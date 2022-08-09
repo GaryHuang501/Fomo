@@ -9,6 +9,13 @@ import { render } from '../../test-util';
 
 const testUrl = "http://localhost";
 let mock;
+let mockUseParams = {};
+
+jest.mock('react-router-dom', () => ({
+    useParams: function(){
+        return mockUseParams;
+    }
+}));
 
 beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -26,14 +33,15 @@ afterEach(() => {
 
 it("Should show api error when registration fails", async () => {
 
-    const spy = jest.spyOn(axios, 'post');
+    mockUseParams = { urlUserId: 100 };
+    const spy = jest.spyOn(axios, 'put');
 
     act(() => {
         render(<RegistrationPage/>);
     });
 
-    const endPointUrl = `${process.env.REACT_APP_API_URL}/accounts/register`
-    mock.onPost(endPointUrl)
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/accounts/${mockUseParams.urlUserId}`
+    mock.onPut(endPointUrl)
         .reply(404, "Failed");
 
     const inputs = screen.getAllByRole('textbox');
@@ -48,16 +56,17 @@ it("Should show api error when registration fails", async () => {
 });
 
 
-it("Should submit new user", async () => {
+it("Should register new user", async () => {
 
-    const spy = jest.spyOn(axios, 'post');
+    mockUseParams = { urlUserId: 100 };
+    const spy = jest.spyOn(axios, 'put');
 
     act(() => {
         render(<RegistrationPage/>);
     });
 
-    const endPointUrl = `${process.env.REACT_APP_API_URL}/accounts/register`
-    mock.onPost(endPointUrl)
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/accounts/${mockUseParams.urlUserId}`
+    mock.onPut(endPointUrl)
         .reply(200);
 
     const inputs = screen.getAllByRole('textbox');
@@ -68,5 +77,5 @@ it("Should submit new user", async () => {
     fireEvent.change(nameInput, { target: { value: 'updatedName' } });
     fireEvent.click(submit);
 
-    await waitFor(() => expect(spy).toHaveBeenCalledWith(endPointUrl, { name: 'updatedName' },  {"withCredentials": true}));
+    await waitFor(() => expect(spy).toHaveBeenCalledWith(endPointUrl, { id: 100, name: 'updatedName' },  {"withCredentials": true}));
 });

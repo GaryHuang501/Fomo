@@ -30,7 +30,7 @@ it("calls enter callback when enter is pressed", async () => {
     await waitFor(() => expect(enterPressed).toEqual(true));
 });
 
-it("calls emoji callback when emoji picker is pressed", () => {
+it("calls emoji callback when emoji picker is pressed", async() => {
 
     let isEmojiPickerCalled;
 
@@ -47,10 +47,10 @@ it("calls emoji callback when emoji picker is pressed", () => {
 
     fireEvent.click(emojiButton);
 
-    expect(isEmojiPickerCalled).toEqual(true);
+    await waitFor(() => expect(isEmojiPickerCalled).toEqual(true));
 });
 
-it("calls submit callback when send button is pressed", () => {
+it("calls submit callback when send button is pressed", async() => {
     let isSubmitPressed;
 
     const onSubmitPressed = (event) => {
@@ -66,11 +66,11 @@ it("calls submit callback when send button is pressed", () => {
 
     fireEvent.click(submitButton);
 
-    expect(isSubmitPressed).toEqual(true);
+    waitFor(() => expect(isSubmitPressed).toEqual(true));
 });
 
 
-it("renders content editable with message from props", () => {
+it("renders content editable with message from props", async() => {
     let isSubmitPressed;
 
     const onSubmitPressed = (event) => {
@@ -82,5 +82,5 @@ it("renders content editable with message from props", () => {
     });
 
     const textbox = screen.getByRole("textbox");
-    expect(textbox.innerHTML).toEqual('message');
+    await waitFor(() => expect(textbox.innerHTML).toEqual('message'));
 });

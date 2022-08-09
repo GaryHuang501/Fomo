@@ -132,6 +132,12 @@ namespace FomoAPI
             {
                 options.LoginPath = $"/api/accounts/login";
                 options.LogoutPath = $"/api/Account/Logout";
+                options.Cookie.Name = "IdentityCookie";
+                options.Cookie.Path = "/";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;
@@ -149,7 +155,7 @@ namespace FomoAPI
                 options.AddPolicy(policyName,
                 builder =>
                 {
-                    builder.WithOrigins(configuration.GetValue<string>("Accounts:MainPage"))
+                    builder.WithOrigins(configuration.GetValue<string>("Accounts:MainPage"), "https://localhost:3000")
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();
@@ -164,7 +170,6 @@ namespace FomoAPI
             services.AddAntiforgery(options =>
             {
                 options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-                options.Cookie.Domain = config["DomainName"];
                 options.Cookie.Name = "X-CSRF-TOKEN-COOKIENAME";
                 options.Cookie.Path = "Path";
                 options.FormFieldName = "AntiforgeryFieldname";
