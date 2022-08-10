@@ -8,13 +8,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import EditPortfolioForm  from './EditPortfolioForm';
 import Modal from '../../app/modal/Modal';
 import PercentageColumn from './PercentageColumn';
+import ProfileSettings from '../login/ProfileSettings';
 import VoteColumn from './VoteColumn';
 
 /*
     The row in the portfolio table that represents a stock in the portfolio.
 */
 export const PortfolioStock = (props) => {
-    
     const { portfolioId, portfolioSymbol } = props;
     const dispatch = useDispatch();
      
@@ -44,11 +44,18 @@ export const PortfolioStock = (props) => {
     }
 
     function onMouseOver(){
-        setIsEditMode(true);
+        // Prevents re-rendering of modal due to state change.
+        if(!showEditPortfolioModal)
+        {
+            setIsEditMode(true);
+        }
     }
 
     function onMouseLeave(){
-        setIsEditMode(false);
+        if(!showEditPortfolioModal)
+        {
+            setIsEditMode(false);
+        }
     }
 
     function onMoveUp(){
@@ -65,6 +72,7 @@ export const PortfolioStock = (props) => {
 
     function onCloseEdit(){
         setShowEditPortfolioModal(false);
+        setIsEditMode(false);
     }
 
     function onShowChart(){

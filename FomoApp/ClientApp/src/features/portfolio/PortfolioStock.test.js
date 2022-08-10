@@ -7,6 +7,7 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import { render } from '../../test-util';
+import userEvent from '@testing-library/user-event'
 
 const symbolCol = 0;
 const priceCol = 1;
@@ -326,31 +327,98 @@ describe("Clicking portfolio stock options", () => {
     await waitFor(() => expect(within(stocks[0]).getByText("VOO")).toBeInTheDocument());
     expect(within(stocks[1]).getByText("BA")).toBeInTheDocument();
   });
-});
 
-it('should not show options when showOptions flag is false', async () => {
-  const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 0, return: 1 };
+  it("clicking edit will open edit modal", async () => {
 
-  const stockData = {
-    symbolId: 1,
-    ticker: 'SPY',
-    price: 100
-  };
+    act(() => {
+      render(<div><div id='modal-root'></div><Portfolio isMyUserPage={true}/></div>, { initialState: initialState });
+    });
 
-  const initialState = {
-    stocks: {
-      singleQuoteData:{
-        1: stockData
-      },
-      votes:{
-      }
-    }
-  };
+    const editButtons = screen.getAllByTitle("Edit");
 
-  act(() => {
-    render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} showOptions={false}/></tbody></table>, { initialState });
+    expect(editButtons.length).toEqual(3);
+
+    const editButton = editButtons[1];
+
+    fireEvent.click(editButton);
+
+    await waitFor(() => expect(document.getElementsByClassName('edit-portfolio-form')[0]).toBeInTheDocument());
+  });
+  
+  it("hovering over edit modal should not trigger hover events on portfolio stock", async () => {
+
+    act(() => {
+      render(<div><div id='modal-root'></div><Portfolio isMyUserPage={true}/></div>, { initialState: initialState });
+    });
+
+    const editButtons = screen.getAllByTitle("Edit");
+
+    expect(editButtons.length).toEqual(3);
+
+    const editButton = editButtons[1];
+
+    expect(document.getElementsByClassName('votable').length).toBe(0);
+
+    fireEvent.click(editButton);
+
+    await waitFor(() => expect(document.getElementsByClassName('edit-portfolio-form')[0]).toBeInTheDocument());
+
+    const stocks = document.getElementsByClassName('portfolio-stock');
+
+    userEvent.hover(stocks[1]);
+
+    await expect(async() => {
+      await waitFor(() => expect(document.getElementsByClassName('votable').length).toBeGreaterThan(0))
+    }).rejects.toEqual(expect.anything()); 
   });
 
-  const columns = screen.queryAllByRole('cell');
-  expect(columns[columns.length - 1].getElementsByClassName("portfolio-row-options").length === 0).toBeTruthy();
+  it("hovering over stock should show vote options", async () => {
+
+    act(() => {
+      render(<div><Portfolio isMyUserPage={true}/></div>, { initialState: initialState });
+    });
+
+    const stocks = document.getElementsByClassName('portfolio-stock');
+
+    userEvent.hover(stocks[1]);
+
+    await waitFor(() => expect(document.getElementsByClassName('votable').length).toBeGreaterThan(0));
+  });
 });
+
+describe('visibility of options controlled by showOptions flag', () => 
+{
+  const cases = [[false, true],[true, false]]
+  test.each(cases)(
+    'when showOptions is %s, it should be visible %s',
+    async (showOptionsValue, shouldNotShow) => {
+
+    const portfolioSymbol = { portfolioSymbolId: 1, symbolId: 1, ticker: 'abc', averagePrice: 0, return: 1 };
+  
+    const stockData = {
+      symbolId: 1,
+      ticker: 'SPY',
+      price: 100
+    };
+  
+    const initialState = {
+      stocks: {
+        singleQuoteData:{
+          1: stockData
+        },
+        votes:{
+        }
+      }
+    };
+  
+    act(() => {
+      render(<table><tbody><PortfolioStock key={portfolioSymbol.symbolId} portfolioSymbol={portfolioSymbol} showOptions={showOptionsValue}/></tbody></table>, { initialState });
+    });
+  
+    const columns = screen.queryAllByRole('cell');
+    expect(columns[columns.length - 1].getElementsByClassName("portfolio-row-options").length === 0).toBe(shouldNotShow);
+  });
+
+
+});
+

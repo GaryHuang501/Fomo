@@ -26,7 +26,7 @@ export default function EditPortfolioForm(props){
 
     function validatePrice(price)
     {
-        if(price <= 0 || price == NaN)
+        if(price <= 0 || isNaN(price))
         {
             return "Value must be positive number.";
         }
@@ -50,12 +50,12 @@ export default function EditPortfolioForm(props){
     }
 
     return (    
-        <form className='edit-portfolio-form'>
+        <div className='edit-portfolio-form'>
             <h3>{ticker}</h3>
             <label htmlFor="input-portfolio-avg-price">Set avg Price: </label><br></br>
             <input max={maxValue} min='0' type='number' className="form-input" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
             { error != null ? <p className='input-portfolio-avg-price-error'>{error}</p> : <br></br>}
             <input className='edit-portfolio-form-submit submit-input' type="submit" value="Submit" onClick={onSubmit}></input>
-        </form>
+        </div>
     );
 }

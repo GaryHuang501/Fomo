@@ -17,7 +17,6 @@ export default function PortfolioStockListener(props) {
   useEffect(() => {
 
     function bindListener() {
-
       let currentStockRef = stockRef;
 
       if (!currentStockRef) {
