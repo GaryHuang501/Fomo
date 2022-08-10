@@ -10,21 +10,39 @@ import { useDispatch } from 'react-redux';
 */
 export default function EditPortfolioForm(props){
 
+    const maxValue = 10000000;
     const ticker = props.ticker;
     const dispatch = useDispatch();
     const [averagePrice, setAveragePrice] = useState(0);
-    const [showError, setShowError] = useState(false);
+    const [error, setError] = useState(false);
 
     function handleChange(e){
-        const newAveragePrice = e.target.value;
+        const newAveragePrice = parseFloat(e.target.value);
+        const error = validatePrice(newAveragePrice);
+
         setAveragePrice(newAveragePrice);
-        setShowError(parseFloat(newAveragePrice) <= 0);
+        setError(error);
+    }
+
+    function validatePrice(price)
+    {
+        if(price <= 0 || price == NaN)
+        {
+            return "Value must be positive number.";
+        }
+
+        if(price > maxValue)
+        {
+            return `Max value is ${maxValue}`;
+        }
+
+        return null;
     }
 
     function onSubmit(e){
         e.preventDefault();
 
-        if(!showError){
+        if(error === null){
             const payload = {portfolioSymbolId: props.portfolioSymbolId, averagePrice: parseFloat(averagePrice).toFixed(2)};
             dispatch(updateAvergePricePortfolioStock(payload));
             props.onSubmit();
@@ -32,12 +50,12 @@ export default function EditPortfolioForm(props){
     }
 
     return (    
-        <div className='edit-portfolio-form'>
+        <form className='edit-portfolio-form'>
             <h3>{ticker}</h3>
             <label htmlFor="input-portfolio-avg-price">Set avg Price: </label><br></br>
-            <input type='number' className="form-input" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
-            { showError ? <p className='input-portfolio-avg-price-error'>Value must be positive</p> : <br></br>}
+            <input max={maxValue} min='0' type='number' className="form-input" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
+            { error != null ? <p className='input-portfolio-avg-price-error'>{error}</p> : <br></br>}
             <input className='edit-portfolio-form-submit submit-input' type="submit" value="Submit" onClick={onSubmit}></input>
-        </div>
+        </form>
     );
 }

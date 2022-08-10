@@ -22,7 +22,6 @@ namespace FomoAPI.Controllers.Authorization
                 return Task.CompletedTask;
             }
 
-
             if(!TryGetPortfolioIdFromPath(out string portfolioId))
             {
                 return Task.CompletedTask;

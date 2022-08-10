@@ -8,7 +8,9 @@ import axios from 'axios';
 import { render } from '../../test-util';
 
 const testUrl = "http://localhost";
-
+let portfolioId;
+let portfolioSymbol;
+let initialState
 let mock;
 
 beforeEach(() => {
@@ -18,6 +20,32 @@ beforeEach(() => {
       REACT_APP_API_URL: testUrl
   };
 
+  portfolioId = 1000;
+
+  portfolioSymbol = { id: 1, symbolId: 1, ticker: 'abc', averagePrice: 1.00, return: 1 };
+
+  initialState = {
+    portfolio:{
+      ids: [portfolioId],
+      selectedPortfolioId: portfolioId,
+      portfolios: {
+        [portfolioId]: {
+          id: portfolioId,
+          portfolioSymbols: [portfolioSymbol]
+        }
+      }
+    },
+    login: {
+      selectedUser: {
+          id: "200",
+          name: "myUser"
+      },
+      myUser: {
+          id: "200",
+          name: "myUser"
+      }
+    } 
+  };
 });
 
 afterEach(() => {
@@ -25,46 +53,46 @@ afterEach(() => {
   process.env = {};
 });
 
+describe("client input error when invalid value", () => {
+
+  const cases = [[-2.5, 'Value must be positive number.'], [20000000, 'Max value is 10000000'] ];
+
+  test.each(cases)(
+    "Expect value %d to return error %s",
+    async (testValue, expectedError) => {
+      
+      let submitCalled = false;
+
+      function onSubmit(){
+          submitCalled = true;
+      }
+    
+      act(() => {
+        render(<EditPortfolioForm onSubmit={onSubmit} portfolioSymbolId={portfolioSymbol.id}/>, { initialState });
+      });
+    
+      const averagePriceInput = screen.getByRole('spinbutton');
+      const submit = screen.getByRole('button');
+    
+      fireEvent.change(averagePriceInput, { target: { value: testValue}} );
+      fireEvent.click(submit);
+    
+      await waitFor( () => expect(screen.getByText(expectedError)));
+    
+      expect(submitCalled).toBe(false);
+    }
+  );
+});
 
 it("updates average price when submitted", async () => {
-
-    const portfolioId = 1000;
-
-    const portfolioSymbol = { id: 1, symbolId: 1, ticker: 'abc', averagePrice: 1.00, return: 1 };
-
-    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolioId}/portfolioSymbols/${portfolioSymbol.id}`
-
-    mock.onPatch(endPointUrl)
-        .reply(200, {});
-
-    const initialState = {
-      portfolio:{
-        ids: [portfolioId],
-        selectedPortfolioId: portfolioId,
-        portfolios: {
-          [portfolioId]: {
-            id: portfolioId,
-            portfolioSymbols: [portfolioSymbol]
-          }
-        }
-      },
-      login: {
-        selectedUser: {
-            id: "200",
-            name: "myUser"
-        },
-        myUser: {
-            id: "200",
-            name: "myUser"
-        }
-      } 
-    };
 
     let submitCalled = false;
 
     function onSubmit(){
         submitCalled = true;
     }
+    
+    const endPointUrl = `${process.env.REACT_APP_API_URL}/portfolios/${portfolioId}/portfolioSymbols/${portfolioSymbol.id}`
 
     const spy = jest.spyOn(axios, 'patch');
 

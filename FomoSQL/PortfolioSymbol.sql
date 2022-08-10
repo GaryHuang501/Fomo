@@ -4,7 +4,7 @@
 	[PortfolioId] INT NOT NULL,
 	[SymbolId] INT NOT NULL,
 	[SortOrder] TINYINT NOT NULL,
-	[AveragePrice] DECIMAL(10, 4) NOT NULL DEFAULT(0),
+	[AveragePrice] DECIMAL(12, 2) NOT NULL DEFAULT(0),
 	UNIQUE(PortfolioId, SymbolId),
 	CONSTRAINT FK_PortfolioSymbol_PortfolioId FOREIGN KEY ([PortfolioId]) REFERENCES Portfolio(Id),
 	CONSTRAINT FK_PortfolioSymbol_SymbolId FOREIGN KEY (SymbolId) REFERENCES Symbol(Id)
