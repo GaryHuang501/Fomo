@@ -113,11 +113,13 @@
     border-right: var(--standard-border-size) solid lightgrey;
     box-sizing: content-box;
     z-index: 99999;
+    animation: slide 0.5s forwards;
   }
   
   #mobile-header-nav-popup-close{
     padding: 1rem;
     font-size: 2rem;
+    font-weight: bold;
     color: black;
     cursor: pointer;
   }

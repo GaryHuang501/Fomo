@@ -35,9 +35,9 @@ export default function EditPortfolioForm(props){
         <div className='edit-portfolio-form'>
             <h3>{ticker}</h3>
             <label htmlFor="input-portfolio-avg-price">Set avg Price: </label><br></br>
-            <input type='number' className="input-portfolio-avg-price" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
+            <input type='number' className="form-input" name="input-portfolio-avg-price" value={averagePrice} onChange={handleChange}/><br></br>
             { showError ? <p className='input-portfolio-avg-price-error'>Value must be positive</p> : <br></br>}
-            <input className='edit-portfolio-form-submit' type="submit" value="Submit" onClick={onSubmit}></input>
+            <input className='edit-portfolio-form-submit submit-input' type="submit" value="Submit" onClick={onSubmit}></input>
         </div>
     );
 }
