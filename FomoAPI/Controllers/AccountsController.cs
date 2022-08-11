@@ -173,15 +173,15 @@ namespace FomoAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginDemo([FromQuery, Required] string returnUrl)
         {
-            var demoUser = _accountsOptions.CurrentValue.DemoUser;
-            var signInResult = await _signInManager.PasswordSignInAsync(demoUser.UserName, demoUser.Password, false, false);
+            var demoUser = await _userManager.FindByIdAsync(_accountsOptions.CurrentValue.DemoUser.Id);
+            var signInResult = await _signInManager.PasswordSignInAsync(demoUser.UserName, _accountsOptions.CurrentValue.DemoUser.Password, false, false);
 
             if (signInResult.Succeeded)
             {
                 return Redirect(returnUrl);
             }
 
-            return Unauthorized();
+            return Unauthorized("Demo login failed");
         }
 
         /// <summary>
