@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import EditPortfolioForm  from './EditPortfolioForm';
 import Modal from '../../app/modal/Modal';
 import PercentageColumn from './PercentageColumn';
-import ProfileSettings from '../login/ProfileSettings';
 import VoteColumn from './VoteColumn';
 
 /*

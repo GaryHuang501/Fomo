@@ -6,8 +6,8 @@ import { React } from 'react';
 export const LoadingOverlay = function (props) {
 
   return (
-    <div class='loading-overlay'>
-      <div class="lds-ring"><div></div><div></div><div></div><div></div></div>    
+    <div className='loading-overlay'>
+      <div className="lds-ring"><div></div><div></div><div></div><div></div></div>    
   </div> 
   );
 }

@@ -32,8 +32,12 @@ export default function ProfileSettings(props){
         if (typeof apiError === 'string'){
             return apiError;
         }
+        else if(apiError && 'description' in apiError)
+        {
+            return apiError.description;
+        }
         else{
-            return "Unexpected Error Registering";
+            return "Unexpected Error";
         }
     }
 

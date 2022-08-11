@@ -17,7 +17,7 @@ export default function RegistrationPage() {
   async function onSubmit(updatedUser) {
     
     try{
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/accounts/${updatedUser.id}`, updatedUser, {withCredentials: true});
+      await axios.put(`${process.env.REACT_APP_API_URL}/accounts/${updatedUser.id}`, updatedUser, {withCredentials: true});
       window.location.href = window.location.origin;
     }
     catch(error){
