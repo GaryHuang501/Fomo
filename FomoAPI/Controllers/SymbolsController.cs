@@ -50,9 +50,7 @@ namespace FomoAPI.Controllers
 
             IEnumerable<SymbolSearchResultDTO> matches = await _searchService.GetSearchedTickers(keywords, limit);
 
-            var descendingMatches = matches.OrderByDescending(m => m.Match).ThenBy(m => m.Ticker);
-
-            return Ok(descendingMatches);
+            return Ok(matches);
         }
     }
 }

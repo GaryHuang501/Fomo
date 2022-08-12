@@ -1,6 +1,7 @@
 ﻿using FomoAPI.Application.DTOs;
 using FomoAPI.Application.EventBuses;
 using FomoAPI.Domain.Stocks.Queries;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FomoAPI.Application.Services
@@ -11,7 +12,14 @@ namespace FomoAPI.Application.Services
     public interface IStockDataService
     {
         /// <summary>
-        /// Retrieves the single quote DTO containing fetch result and data for a stock
+        /// Retrieves the single quote data for the given symbols and subrscribes to them.
+        /// </summary>
+        /// <param name="symbolIds">Ids of the symbols to get single quote data from.</param>
+        /// <returns>The stock data <see cref="IEnumerable{StockSingleQuoteDataDTO}"/> for the given symbol ids. </returns>
+        Task<IEnumerable<StockSingleQuoteDataDTO>> SubcribeSingleQuoteData(IEnumerable<int> symbolIds);
+
+        /// <summary>
+        /// Retrieves the single quote data for the given symbols
         /// </summary>
         /// <param name="symbolId">Id for the symbol.</param>
         /// <returns>The stock data <see cref="StockSingleQuoteDataDTO"/>.</returns>

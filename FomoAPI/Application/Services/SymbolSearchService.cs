@@ -34,7 +34,7 @@ namespace FomoAPI.Application.Services
                 _cache.Upsert(keywords, dtos);
             }
 
-            return dtos.Take(limit).ToList();
+            return dtos.Take(limit).ToList().OrderByDescending(m => m.Match).ThenBy(m => m.Ticker);
         }
 
         private async Task<IEnumerable<SymbolSearchResultDTO>> CreateMatchingSymbolDTOs(string keywords)

@@ -11,8 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -26,6 +25,7 @@ namespace FomoAPIUnitTests.Application
 
         private readonly Mock<IStockDataRepository> _stockDataRepository;
 
+        private readonly QuerySubscriptions _querySubscriptions;
         public StockDataServiceTests()
         {
             _stockDataRepository = new Mock<IStockDataRepository>();
@@ -38,10 +38,11 @@ namespace FomoAPIUnitTests.Application
                 CacheSize = 100
             });
 
+            _querySubscriptions = new QuerySubscriptions();
             _cache = new SingleQuoteCache(options.Object);
             _service = new StockDataService(_stockDataRepository.Object,
                                             _cache,
-                                            new QuerySubscriptions(),
+                                            _querySubscriptions,
                                             new Mock<ILogger<StockDataService>>().Object);
 
             _singleQuoteData = new SingleQuoteData(
@@ -94,7 +95,6 @@ namespace FomoAPIUnitTests.Application
             await Assert.ThrowsAsync<ArgumentException>(async () => await _service.UpsertSingleQuoteData(query, queryResult));
         }
 
-
         [Fact]
         public async Task GetSingleQuoteData_ShouldGetValueFromCache()
         {
@@ -135,7 +135,49 @@ namespace FomoAPIUnitTests.Application
 
             Assert.Null(data.Data);
             Assert.Null(data.LastUpdated);
+        }
 
+        [Fact]
+        public async Task SubscribeToSingleQuoteData_ShouldReturnEmptyDataSet_WhenEmptySymbolIds()
+        {
+            var dataSet = await _service.SubcribeSingleQuoteData(Array.Empty<int>());
+
+            Assert.Empty(dataSet);
+        }
+
+        [Fact]
+        public async Task SubscribeToSingleQuoteData_ShouldReturnSingleQuoteDataAndSubcribe_ForEachSymbolId()
+        {
+            var quote1 = new SingleQuoteData(
+                    symbolId: 1,
+                    ticker: "MSFT",
+                    price: 7,
+                    change: 0.7m,
+                    changePercent: 0.9m,
+                    lastUpdated: DateTime.UtcNow
+                );
+
+            var quote2 = new SingleQuoteData(
+                symbolId: 2,
+                ticker: "Meta",
+                price: 7,
+                change: 0.7m,
+                changePercent: 0.9m,
+                lastUpdated: DateTime.UtcNow
+            );
+
+            _stockDataRepository.Setup(s => s.GetSingleQuoteData(1)).Returns(Task.FromResult<SingleQuoteData>(quote1));
+            _stockDataRepository.Setup(s => s.GetSingleQuoteData(2)).Returns(Task.FromResult<SingleQuoteData>(quote2));
+
+            var symbolIds = new int[] { 1, 2};
+            var dataSet = await _service.SubcribeSingleQuoteData(symbolIds);
+
+            Assert.Equal(dataSet.Count(), symbolIds.Length);
+            Assert.Equal(1, dataSet.ElementAt(0).SymbolId);
+            Assert.Equal(2, dataSet.ElementAt(1).SymbolId);
+
+            Assert.Equal(1, _querySubscriptions.GetSubscriberCount(new SingleQuoteQuery(1)));
+            Assert.Equal(1, _querySubscriptions.GetSubscriberCount(new SingleQuoteQuery(2)));
         }
     }
 }

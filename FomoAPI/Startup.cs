@@ -155,7 +155,7 @@ namespace FomoAPI
                 options.AddPolicy(policyName,
                 builder =>
                 {
-                    builder.WithOrigins(configuration.GetValue<string>("Accounts:MainPage"), "https://localhost:3000")
+                    builder.WithOrigins(configuration.GetValue<string>("Accounts:MainPage"))
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();

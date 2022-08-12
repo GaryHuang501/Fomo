@@ -4,12 +4,12 @@ using System;
 using FomoAPI.Infrastructure.Repositories;
 using FomoAPI.Application.DTOs;
 using FomoAPI.Application.EventBuses;
-using FomoAPI.Infrastructure.Stocks.Clients.AlphaVantage;
 using System.Threading.Tasks;
 using FomoAPI.Domain.Stocks.Queries;
 using FomoAPI.Infrastructure.Stocks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace FomoAPI.Application.Services
 {
@@ -36,16 +36,23 @@ namespace FomoAPI.Application.Services
             _logger = logger;
         }
 
-        /// <summary>
-        /// Gets the single quote stock data for a ticker.
-        /// Retrieves from the cache <see cref="SingleQuoteCache"/> if it exists,
-        /// otherwise it will fetch from the database.
-        /// 
-        /// If does not exist in the database it will return no data.
-        /// Returns empty 
-        /// </summary>
-        /// <param name="symbolId">Id for the symbol.</param>
-        /// <returns>The <see cref="StockSingleQuoteDataDTO"/></returns>
+        public async Task<IEnumerable<StockSingleQuoteDataDTO>> SubcribeSingleQuoteData(IEnumerable<int> symbolIds)
+        {
+            List<StockSingleQuoteDataDTO> dataset = new();
+
+            foreach (int id in symbolIds)
+            {
+                // Fetching one stock at a time since values are cached.
+                StockSingleQuoteDataDTO quote = await GetSingleQuoteData(id);
+                dataset.Add(quote);
+
+                var query = new SingleQuoteQuery(id);
+                _querySubscriptions.AddSubscriber(query);
+            }
+
+            return dataset;
+        }
+
         public async Task<StockSingleQuoteDataDTO> GetSingleQuoteData(int symbolId)
         {
             SingleQuoteData data;
@@ -67,15 +74,6 @@ namespace FomoAPI.Application.Services
             return StockSingleQuoteDataDTO.CreateNoDataExists(symbolId);
         }
 
-        /// <summary>
-        /// Saves the single quote query result or updates it if it already exists.
-        /// </summary>
-        /// <param name="query"><see cref="SingleQuoteQuery"/> to upsert data for.</param>
-        /// <param name="queryResult"><see cref="SingleQuoteQueryResult"/> stock data results to save.</param>
-        /// <remarks>
-        /// Will update the database and then <see cref="SingleQuoteCache"/> if it was successful. 
-        /// Error results will be ignored.
-        /// </remarks>
         public async Task UpsertSingleQuoteData(SingleQuoteQuery query, SingleQuoteQueryResult queryResult)
         {
             if (queryResult.HasError)

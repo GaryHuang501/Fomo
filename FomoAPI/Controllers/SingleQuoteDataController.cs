@@ -39,18 +39,9 @@ namespace FomoAPI.Controllers
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<StockSingleQuoteDataDTO>>> GetSingleQuoteData([FromQuery] int[] sids)
         {
-            List<StockSingleQuoteDataDTO> dataset = new List<StockSingleQuoteDataDTO>();
+            var dataSet = await _stockDataService.SubcribeSingleQuoteData(sids);
 
-            foreach (int id in sids)
-            {
-                // Fetching one stock at a time since values are cached.
-                StockSingleQuoteDataDTO quote = await _stockDataService.GetSingleQuoteData(id);
-                dataset.Add(quote);
-
-                _stockDataService.AddSubscriberToSingleQuote(id);
-            }
-
-            return Ok(dataset);
+            return Ok(dataSet);
         }
     }
 }

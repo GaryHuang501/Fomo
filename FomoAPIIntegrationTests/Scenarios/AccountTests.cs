@@ -78,7 +78,7 @@ namespace FomoAPIIntegrationTests.Scenarios
 
             var saveResponse = await _client.SendAsync(httpMessage);
 
-            Assert.Equal(HttpStatusCode.Forbidden, saveResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Unauthorized, saveResponse.StatusCode);
         }
     }
 }
