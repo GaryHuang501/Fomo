@@ -13,7 +13,6 @@ using FomoAPI.Controllers.Authorization;
 using Microsoft.Extensions.Options;
 using FomoAPI.Application.ConfigurationOptions;
 using FomoAPI.Domain.Login;
-using FomoAPI.Application.Commands.User;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 
@@ -128,6 +127,7 @@ namespace FomoAPI.Controllers
             }
 
             var updatedUser = await _userManager.FindByIdAsync(userToUpdate.Id.ToString());
+            await _signInManager.RefreshSignInAsync(updatedUser);
 
             return Ok(new UserDTO(updatedUser.Id, updatedUser.UserName));
         }
