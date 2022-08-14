@@ -18,6 +18,9 @@ namespace FomoAPI.Application.ConfigurationOptions
         public string MainPage { get; set; }
 
         [Required]
+        public string ExternalCallBackUrl { get; set; }
+
+        [Required]
         public string DefaultName { get; set; }
 
         [Required]

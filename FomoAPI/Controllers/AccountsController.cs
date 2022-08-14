@@ -159,7 +159,7 @@ namespace FomoAPI.Controllers
         [HttpGet("login")]
         public IActionResult Login([FromQuery, Required] string provider, [FromQuery, Required] string returnUrl)
         {
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, "/api/accounts/ExternalLoginCallback?returnurl=" + returnUrl);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, $"{_accountsOptions.CurrentValue.ExternalCallBackUrl}?returnurl=" + returnUrl);
             return new ChallengeResult(provider, properties);
         }
 

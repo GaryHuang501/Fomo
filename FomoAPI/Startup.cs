@@ -134,9 +134,8 @@ namespace FomoAPI
                 options.LogoutPath = $"/api/Account/Logout";
                 options.Cookie.Name = "IdentityCookie";
                 options.Cookie.Path = "/";
-                options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
-                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
 
                 options.Events.OnRedirectToLogin = context =>
                 {
