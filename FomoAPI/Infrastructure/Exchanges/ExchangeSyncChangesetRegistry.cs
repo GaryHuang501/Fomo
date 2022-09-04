@@ -22,6 +22,7 @@ namespace FomoAPI.Infrastructure.Exchanges
                             new SymbolDetailsChangeset(existingSymbolsMap, downloadedSymbolsMap),
                             new NewSymbolChangeset(existingSymbolsMap, downloadedSymbolsMap),
                             new SymbolDelistChangeset(existingSymbolsMap, downloadedSymbolsMap),
+                            new SymbolRelistChangeset(existingSymbolsMap, downloadedSymbolsMap),
                         };
         }
     }

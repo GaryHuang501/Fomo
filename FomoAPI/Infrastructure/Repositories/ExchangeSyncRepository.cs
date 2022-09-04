@@ -92,28 +92,12 @@ namespace FomoAPI.Infrastructure.Repositories
 
         public async Task<int> DelistSymbols(IEnumerable<int> symbolIds)
         {
-            const string procedure = "dbo.DelistSymbols";
+            return await ToggleDelistSymbols(symbolIds, true);
+        }
 
-            var idDataTable = symbolIds.ToDataTable(new ColumnSchema<int>("Id", typeof(int), (id => id)));
-
-            var tvpParam = new { tvpSymbolID = idDataTable.AsTableValuedParameter(TableType.IntIdType) };
-
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            using var transaction = await connection.BeginTransactionAsync();
-            try
-            {
-                var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
-                await transaction.CommitAsync();
-
-                return rowsUpdated;
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+        public async Task<int> RelistSymbols(IEnumerable<int> symbolIds)
+        {
+            return await ToggleDelistSymbols(symbolIds, false);
         }
 
         public async Task<int> UpdateSymbols(IEnumerable<UpdateSymbolAction> symbols)
@@ -160,9 +144,7 @@ namespace FomoAPI.Infrastructure.Repositories
                               INNER JOIN
                                 Exchange
                               ON
-                                Exchange.Id = Symbol.ExchangeId
-                              WHERE
-                                Symbol.Delisted = 0";
+                                Exchange.Id = Symbol.ExchangeId";
 
             IEnumerable<Symbol> symbols;
 
@@ -216,6 +198,32 @@ namespace FomoAPI.Infrastructure.Repositories
                 Url = result.Url,
                 ClientName = result.ClientName
             };
+        }
+
+        private async Task<int> ToggleDelistSymbols(IEnumerable<int> symbolIds, bool isDelisted)
+        {
+            const string procedure = "dbo.DelistSymbols";
+
+            var idDataTable = symbolIds.ToDataTable(new ColumnSchema<int>("Id", typeof(int), (id => id)));
+
+            var tvpParam = new { tvpSymbolID = idDataTable.AsTableValuedParameter(TableType.IntIdType), isDelisted };
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var rowsUpdated = await connection.ExecuteAsync(procedure, tvpParam, transaction, commandType: CommandType.StoredProcedure);
+                await transaction.CommitAsync();
+
+                return rowsUpdated;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

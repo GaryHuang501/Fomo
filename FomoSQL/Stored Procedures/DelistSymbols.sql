@@ -1,9 +1,10 @@
 ﻿CREATE PROCEDURE [dbo].[DelistSymbols]
-	@tvpSymbolID dbo.IntIdType READONLY
+	@tvpSymbolID dbo.IntIdType READONLY,
+	@isDelisted BIT
 AS
 	UPDATE Symbol
 	SET	
-		Delisted = 1
+		Delisted = @isDelisted
 	FROM 
 		Symbol
 	INNER JOIN

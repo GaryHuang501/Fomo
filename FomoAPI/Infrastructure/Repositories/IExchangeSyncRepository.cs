@@ -11,6 +11,8 @@ namespace FomoAPI.Infrastructure.Repositories
 
         Task<int> DelistSymbols(IEnumerable<int> symbolIds);
 
+        Task<int> RelistSymbols(IEnumerable<int> symbolIds);
+
         Task<int> UpdateSymbols(IEnumerable<UpdateSymbolAction> symbols);
 
         Task AddSyncHistory(string actionName, int symbolsChanged, string message, string error = null);

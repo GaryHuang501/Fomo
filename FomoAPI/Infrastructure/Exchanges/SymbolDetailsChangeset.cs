@@ -71,7 +71,6 @@ namespace FomoAPI.Infrastructure.Exchanges
             var symbolsUpdated = await repository.UpdateSymbols(_changedSymbols);
 
             await repository.AddSyncHistory(nameof(SymbolDetailsChangeset), symbolsUpdated, $"{symbolsUpdated} symbols updated");
-
         }
     }
 }

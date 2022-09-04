@@ -97,6 +97,20 @@ namespace FomoAPIIntegrationTests.Scenarios
         }
 
         [Fact]
+        public async Task Should_NotReaddNewSymbols_WhenSymbolDelisted()
+        {
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM");
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT");
+
+            await _syncRepo.DelistSymbols(new List<int> { jpmSymbol.Id, msftSymbol.Id });
+            var startDate = DateTime.Now;
+            await _sync.Sync();
+
+            var histories = await GetSyncHistory(startDate);
+            Assert.Empty(histories.Where(h => h.ActionName == nameof(NewSymbolChangeset)));
+        }
+
+        [Fact]
         public async Task Should_DelistSymbols_WhenSymbolNotInExchangeData()
         {
             var testSymbol1 = new InsertSymbolAction("Test@1", ExchangeType.NASDAQ.Id, "Test Symbol 1", false);
@@ -113,10 +127,33 @@ namespace FomoAPIIntegrationTests.Scenarios
             Assert.True(test2Symbol.Delisted);
 
             var histories = await GetSyncHistory(startDate);
-            var delistSyncHistory = histories.SingleOrDefault(hist => hist.ActionName == nameof(SymbolDelistChangeset));
+            var delistSyncHistory = histories.SingleOrDefault(hist => hist.ActionName == nameof(SymbolRelistChangeset));
 
             Assert.NotNull(delistSyncHistory);
             Assert.Equal(2, delistSyncHistory.SymbolsChanged);
+        }
+
+        [Fact]
+        public async Task Should_RelistSymbols_WhenSymbolIsAddedBack()
+        {
+            var jpmSymbol = await _symbolRepo.GetSymbol("JPM");
+            var msftSymbol = await _symbolRepo.GetSymbol("MSFT");
+            await _syncRepo.DelistSymbols(new List<int> { jpmSymbol.Id, msftSymbol.Id });
+
+            var startDate = DateTime.Now;
+            await _sync.Sync();
+
+            jpmSymbol = await _symbolRepo.GetSymbol("JPM");
+            msftSymbol = await _symbolRepo.GetSymbol("MSFT");
+
+            Assert.False(jpmSymbol.Delisted);
+            Assert.False(msftSymbol.Delisted);
+
+            var histories = await GetSyncHistory(startDate);
+            var relistSyncHistory = histories.SingleOrDefault(hist => hist.ActionName == nameof(SymbolRelistChangeset));
+
+            Assert.NotNull(relistSyncHistory);
+            Assert.Equal(2, relistSyncHistory.SymbolsChanged);
         }
 
         [Fact]
