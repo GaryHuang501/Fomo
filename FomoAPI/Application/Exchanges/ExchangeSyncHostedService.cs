@@ -45,7 +45,14 @@ namespace FomoAPI.Application.Exchanges
 
             _timer = new Timer(async (state) =>
             {
-                await _exchangeSync.Sync();
+                try
+                {
+                    await _exchangeSync.Sync();
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
+                }
             }, null, TimeSpan.Zero, TimeSpan.FromMinutes(minutesInterval));
 
             return Task.CompletedTask;

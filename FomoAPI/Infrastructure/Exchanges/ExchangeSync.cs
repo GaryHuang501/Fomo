@@ -57,7 +57,6 @@ namespace FomoAPI.Infrastructure.Exchanges
 
                         if (!success)
                         {
-                            _logger.LogError(error);
                             throw new ExchangeSyncException(error);
                         }
                     }
@@ -71,7 +70,6 @@ namespace FomoAPI.Infrastructure.Exchanges
             catch (Exception ex)
             {
                 await _syncRepository.AddSyncHistory("Exception", 0, ex.Message, ex.ToString());
-                _logger.LogError(ex.Message, ex);
                 throw new ExchangeSyncException("Error syncing with Exchange", ex);
             }
         }
